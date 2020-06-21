@@ -4,10 +4,10 @@
  * and open the template in the editor.
  */
 
-module Neuroevolution {
-    requires EvolutionAlgorithms;
-    requires MachineLearning;
-    requires Utils;
+module neuroevolution {
+    requires evolution_algorithms;
+    requires machine_learning;
+    requires utils;
     
     exports neuroevolution;
     exports execution;

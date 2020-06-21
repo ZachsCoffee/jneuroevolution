@@ -4,11 +4,11 @@
  * and open the template in the editor.
  */
 
-module EvolutionAlgorithms {
+module evolution_algorithms {
+    requires utils;
+    requires machine_learning;
+
     exports evolution_builder;
     exports evolution_builder.components;
     exports evolution_builder.population;
-    
-    requires Utils;
-    requires MachineLearning;
 }

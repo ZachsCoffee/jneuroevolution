@@ -4,13 +4,13 @@
  * and open the template in the editor.
  */
 
-module MachineLearning {
+module machine_learning {
+    requires utils;
+
     exports functions;
     exports networks.interfaces;
     exports networks.multilayer_perceptron;
     exports networks.recurrent_neural_network;
     exports abstraction;
     exports data_manipulation;
-    
-    requires Utils;
 }

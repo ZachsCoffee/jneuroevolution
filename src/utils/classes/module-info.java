@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-module Utils {
+module utils {
     requires json.simple;
+
     exports files;
     exports maths;
 }

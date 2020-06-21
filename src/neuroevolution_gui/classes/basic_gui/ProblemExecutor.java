@@ -1,3 +1,5 @@
+package basic_gui;
+
 import data_manipulation.Dataset;
 import evolution_builder.Evolution;
 import evolution_builder.population.PersonMigration;

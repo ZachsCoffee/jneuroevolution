@@ -1,3 +1,5 @@
+package basic_gui;
+
 public class ResultsData {
     public double[] evolutionStatistics, validationStatistics;
     public double[][] realData, predictedData;
