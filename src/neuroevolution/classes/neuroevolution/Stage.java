@@ -99,32 +99,41 @@ public class Stage implements EvolutionStage {
 
     @Override
     public boolean stopEvolution(Population population, evolution_builder.population.Person totalBestPerson, int epoch) {
-        double currentFitness, epochBestFitness = 0;
+        double
+                validationCurrentFitness,
+                validationEpochBestFitness = 0,
+                evolutionCurrentFitness,
+                evolutionEpochBestFitness = 0;
 
         int populationSize = population.getSize();
         evolution_builder.population.Person currentPerson;
         for (int i=0; i<populationSize; i++){
             
             currentPerson = population.getPersonAt(i);
-            currentFitness = Person.computeFitness(currentPerson, problem.getValidationDataset());
-            
-            if (currentFitness > validationMaxFitness){
-                validationMaxFitness = currentFitness;
+            evolutionCurrentFitness = currentPerson.getFitness();
+            validationCurrentFitness = Person.computeFitness(currentPerson, problem.getValidationDataset());
+
+            if (evolutionCurrentFitness > evolutionEpochBestFitness) {
+                evolutionEpochBestFitness = evolutionCurrentFitness;
+            }
+
+            if (validationCurrentFitness > validationMaxFitness){
+                validationMaxFitness = validationCurrentFitness;
                 validationBestPerson = currentPerson;
             }
-            if (currentFitness > epochBestFitness){
-                epochBestFitness = currentFitness;
+            if (validationCurrentFitness > validationEpochBestFitness){
+                validationEpochBestFitness = validationCurrentFitness;
             }
             
         }
         
-        evolutionStatistics[epoch] = totalBestPerson.getFitness();
-        validationStatistics[epoch] = 20 - epochBestFitness;
+        evolutionStatistics[epoch] = evolutionEpochBestFitness;
+        validationStatistics[epoch] = validationEpochBestFitness;
 
         return false;
     }
 
     public interface ProgressListener {
-        public void epochUpdate(int currentEpoch);
+        void epochUpdate(int currentEpoch);
     }
 }
