@@ -3,11 +3,13 @@ package basic_gui;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
@@ -284,6 +286,10 @@ public class Gui extends javax.swing.JFrame implements DataBinder {
                 "Epochs", "Value", evolutionCollection
         );
 
+        Shape cross = new Ellipse2D.Double(0, 0, 2, 2);
+        ((XYPlot) evolutionChart.getPlot()).getRenderer().setSeriesShape(0, cross);
+        ((XYPlot) evolutionChart.getPlot()).getRenderer().setSeriesShape(1, cross);
+
         evolutionPanel.add(new ChartPanel(evolutionChart));
         evolutionPanel.revalidate();
     }
@@ -295,28 +301,33 @@ public class Gui extends javax.swing.JFrame implements DataBinder {
                 realDataSeries = new XYSeries("Real value"),
                 predictedDataSeries = new XYSeries("Predicted values");
 
+
+
         for (int i=0; i<resultsData.realData.length; i++) {
 
             for (int j=0; j<resultsData.realData[i].length; j++) {
 
-                if (resultsData.realData[i][j] == resultsData.predictedData[i][j]) {
+//                if (resultsData.realData[i][j] == resultsData.predictedData[i][j]) {
                     predictedDataSeries.add(i, resultsData.predictedData[i][j]);
 
-                }
-                else {
+//                }
+//                else {
                     realDataSeries.add(i, resultsData.realData[i][j]);
 
-                }
+//                }
             }
         }
 
-        predictionCollection.addSeries(realDataSeries);
         predictionCollection.addSeries(predictedDataSeries);
+        predictionCollection.addSeries(realDataSeries);
 
         JFreeChart predictionChart = ChartFactory.createScatterPlot(
                 "Evolution",
                 "Epochs", "Value", predictionCollection
         );
+
+        Shape cross = new Ellipse2D.Double(-2, -2, 4, 4);
+        ((XYPlot) predictionChart.getPlot()).getRenderer().setSeriesShape(0, cross);
 
         predictionPanel.add(new ChartPanel(predictionChart));
         predictionPanel.revalidate();
