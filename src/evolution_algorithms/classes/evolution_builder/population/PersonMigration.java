@@ -60,8 +60,9 @@ public class PersonMigration {
                 
                 if (tempPerson != null) {
                     tempPerson = (Person)tempPerson.clone();
+
+                    if (tempPerson.getGeneCode() instanceof BackpropagationMLP) propagate((BackpropagationMLP) tempPerson.getGeneCode(), currentEpoch);
                 }
-//                propagate((BackpropagationMLP) tempPerson.getGeneCode(), currentEpoch);
 
                 population.setPersonAt(tempPerson, i);
             }
