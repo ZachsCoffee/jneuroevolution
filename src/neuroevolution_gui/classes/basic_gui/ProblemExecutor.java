@@ -13,7 +13,7 @@ import neuroevolution.Stage;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class ProblemExecutor extends Problem implements Stage.ProgressListener {
-    protected EvaluationTarget evaluationTarget;
+    protected EvaluationTarget EVALUATION_TARGET;
     protected boolean
             PERCENT_OF_FITNESS = false,
             PERSON_MIGRATION = true;
@@ -68,7 +68,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
                 evolution.startEvolution(EPOCHS, stage);
 
                 Network network = null;
-                switch (evaluationTarget) {
+                switch (EVALUATION_TARGET) {
                     case EVOLUTION_BEST:
 
                         network = (Network) evolution.getTotalBestPerson().getGeneCode();

@@ -58,7 +58,7 @@ public class Dataset {
         return dataset;
     }
     /**
-     * Returns a new array from the last value of each array from the given data-set. 
+     * Returns a new array with the last value of each array from the given data-set.
      * @param dataset The data set
      * @return The new array
      * @throws RuntimeException If not all the arrays length isn't the same
