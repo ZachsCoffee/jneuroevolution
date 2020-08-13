@@ -56,18 +56,25 @@ public abstract class Problem implements MLProblem, EvolutionComponents {
     }
     
     public PersonManager getPersonManager(){
+        System.out.println(Thread.currentThread().getId());
         return PERSON;
     }
 
     public Dataset getTrainingDataset() {
+        System.out.println(Thread.currentThread().getId());
+
         return trainingDataset;
     }
 
     public Dataset getValidationDataset() {
+                System.out.println(Thread.currentThread().getId());
+
         return validationDataset;
     }
 
     public Dataset getTestingDataset() {
+                System.out.println(Thread.currentThread().getId());
+
         return testingDataset;
     }
 }

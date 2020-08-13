@@ -5,25 +5,25 @@
     <content url="file://$MODULE_DIR$/../src/neuroevolution_gui">
       <sourceFolder url="file://$MODULE_DIR$/../src/neuroevolution_gui/classes" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="14" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="9" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="neuroevolution" />
-    <orderEntry type="module" module-name="evolution_algorithms" />
-    <orderEntry type="module" module-name="machine_learning" />
-    <orderEntry type="module" module-name="utils" />
-    <orderEntry type="module-library">
-      <library>
+    <orderEntry type="module" module-name="neuroevolution" exported="" />
+    <orderEntry type="module" module-name="evolution_algorithms" exported="" />
+    <orderEntry type="module" module-name="machine_learning" exported="" />
+    <orderEntry type="module" module-name="utils" exported="" />
+    <orderEntry type="module-library" exported="">
+      <library name="jcommon">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../libs/jfreechart-1.0.19/jfreechart-1.0.19/lib/jcommon-1.0.23.jar!/" />
+          <root url="jar://$MODULE_DIR$/../src/neuroevolution_gui/classes/lib/jcommon-1.0.23.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library>
+    <orderEntry type="module-library" exported="">
+      <library name="jfreechart">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../libs/jfreechart-1.0.19/jfreechart-1.0.19/lib/jfreechart-1.0.19.jar!/" />
+          <root url="jar://$MODULE_DIR$/../src/neuroevolution_gui/classes/lib/jfreechart-1.0.19.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

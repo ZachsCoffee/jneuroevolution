@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package execution;
+package functions;
 
 /**
  *
  * @author zachs
  */
-public enum EvaluationTarget {
-    EVOLUTION_BEST, VALIDATION_BEST
+public class FunctionNotFoundException extends RuntimeException {
+    public FunctionNotFoundException(String message) {
+        super(message);
+    }
 }

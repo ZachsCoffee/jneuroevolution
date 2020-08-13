@@ -7,7 +7,11 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="utils" />
-    <orderEntry type="module" module-name="utils" />
+    <orderEntry type="module" module-name="evolution_algorithms1" />
+    <orderEntry type="module" module-name="machine_learning1" />
+    <orderEntry type="module" module-name="utils1" />
+    <orderEntry type="module" module-name="evolution_algorithms1" />
+    <orderEntry type="module" module-name="utils1" />
+    <orderEntry type="module" module-name="machine_learning1" />
   </component>
 </module>

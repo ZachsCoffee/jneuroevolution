@@ -37,7 +37,7 @@ public class PersonMigration {
 
         migrationPersons = new Person[populationsCount];
         SAMPLE_RATE = (int)(epochs * percent);
-        dynamicLinearValues = new LinearValues(new MinMax(0.00001, 0.3), SAMPLE_RATE, LinearValues.Order.DESC);
+        dynamicLinearValues = new LinearValues(new MinMax(0.00001, 0.1), SAMPLE_RATE, LinearValues.Order.DESC);
 //        squareFunction = new SquareFunction(0.1, epochs);
     }
     
@@ -45,24 +45,23 @@ public class PersonMigration {
         EVOLUTIONS.add(evolution);
     }
     
-    public void migrate(Population population, int currentEpoch) throws CloneNotSupportedException{
-        if (currentEpoch % SAMPLE_RATE != 0) return;
+    public synchronized void migrate(Population population, int currentEpoch) throws CloneNotSupportedException{
+        if (currentEpoch == 0 || currentEpoch % SAMPLE_RATE != 0) return;
         
-        synchronized(population){
-            population.sortPopulation();
-        
-            Person tempPerson;
-            int size = EVOLUTIONS.size();
-            for (int i=0; i<size; i++){
-                if (EVOLUTIONS.get(i) == null) continue;
+        System.err.println("Migrate");
+        population.sortPopulation();
 
-                tempPerson = EVOLUTIONS.get(i).getTotalBestPerson();
-                
-                if (tempPerson != null) {
-                    tempPerson = (Person)tempPerson.clone();
+        Person tempPerson;
+        int size = EVOLUTIONS.size();
+        for (int i=0; i<size; i++){
+            if (EVOLUTIONS.get(i) == null) continue;
 
-                    if (tempPerson.getGeneCode() instanceof BackpropagationMLP) propagate((BackpropagationMLP) tempPerson.getGeneCode(), currentEpoch);
-                }
+            tempPerson = EVOLUTIONS.get(i).getTotalBestPerson();
+
+            if (tempPerson != null) {
+                tempPerson = (Person)tempPerson.clone();
+
+                if (tempPerson.getGeneCode() instanceof BackpropagationMLP) propagate((BackpropagationMLP) tempPerson.getGeneCode(), currentEpoch);
 
                 population.setPersonAt(tempPerson, i);
             }
@@ -81,11 +80,13 @@ public class PersonMigration {
 //        mlp.propagate();
 //        double lastError = mlp.getError(), tempError;
 //        double errorBefore = mlp.getError();
-        int goodCount = 0;
+//        int goodCount = 0;
         
         for (int i=0; i<SAMPLE_RATE; i++){
 //            mlp.propagate();
             mlp.propagate(dynamicLinearValues.computeD(i));
+//            System.err.println(dynamicLinearValues.computeD(i));
+//            System.err.println("BP error: "+(errorBefore - mlp.getError())+"\n");
 //            mlp.propagate(squareFunction.compute(currentEpoch));
 //            
 //            tempError = mlp.getError();

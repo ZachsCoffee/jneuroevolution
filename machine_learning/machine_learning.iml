@@ -5,8 +5,8 @@
     <content url="file://$MODULE_DIR$/../src/machine_learning">
       <sourceFolder url="file://$MODULE_DIR$/../src/machine_learning/classes" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="14" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="9" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="utils" />
+    <orderEntry type="module" module-name="utils" exported="" />
   </component>
 </module>

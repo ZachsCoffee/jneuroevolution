@@ -127,6 +127,8 @@ public class Stage implements EvolutionStage {
             
         }
         
+        progressListener.evolutionBestUpdate(evolutionEpochBestFitness);
+        
         evolutionStatistics[epoch] = evolutionEpochBestFitness;
         validationStatistics[epoch] = validationEpochBestFitness;
 
@@ -135,5 +137,7 @@ public class Stage implements EvolutionStage {
 
     public interface ProgressListener {
         void epochUpdate(int currentEpoch);
+        
+        void evolutionBestUpdate(double bestPersonFitness);
     }
 }

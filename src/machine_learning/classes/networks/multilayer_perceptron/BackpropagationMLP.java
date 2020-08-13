@@ -12,31 +12,32 @@ import maths.Function;
  * @author arx-dev-3a-19
  */
 public class BackpropagationMLP extends NeuralNetwork{
-    private final double[][] TRAINING_SET, TRAINING_DATA;
-    private final double LEARN_RATE;
+    public final double LEARN_RATE;
+
+    private final double[][] TRAINING_TARGETS, TRAINING_FEATURES;
     
     private double[][] signalsError, neurosOutput;//, outputDerivative;
     
-    public BackpropagationMLP(NeuralNetwork neuralNetwork, double learnRate, double[][] trainingSet, double[][] trainingData){
-        this(getNetworkLayers(neuralNetwork), learnRate, trainingSet, trainingData);
+    public BackpropagationMLP(NeuralNetwork neuralNetwork, double learnRate, double[][] trainingFeatures, double[][] trainingTargets){
+        this(getNetworkLayers(neuralNetwork), learnRate, trainingFeatures, trainingTargets);
     }
     
-    public BackpropagationMLP(NetworkLayer[] networkLayers, double learnRate, double[][] trainingSet, double[][] trainingData){
+    public BackpropagationMLP(NetworkLayer[] networkLayers, double learnRate, double[][] trainingFeatures, double[][] trainingTargets){
         super(networkLayers, 1);
         
         if (learnRate < 0 || learnRate > 1) throw new IllegalArgumentException(
                 "learnRate must be a number between 0 and 1, learnRate="+learnRate
         );
-        if (trainingSet == null) throw new IllegalArgumentException(
+        if (trainingFeatures == null) throw new IllegalArgumentException(
                 "trainingSet not null"
         );
-        if (trainingData == null) throw new IllegalArgumentException(
+        if (trainingTargets == null) throw new IllegalArgumentException(
                 "trainingData not null"
         );
         
         LEARN_RATE = learnRate;
-        TRAINING_SET = trainingSet;
-        TRAINING_DATA = trainingData;
+        TRAINING_FEATURES = trainingFeatures;
+        TRAINING_TARGETS = trainingTargets;
         
         signalsError = new double[layers.length][];
         neurosOutput = new double[layers.length][];
@@ -51,6 +52,7 @@ public class BackpropagationMLP extends NeuralNetwork{
     public double[] compute(double[] features) {
         double[] results = features;
         for (int i=0; i<layers.length; i++){
+//            System.err.println(results.length+" "+i+" "+layers.length);
             results = layers[i].computeLayer(results);
             neurosOutput[i] = results;
         }
@@ -61,18 +63,18 @@ public class BackpropagationMLP extends NeuralNetwork{
     public void propagate(double learningRate){
         final int POS_OF_OUTPUT_NEURONS = layers.length -1;
         final int OUTPUT_NEURONS_COUNT = layers[layers.length -1].getNeuronsCount();
-        final int TARGET_POS = TRAINING_SET[0].length -1;
+        final int TARGET_POS = 0;
         
-        for (int i=0; i<TRAINING_SET.length; i++){
+        for (int i=0; i<TRAINING_TARGETS.length; i++){
             //compute
-            compute(TRAINING_DATA[i]);
+            compute(TRAINING_FEATURES[i]);
 //            compute(Arrays.copyOf(TRAINING_SET[i], TRAINING_SET[i].length -1));
 
             
             //error for the outputlayer
             for (int j=0; j<OUTPUT_NEURONS_COUNT; j++){
                 signalsError[POS_OF_OUTPUT_NEURONS][j] = 
-                        (neurosOutput[POS_OF_OUTPUT_NEURONS][j] - TRAINING_SET[i][TARGET_POS]) * 
+                        (neurosOutput[POS_OF_OUTPUT_NEURONS][j] - TRAINING_TARGETS[i][TARGET_POS]) * 
                         (1 - neurosOutput[POS_OF_OUTPUT_NEURONS][j]);
             }
             
@@ -93,13 +95,13 @@ public class BackpropagationMLP extends NeuralNetwork{
     
     public double getError(){
         double error = 0, prediction = getNetworkOutput()[0];
-        int target = TRAINING_SET[0].length -1;
+        final int TARGET_POS = 0;
         
-        for (int i=0; i<TRAINING_SET.length; i++){
-            error += Math.pow(TRAINING_SET[i][target] - prediction, 2);
+        for (int i=0; i<TRAINING_TARGETS.length; i++){
+            error += Math.pow(TRAINING_TARGETS[i][TARGET_POS] - prediction, 2);
         }
         
-        return Math.sqrt(error/TRAINING_SET.length);
+        return Math.sqrt(error/TRAINING_TARGETS.length);
     }
     
     public void propagate(){
