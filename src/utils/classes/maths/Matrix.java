@@ -17,7 +17,7 @@ public class Matrix {
         if (x[0].length != y.length) throw new IllegalArgumentException(
                 "The columns length of x must be equal to rows length of y. Xcols="+x[0].length+" Yrows"+y.length
         );
-        if (!isMatrix(x) || !isMatrix(y)) throw new IllegalArgumentException(
+        if (!isSquare(x) || !isSquare(y)) throw new IllegalArgumentException(
                 "The x and y must be matrices"
         );
         
@@ -78,11 +78,22 @@ public class Matrix {
         return x;
     }
     
-    public static boolean isMatrix(double[][] x){
-        int firstRowLength = x[0].length;
-        
-        for (int i=1; i<x.length; i++) if (firstRowLength != x[i].length) return false;
-            
+    public static boolean isSquare(double[][] matrix){
+        if (matrix == null) {
+            throw new IllegalArgumentException("Matrix can't be null!");
+        }
+        if (matrix.length == 0) {
+            throw new IllegalArgumentException("The matrix don't have any rows!");
+        }
+
+        int rowsCount = matrix.length;
+
+        for (double[] m : matrix) {
+            if (m.length != rowsCount) {
+                return false;
+            }
+        }
+
         return true;
     }
 }
