@@ -1,14 +1,7 @@
 package convolution;
 
 import filters.Filter;
-import filters.Kernel;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.renderable.RenderableImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.Objects;
 
 public class ConvolutionLayer {
@@ -19,10 +12,9 @@ public class ConvolutionLayer {
     private final int inputRows, inputColumns;
     private final int stride;
     private final boolean keepSize;
-    private final int sampleSize;
     private final double[][][] output;
 
-    public ConvolutionLayer(MatrixReader matrixReader, Filter[] filters, int sampleSize, int stride, boolean keepSize) {
+    public ConvolutionLayer(MatrixReader matrixReader, Filter[] filters, int stride, boolean keepSize) {
         this.matrixReader = Objects.requireNonNull(matrixReader);
         this.filters = Objects.requireNonNull(filters);
 
@@ -30,19 +22,10 @@ public class ConvolutionLayer {
             throw new IllegalArgumentException("Sample size must be at least: "+MIN_SAMPLE_SIZE);
         }
 
-        int rowCount = matrixReader.getRowCount();
-        int columnCount = matrixReader.getColumnCount();
-        if (sampleSize > rowCount || sampleSize > columnCount) {
-            throw new IllegalArgumentException(
-                    "Sample size is bigger than the matrix reader: sample size "+sampleSize+" rowCount: "+rowCount+" columnCount"+columnCount
-            );
-        }
-
         if (stride < 1) {
             throw new IllegalArgumentException("Stride can't be smaller than 1.");
         }
 
-        this.sampleSize = sampleSize;
         this.stride = stride;
         this.keepSize = keepSize;
 
@@ -58,69 +41,36 @@ public class ConvolutionLayer {
 
     public void computeLayer() {
         for (int i=0; i<filters.length; i++) {
+
             computeFilter(i);
+
             BufferedImage bufferedImage = new BufferedImage(output[i][0].length, output[i].length, BufferedImage.TYPE_INT_RGB);
-            try {
-                ImageIO.write(bufferedImage, "jpg", new File("output"+i));
-            }
-            catch (IOException e) {
-                e.printStackTrace();
+            for (int p=0; p<output[i].length; p++) {
+                for (int j=0; j<output[i][p].length; j++) {
+                    int value = (int) (output[i][p][j] * 255);
+                    bufferedImage.setRGB(j, p, (value << 8 | value << 16 | value));
+                }
             }
         }
     }
 
     private void computeFilter(int filterIndex) {
+        int kernelSize = filters[filterIndex].getKernelSize();
         int paddingRows = 0, paddingColumns = 0;
         if (keepSize) {
-            paddingRows = computePadding(inputRows, filters[filterIndex].getKernelSize());
-            paddingColumns = computePadding(inputColumns, filters[filterIndex].getKernelSize());
+            paddingRows = computePadding(inputRows, kernelSize);
+            paddingColumns = computePadding(inputColumns, kernelSize);
         }
 
-        int outputRows = computeMatrixDimension(inputRows, filters[filterIndex].getKernelSize(), paddingRows);
-        int outputColumns = computeMatrixDimension(inputColumns, filters[filterIndex].getKernelSize(), paddingColumns);
+        int outputRows = computeMatrixDimension(inputRows, kernelSize, paddingRows);
+        int outputColumns = computeMatrixDimension(inputColumns, kernelSize, paddingColumns);
 
         output[filterIndex] = new double[outputRows][outputColumns];
-        int debug = outputColumns * outputColumns;
-        int debugCount = 0;
-        for (int i= - paddingRows, outI = 0; i + sampleSize < inputRows + paddingRows; i += stride, outI++) {
-            for (int j= - paddingColumns, outJ = 0; j + sampleSize < inputColumns + paddingColumns; j += stride, outJ++) {
+
+        for (int i= - paddingRows, outI = 0; i < inputRows + paddingRows - kernelSize; i += stride, outI++) {
+            for (int j= - paddingColumns, outJ = 0; j < inputColumns + paddingColumns - kernelSize; j += stride, outJ++) {
                 output[filterIndex][outI][outJ] = filters[filterIndex].compute(i, j, matrixReader);
-                debugCount++;
             }
-        }
-
-        if (debugCount != debug) {
-            throw new RuntimeException("Output total:" + debug + " count: " + debugCount + " rows: "+ outputRows + " columns: "+outputColumns);
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            BufferedImage bufferedImage = ImageIO.read(new File("/home/zachs/Downloads/ΟΔ 5396.jpg"));
-
-            MatrixReader matrixReader = new MatrixReader() {
-                @Override
-                public int getRowCount() {
-                    return bufferedImage.getHeight();
-                }
-
-                @Override
-                public int getColumnCount() {
-                    return bufferedImage.getWidth();
-                }
-
-                @Override
-                public double valueAt(int rowIndex, int columnIndex) {
-                    int rgb = bufferedImage.getRGB(columnIndex, rowIndex);
-
-                    return Color.RGBtoHSB(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF, null)[1];
-                }
-            };
-
-            new ConvolutionLayer(matrixReader, new Filter[]{new Filter(Kernel.EDGE_DETECTION_HIGH)}, );
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
