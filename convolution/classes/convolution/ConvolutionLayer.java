@@ -5,8 +5,6 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 public class ConvolutionLayer {
-    private static final int MIN_SAMPLE_SIZE = 3;
-
     private final MatrixReader matrixReader;
     private final Filter[] filters;
     private final int inputRows, inputColumns;
@@ -17,10 +15,6 @@ public class ConvolutionLayer {
     public ConvolutionLayer(MatrixReader matrixReader, Filter[] filters, int stride, boolean keepSize) {
         this.matrixReader = Objects.requireNonNull(matrixReader);
         this.filters = Objects.requireNonNull(filters);
-
-        if (MIN_SAMPLE_SIZE < 3) {
-            throw new IllegalArgumentException("Sample size must be at least: "+MIN_SAMPLE_SIZE);
-        }
 
         if (stride < 1) {
             throw new IllegalArgumentException("Stride can't be smaller than 1.");
