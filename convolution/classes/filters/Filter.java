@@ -1,5 +1,6 @@
 package filters;
 
+import convolution.MatrixReader;
 import maths.Function;
 import maths.Matrix;
 
@@ -35,9 +36,9 @@ public class Filter {
      * @param input A matrix to apply the filter.
      * @return The result.
      */
-    public double compute(int rowIndex, int columnIndex, double[][] input) {
-        Objects.requireNonNull(input);
-        if (input.length == 0) {
+    public double compute(int rowIndex, int columnIndex, MatrixReader matrixReader) {
+        Objects.requireNonNull(matrixReader);
+        if (matrixReader.getRowCount() == 0) {
             throw new IllegalArgumentException("Argument input don't have any rows!");
         }
 
@@ -49,11 +50,11 @@ public class Filter {
             for (int j = columnIndex, kj = 0; j < columnLength; j++, kj++) {
                 // if kernel value is zero then no need to compute
                 // if the input is outbounds no need to compute. (Is a valid case because the convolution can have padding)
-                if (kernel[ki][kj] == 0 || i < 0 || i >= input.length || j < 0 || j >= input[i].length) {
+                if (kernel[ki][kj] == 0 || i < 0 || i >= matrixReader.getRowCount() || j < 0 || j >= matrixReader.getColumnCount()) {
                     continue;
                 }
 
-                sum += input[i][j] * kernel[ki][kj];
+                sum += matrixReader.valueAt(i, j) * kernel[ki][kj];
             }
         }
 
