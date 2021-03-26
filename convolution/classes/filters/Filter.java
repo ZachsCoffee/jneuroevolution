@@ -1,8 +1,8 @@
 package filters;
 
-import convolution.MatrixReader;
+import maths.matrix.MatrixReader;
 import maths.Function;
-import maths.Matrix;
+import maths.matrix.Matrix;
 
 import java.util.Objects;
 

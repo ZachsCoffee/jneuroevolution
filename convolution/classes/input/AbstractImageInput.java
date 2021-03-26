@@ -1,6 +1,6 @@
 package input;
 
-import convolution.MatrixReader;
+import maths.matrix.MatrixReader;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

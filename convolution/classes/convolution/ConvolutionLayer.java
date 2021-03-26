@@ -1,90 +1,62 @@
 package convolution;
 
 import filters.Filter;
-import java.awt.image.BufferedImage;
+import maths.matrix.MatrixReader;
+import maths.matrix.MatrixReader2D;
+
 import java.util.Objects;
 
-public class ConvolutionLayer {
+public class ConvolutionLayer implements Layer {
     private final MatrixReader matrixReader;
-    private final Filter[] filters;
+    private final Filter filter;
     private final int inputRows, inputColumns;
+    private final int paddingRows, paddingColumns;
     private final int stride;
-    private final boolean keepSize;
-    private final double[][][] output;
+    private final double[][] output;
+    //    private final boolean keepSize;
 
-    public ConvolutionLayer(MatrixReader matrixReader, Filter[] filters, int stride, boolean keepSize) {
+    public ConvolutionLayer(MatrixReader matrixReader, Filter filter, int stride, boolean keepSize) {
         this.matrixReader = Objects.requireNonNull(matrixReader);
-        this.filters = Objects.requireNonNull(filters);
+        this.filter = Objects.requireNonNull(filter);
 
         if (stride < 1) {
             throw new IllegalArgumentException("Stride can't be smaller than 1.");
         }
 
         this.stride = stride;
-        this.keepSize = keepSize;
-
-        if (filters.length == 0) {
-            throw new IllegalArgumentException("Need at least one filter!");
-        }
+//        this.keepSize = keepSize;
 
         // initial basic fields
         inputRows = matrixReader.getRowCount();
         inputColumns = matrixReader.getColumnCount();
-        output = new double[filters.length][][];
-    }
 
-    public void computeLayer() {
-        for (int i=0; i<filters.length; i++) {
+        int kernelSize = filter.getKernelSize();
 
-            computeFilter(i);
-
-            BufferedImage bufferedImage = new BufferedImage(output[i][0].length, output[i].length, BufferedImage.TYPE_INT_RGB);
-            for (int p=0; p<output[i].length; p++) {
-                for (int j=0; j<output[i][p].length; j++) {
-                    int value = (int) (output[i][p][j] * 255);
-                    bufferedImage.setRGB(j, p, (value << 8 | value << 16 | value));
-                }
-            }
-        }
-    }
-
-    private void computeFilter(int filterIndex) {
-        int kernelSize = filters[filterIndex].getKernelSize();
         int paddingRows = 0, paddingColumns = 0;
         if (keepSize) {
-            paddingRows = computePadding(inputRows, kernelSize);
-            paddingColumns = computePadding(inputColumns, kernelSize);
+            paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, stride);
+            paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, stride);
         }
 
-        int outputRows = computeMatrixDimension(inputRows, kernelSize, paddingRows);
-        int outputColumns = computeMatrixDimension(inputColumns, kernelSize, paddingColumns);
+        this.paddingRows = paddingRows;
+        this.paddingColumns = paddingColumns;
 
-        output[filterIndex] = new double[outputRows][outputColumns];
+        int rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, stride);
+        int columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, stride);
+
+        output = new double[rowsCount][columnsCount];
+    }
+
+
+    public MatrixReader computeLayer() {
+        int kernelSize = filter.getKernelSize();
 
         for (int i= - paddingRows, outI = 0; i < inputRows + paddingRows - kernelSize; i += stride, outI++) {
             for (int j= - paddingColumns, outJ = 0; j < inputColumns + paddingColumns - kernelSize; j += stride, outJ++) {
-                output[filterIndex][outI][outJ] = filters[filterIndex].compute(i, j, matrixReader);
+                output[outI][outJ] = filter.compute(i, j, matrixReader);
             }
         }
-    }
 
-    private int computePadding(int inputLength, int kernelSize) {
-        return (inputLength * stride - inputLength + kernelSize - stride) / 2;
-    }
-
-    private int computeMatrixDimension(int dimensionLength, int kernelSize, int padding) {
-        if (dimensionLength < 1) throw new IllegalArgumentException(
-                "Need at least a dimensionLength of 1"
-        );
-
-        if (kernelSize < 1) throw new IllegalArgumentException(
-                "Need at least a kernel size of 1"
-        );
-
-        if (padding < 0) throw new IllegalArgumentException(
-                "Padding can't be a negative number"
-        );
-
-        return (dimensionLength - kernelSize + 2 * padding) / stride + 1;
+        return new MatrixReader2D(output);
     }
 }

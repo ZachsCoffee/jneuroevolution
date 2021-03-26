@@ -1,4 +1,4 @@
-package convolution;
+package maths.matrix;
 
 public interface MatrixReader {
     int getRowCount();
