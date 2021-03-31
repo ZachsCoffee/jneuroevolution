@@ -23,4 +23,9 @@ public class MatrixReader2D implements MatrixReader {
     public double valueAt(int rowIndex, int columnIndex) {
         return data[rowIndex][columnIndex];
     }
+
+    @Override
+    public double[] getRow(int position) {
+        return data[position];
+    }
 }

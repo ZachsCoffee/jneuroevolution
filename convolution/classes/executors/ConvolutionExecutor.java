@@ -11,6 +11,7 @@ import maths.matrix.MatrixReader;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,7 +24,7 @@ public class ConvolutionExecutor {
 
     protected final MatrixReader[] channels;
     private final ArrayList<Layer>[] channelLayers;
-    private MatrixReader[] output;
+    private MatrixReader[][] output;
 
     protected ConvolutionExecutor(MatrixReader[] channels) {
         this.channels = Objects.requireNonNull(channels);
@@ -37,7 +38,7 @@ public class ConvolutionExecutor {
             channelLayers[i] = new ArrayList<>();
         }
 
-        output = new MatrixReader[channels.length];
+        output = new MatrixReader[channels.length][];
     }
 
     public ConvolutionExecutor addLayerForAllChannels(Layer layer) {
@@ -53,16 +54,48 @@ public class ConvolutionExecutor {
         }
     }
 
-    protected MatrixReader computeChannel(int channelIndex) {
-        MatrixReader previousMatrixReader = channels[channelIndex];
+    public double[] flatten() {
+        double[] flat = new double[flatSize()];
+
+        int startCopyIndex = 0;
+        for (MatrixReader[] channel : output) {
+            for (MatrixReader filter: channel) {
+                int rows = filter.getRowCount();
+                int columns = filter.getColumnCount();
+                for (int i=0; i<rows; i++) {
+                    System.arraycopy(filter.getRow(i), 0, flat, startCopyIndex, columns);
+                    startCopyIndex += columns;
+                }
+            }
+        }
+
+        return flat;
+    }
+
+    public int flatSize() {
+        int flatSize = 0;
+
+        for (MatrixReader[] channel : output) {
+            for (MatrixReader filter: channel) {
+                flatSize += filter.getColumnCount() * filter.getRowCount();
+            }
+        }
+
+        return flatSize;
+    }
+
+    public MatrixReader[][] getChannelsOutput() {
+        return output;
+    }
+
+    protected MatrixReader[] computeChannel(int channelIndex) {
+        MatrixReader[] previousMatrixReader = new MatrixReader[]{channels[channelIndex]};
         for (Layer layer : channelLayers[channelIndex]) {
             previousMatrixReader = layer.computeLayer(previousMatrixReader);
         }
 
         return previousMatrixReader;
     }
-
-
 
     public static void main(String[] args) {
         ConvolutionExecutor.initialize(new HsbInput(new File("/home/zachs/Downloads/ΟΔ 5396.jpg")))

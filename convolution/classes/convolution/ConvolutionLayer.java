@@ -7,14 +7,17 @@ import maths.matrix.MatrixReader2D;
 import java.util.Objects;
 
 public class ConvolutionLayer implements Layer {
-    private final Filter filter;
+    private final Filter[] filters;
     private final int stride;
     private final boolean keepSize;
 //    private double[][] output;
 
-    public ConvolutionLayer(Filter filter, int stride, boolean keepSize) {
-        this.filter = Objects.requireNonNull(filter);
+    public ConvolutionLayer(Filter[] filters, int stride, boolean keepSize) {
+        this.filters = Objects.requireNonNull(filters);
 
+        if (filters.length == 0) {
+            throw new RuntimeException("Need at least one filter");
+        }
         if (stride < 1) {
             throw new IllegalArgumentException("Stride can't be smaller than 1.");
         }
@@ -23,7 +26,24 @@ public class ConvolutionLayer implements Layer {
         this.keepSize = keepSize;
     }
 
-    public MatrixReader computeLayer(MatrixReader matrixReader) {
+    public MatrixReader[] computeLayer(MatrixReader[] input) {
+        Objects.requireNonNull(input);
+        if (input.length == 0) {
+            throw new IllegalArgumentException("Need at least one matrix reader!");
+        }
+
+        MatrixReader[] output = new MatrixReader[filters.length * input.length];
+
+        for (int i=0; i< input.length; i++) {
+            for (int j=0; j<filters.length; j++) {
+                output[i + j] = computeForFilter(input[i], filters[j]);
+            }
+        }
+
+        return output;
+    }
+
+    private MatrixReader computeForFilter(MatrixReader matrixReader, Filter filter) {
         Objects.requireNonNull(matrixReader);
 
         int inputRows = matrixReader.getRowCount();

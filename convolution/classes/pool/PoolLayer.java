@@ -14,7 +14,6 @@ public class PoolLayer implements Layer {
     private final PoolFunction poolFunction;
     private final int sampleSize;
     private final int stride;
-    private double[][] output;
 
     public PoolLayer(PoolFunction poolFunction, int sampleSize, int stride) {
 
@@ -28,12 +27,24 @@ public class PoolLayer implements Layer {
         this.poolFunction = Objects.requireNonNull(poolFunction);
         this.sampleSize = sampleSize;
         this.stride = stride;
-
     }
 
-    public MatrixReader computeLayer(MatrixReader input) {
+    public MatrixReader[] computeLayer(MatrixReader[] input) {
         Objects.requireNonNull(input);
+        if (input.length == 0) {
+            throw new IllegalArgumentException("Need at least one matrix reader!");
+        }
 
+        MatrixReader[] output = new MatrixReader[input.length];
+
+        for (int i=0; i<output.length; i++) {
+            output[i] = computeMatrix(input[i]);
+        }
+
+        return output;
+    }
+
+    private MatrixReader computeMatrix(MatrixReader input) {
         int[] dimensions = ConvolutionUtils.outputDimensions(
                 input.getRowCount(),
                 input.getColumnCount(),
@@ -42,7 +53,7 @@ public class PoolLayer implements Layer {
                 stride
         );
 
-        output = new double[dimensions[0]][dimensions[1]];
+        double[][] output = new double[dimensions[0]][dimensions[1]];
 
         int rowsCount = input.getRowCount();
         int columnsCount = input.getColumnCount();
