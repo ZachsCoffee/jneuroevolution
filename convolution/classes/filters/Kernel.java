@@ -3,7 +3,7 @@ package filters;
 public class Kernel {
     private Kernel() {}
 
-    public static final int[][] IDENTITY = {
+    public static final double[][] IDENTITY = {
             {0, 0, 0},
             {0, 1, 0},
             {0, 0, 0}

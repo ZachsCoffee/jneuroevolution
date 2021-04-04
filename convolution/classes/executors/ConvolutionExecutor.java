@@ -34,10 +34,12 @@ public class ConvolutionExecutor {
         output = new MatrixReader[channels.length][];
     }
 
-    public void addLayerForAllChannels(Layer layer) {
+    public ConvolutionExecutor addLayerForAllChannels(Layer layer) {
         for (ArrayList<Layer> channel : channelsLayers) {
             channel.add(layer);
         }
+
+        return this;
     }
 
     public void addLayerForChannel(Layer layer, int channelPosition) {
@@ -117,6 +119,10 @@ public class ConvolutionExecutor {
         }
 
         return stringBuilder.toString();
+    }
+
+    public void printSchema() {
+        System.out.println(toString());
     }
 
     protected MatrixReader[] computeChannel(int channelIndex) {

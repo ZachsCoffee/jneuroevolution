@@ -28,4 +28,9 @@ public class LayerSchema implements MatrixSchema {
     public int getColumnCount() {
         return columns;
     }
+
+    @Override
+    public String toString() {
+        return "rows(" + rows + ") columns(" + columns + ")";
+    }
 }

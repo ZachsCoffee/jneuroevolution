@@ -2,8 +2,10 @@ package pool;
 
 import convolution.ConvolutionUtils;
 import convolution.Layer;
+import convolution.LayerSchema;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
+import maths.matrix.MatrixSchema;
 
 import java.util.Objects;
 
@@ -42,6 +44,29 @@ public class PoolLayer implements Layer {
         }
 
         return output;
+    }
+
+    @Override
+    public MatrixSchema[] toString(MatrixSchema[] input, StringBuilder stringBuilder) {
+
+        MatrixSchema[] matrixSchemas = new MatrixSchema[input.length];
+
+        stringBuilder.append("Pool layer:\n");
+
+        for (int i=0; i<input.length; i++) {
+            int[] dimensions = ConvolutionUtils.outputDimensions(
+                    input[i].getRowCount(),
+                    input[i].getColumnCount(),
+                    sampleSize,
+                    0,
+                    stride
+            );
+
+            matrixSchemas[i] = new LayerSchema(dimensions[0], dimensions[1]);
+            stringBuilder.append(matrixSchemas[i]).append("\n");
+        }
+
+        return matrixSchemas;
     }
 
     private MatrixReader computeMatrix(MatrixReader input) {

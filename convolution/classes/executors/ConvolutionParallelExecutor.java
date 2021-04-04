@@ -1,5 +1,6 @@
 package executors;
 
+import convolution.Layer;
 import maths.matrix.MatrixReader;
 
 import java.util.Objects;

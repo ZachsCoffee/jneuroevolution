@@ -46,27 +46,28 @@ public class ConvolutionLayer implements Layer {
 
     @Override
     public MatrixSchema[] toString(MatrixSchema[] input, StringBuilder stringBuilder) {
-        stringBuilder = new StringBuilder("Convolution Layer:\n")
-                .append("\tchannels(")
+        stringBuilder
+                .append("Convolution Layer:\n")
+                .append("\t\tchannels(")
                 .append(input.length)
                 .append(")\n");
 
         for (MatrixSchema inputSchema : input) {
             stringBuilder
-                    .append("\tInput matrix: ")
+                    .append("\t\tInput matrix:\r")
                     .append(inputSchema)
                     .append("\n");
         }
 
         Schema schema = new Schema();
 
-        stringBuilder.append("\tOutput:\n");
+        stringBuilder.append("\tOutput matrix:\n");
 
         MatrixSchema[] matrixSchemas = new MatrixSchema[input.length * filters.length];
         for (int i=0; i<input.length; i++) {
             for (int j=0; j<filters.length; j++) {
                 schema.compute(input[i].getRowCount(), input[i].getColumnCount(), filters[j].getKernelSize());
-                matrixSchemas[i + j] = new LayerSchema(schema.rowsCount, schema.columnsCount);
+                matrixSchemas[i * filters.length + j] = new LayerSchema(schema.rowsCount, schema.columnsCount);
                 stringBuilder
                         .append("\t\tMatrix rows(")
                         .append(schema.rowsCount)

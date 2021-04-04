@@ -20,17 +20,32 @@ public class HsbInput implements ImageInput {
                     public double valueAt(int rowIndex, int columnIndex) {
                         return getHsb(columnIndex, rowIndex)[0];
                     }
+
+                    @Override
+                    public double[] getRow(int position) {
+                        throw new UnsupportedOperationException();
+                    }
                 },
                 new AbstractImageInput(image) {
                     @Override
                     public double valueAt(int rowIndex, int columnIndex) {
                         return getHsb(columnIndex, rowIndex)[1];
                     }
+
+                    @Override
+                    public double[] getRow(int position) {
+                        throw new UnsupportedOperationException();
+                    }
                 },
                 new AbstractImageInput(image) {
                     @Override
                     public double valueAt(int rowIndex, int columnIndex) {
                         return getHsb(columnIndex, rowIndex)[2];
+                    }
+
+                    @Override
+                    public double[] getRow(int position) {
+                        throw new UnsupportedOperationException();
                     }
                 }
         };

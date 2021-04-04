@@ -7,4 +7,5 @@ module convolution {
     exports filters;
     exports executors;
     exports input;
+    exports pool;
 }
