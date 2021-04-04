@@ -5,4 +5,6 @@ module convolution {
 
     exports convolution;
     exports filters;
+    exports executors;
+    exports input;
 }

@@ -3,6 +3,7 @@ package convolution;
 import filters.Filter;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
+import maths.matrix.MatrixSchema;
 
 import java.util.Objects;
 
@@ -33,40 +34,86 @@ public class ConvolutionLayer implements Layer {
         }
 
         MatrixReader[] output = new MatrixReader[filters.length * input.length];
-
-        for (int i=0; i< input.length; i++) {
+        Schema schema = new Schema();
+        for (int i=0; i<input.length; i++) {
             for (int j=0; j<filters.length; j++) {
-                output[i + j] = computeForFilter(input[i], filters[j]);
+                output[i + j] = computeForFilter(input[i], filters[j], schema);
             }
         }
 
         return output;
     }
 
-    private MatrixReader computeForFilter(MatrixReader matrixReader, Filter filter) {
+    @Override
+    public MatrixSchema[] toString(MatrixSchema[] input, StringBuilder stringBuilder) {
+        stringBuilder = new StringBuilder("Convolution Layer:\n")
+                .append("\tchannels(")
+                .append(input.length)
+                .append(")\n");
+
+        for (MatrixSchema inputSchema : input) {
+            stringBuilder
+                    .append("\tInput matrix: ")
+                    .append(inputSchema)
+                    .append("\n");
+        }
+
+        Schema schema = new Schema();
+
+        stringBuilder.append("\tOutput:\n");
+
+        MatrixSchema[] matrixSchemas = new MatrixSchema[input.length * filters.length];
+        for (int i=0; i<input.length; i++) {
+            for (int j=0; j<filters.length; j++) {
+                schema.compute(input[i].getRowCount(), input[i].getColumnCount(), filters[j].getKernelSize());
+                matrixSchemas[i + j] = new LayerSchema(schema.rowsCount, schema.columnsCount);
+                stringBuilder
+                        .append("\t\tMatrix rows(")
+                        .append(schema.rowsCount)
+                        .append(") columns(")
+                        .append(schema.columnsCount)
+                        .append(")\n");
+            }
+        }
+
+        return matrixSchemas;
+    }
+
+    private MatrixReader computeForFilter(MatrixReader matrixReader, Filter filter, Schema schema) {
         Objects.requireNonNull(matrixReader);
 
         int inputRows = matrixReader.getRowCount();
         int inputColumns = matrixReader.getColumnCount();
         int kernelSize = filter.getKernelSize();
 
-        int paddingRows = 0, paddingColumns = 0;
-        if (keepSize) {
-            paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, stride);
-            paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, stride);
-        }
+        schema.compute(matrixReader.getRowCount(), matrixReader.getColumnCount(), filter.getKernelSize());
 
-        int rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, stride);
-        int columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, stride);
+        double[][] output = new double[schema.rowsCount][schema.columnsCount];
 
-        double[][] output = new double[rowsCount][columnsCount];
-
-        for (int i= - paddingRows, outI = 0; i < inputRows + paddingRows - kernelSize; i += stride, outI++) {
-            for (int j= - paddingColumns, outJ = 0; j < inputColumns + paddingColumns - kernelSize; j += stride, outJ++) {
+        for (int i= - schema.paddingRows, outI = 0; i < inputRows + schema.paddingRows - kernelSize; i += stride, outI++) {
+            for (int j= - schema.paddingColumns, outJ = 0; j < inputColumns + schema.paddingColumns - kernelSize; j += stride, outJ++) {
                 output[outI][outJ] = filter.compute(i, j, matrixReader);
             }
         }
 
         return new MatrixReader2D(output);
+    }
+
+    private class Schema {
+        int paddingRows, paddingColumns;
+        int rowsCount, columnsCount;
+
+        void compute(int inputRows, int inputColumns, int kernelSize) {
+            if (keepSize) {
+                paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, stride);
+                paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, stride);
+            }
+            else {
+                paddingRows = paddingColumns = 0;
+            }
+
+            rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, stride);
+            columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, stride);
+        }
     }
 }

@@ -1,20 +1,13 @@
 package executors;
 
-import convolution.ConvolutionLayer;
 import convolution.Layer;
-import filters.Filter;
-import filters.Kernel;
-import functions.ActivationFunctions;
-import input.HsbInput;
+import convolution.LayerSchema;
 import input.ImageInput;
 import maths.matrix.MatrixReader;
+import maths.matrix.MatrixSchema;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ConvolutionExecutor {
 
@@ -22,9 +15,9 @@ public class ConvolutionExecutor {
         return new ConvolutionExecutor(imageInput.getChannels());
     }
 
+    private final ArrayList<Layer>[] channelsLayers;
     protected final MatrixReader[] channels;
-    private final ArrayList<Layer>[] channelLayers;
-    private MatrixReader[][] output;
+    protected MatrixReader[][] output;
 
     protected ConvolutionExecutor(MatrixReader[] channels) {
         this.channels = Objects.requireNonNull(channels);
@@ -33,19 +26,22 @@ public class ConvolutionExecutor {
             throw new IllegalArgumentException("Need at least one channel!");
         }
 
-        channelLayers = (ArrayList<Layer>[]) new ArrayList[channels.length];
-        for (int i=0; i<channelLayers.length; i++) {
-            channelLayers[i] = new ArrayList<>();
+        channelsLayers = (ArrayList<Layer>[]) new ArrayList[channels.length];
+        for (int i = 0; i< channelsLayers.length; i++) {
+            channelsLayers[i] = new ArrayList<>();
         }
 
         output = new MatrixReader[channels.length][];
     }
 
-    public ConvolutionExecutor addLayerForAllChannels(Layer layer) {
-        for (ArrayList<Layer> channel : channelLayers) {
+    public void addLayerForAllChannels(Layer layer) {
+        for (ArrayList<Layer> channel : channelsLayers) {
             channel.add(layer);
         }
-        return this;
+    }
+
+    public void addLayerForChannel(Layer layer, int channelPosition) {
+        channelsLayers[channelPosition].add(layer);
     }
 
     public void execute() {
@@ -88,19 +84,47 @@ public class ConvolutionExecutor {
         return output;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder("==============================\n");
+
+        stringBuilder.append("Input channels:\n");
+
+        int i = 0;
+        for (MatrixReader channel : channels) {
+            stringBuilder
+                    .append("\tChannel ")
+                    .append(i)
+                    .append(" : rows(")
+                    .append(channel.getRowCount())
+                    .append(") columns(")
+                    .append(channel.getColumnCount())
+                    .append(") data size: ")
+                    .append(channel.getRowCount() * channel.getColumnCount())
+                    .append("\n");
+
+            MatrixSchema[] tempLayerSchema = new MatrixSchema[] {
+                new LayerSchema(channel.getRowCount(), channel.getColumnCount())
+            };
+
+            for (Layer channelLayer : channelsLayers[i]) {
+                stringBuilder.append("\t");
+                tempLayerSchema = channelLayer.toString(tempLayerSchema, stringBuilder);
+                stringBuilder.append("\n");
+            }
+
+            i++;
+        }
+
+        return stringBuilder.toString();
+    }
+
     protected MatrixReader[] computeChannel(int channelIndex) {
         MatrixReader[] previousMatrixReader = new MatrixReader[]{channels[channelIndex]};
-        for (Layer layer : channelLayers[channelIndex]) {
+        for (Layer layer : channelsLayers[channelIndex]) {
             previousMatrixReader = layer.computeLayer(previousMatrixReader);
         }
 
         return previousMatrixReader;
-    }
-
-    public static void main(String[] args) {
-        ConvolutionExecutor.initialize(new HsbInput(new File("/home/zachs/Downloads/ΟΔ 5396.jpg")))
-                .addLayerForAllChannels(new ConvolutionLayer(new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()), 1, true))
-                .executeParallel(readers -> System.out.println("Done!"));
-
     }
 }

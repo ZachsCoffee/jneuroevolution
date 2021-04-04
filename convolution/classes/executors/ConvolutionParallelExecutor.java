@@ -20,12 +20,12 @@ public class ConvolutionParallelExecutor extends ConvolutionExecutor {
             amountOfThreads--;
         }
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(amountOfThreads);
+        final ExecutorService threadPool = Executors.newFixedThreadPool(amountOfThreads);
 
-        this.executeStateCallback = Objects.requireNonNull(executeStateCallback);
+        final ExecuteStateCallback checkedCallback = Objects.requireNonNull(executeStateCallback);
 
         executedChannels = 0;
-        double[][] output =
+
         for (int i=0; i<channels.length; i++) {
             int fixedI = i;
             threadPool.submit(() -> {
@@ -34,14 +34,13 @@ public class ConvolutionParallelExecutor extends ConvolutionExecutor {
                 executedChannels++;
                 if (channels.length == executedChannels) {
                     threadPool.shutdown();
-                    executeStateCallback.finish();
+                    checkedCallback.finish(output);
                 }
-                return output[fixedI];
             });
         }
     }
 
     public interface ExecuteStateCallback {
-        void finish(MatrixReader[] output);
+        void finish(MatrixReader[][] output);
     }
 }
