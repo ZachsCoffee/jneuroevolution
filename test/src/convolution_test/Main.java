@@ -14,6 +14,7 @@ import java.io.File;
 import java.nio.file.DirectoryStream;
 
 public class Main {
+
     public static void main(String[] args) {
         Filter[] filters = {
                 new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
@@ -31,11 +32,10 @@ public class Main {
                 new Filter(Kernel.CUSTOM_5, ActivationFunctions.groundRelu()),
         };
 
-        ConvolutionParallelExecutor test = (ConvolutionParallelExecutor) ConvolutionParallelExecutor.initialize(new HsbInput(new File("/home/zachs/Downloads/ΟΔ 5396.jpg")))
+        ConvolutionParallelExecutor.initialize(new HsbInput(new File("/home/zachs/Downloads/ΟΔ 5396.jpg")))
                 .addLayerForAllChannels(new ConvolutionLayer(filters, 1, true))
                 .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
-                .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 3, 3));
-
-
+                .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 3, 3))
+                .printSchema();
     }
 }

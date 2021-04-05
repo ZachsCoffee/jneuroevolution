@@ -6,6 +6,7 @@ import convolution.LayerSchema;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
 import maths.matrix.MatrixSchema;
+import schema.ConvolutionSchema;
 
 import java.util.Objects;
 
@@ -47,14 +48,12 @@ public class PoolLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] toString(MatrixSchema[] input, StringBuilder stringBuilder) {
+    public MatrixSchema[] toString(MatrixSchema[] input, ConvolutionSchema convolutionSchema) {
 
         MatrixSchema[] matrixSchemas = new MatrixSchema[input.length];
-
-        stringBuilder.append("Pool layer:\n");
-
+        int[] dimensions = null;
         for (int i=0; i<input.length; i++) {
-            int[] dimensions = ConvolutionUtils.outputDimensions(
+            dimensions = ConvolutionUtils.outputDimensions(
                     input[i].getRowCount(),
                     input[i].getColumnCount(),
                     sampleSize,
@@ -63,8 +62,14 @@ public class PoolLayer implements Layer {
             );
 
             matrixSchemas[i] = new LayerSchema(dimensions[0], dimensions[1]);
-            stringBuilder.append(matrixSchemas[i]).append("\n");
         }
+
+        convolutionSchema.addRow(
+                "Pool",
+                input.length,
+                "-",
+                input.length + "x" + dimensions[0] + "x" + dimensions[1]
+        );
 
         return matrixSchemas;
     }

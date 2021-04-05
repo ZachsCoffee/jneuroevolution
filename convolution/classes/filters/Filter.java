@@ -33,7 +33,6 @@ public class Filter {
      * Applies the filter into the given input. The two indexes describes the starting position of the filter into the input.
      * @param rowIndex The row index to start the filter.
      * @param columnIndex The column index to start the filter.
-     * @param input A matrix to apply the filter.
      * @return The result.
      */
     public double compute(int rowIndex, int columnIndex, MatrixReader matrixReader) {

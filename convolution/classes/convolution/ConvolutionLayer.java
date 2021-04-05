@@ -4,6 +4,7 @@ import filters.Filter;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
 import maths.matrix.MatrixSchema;
+import schema.ConvolutionSchema;
 
 import java.util.Objects;
 
@@ -45,37 +46,24 @@ public class ConvolutionLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] toString(MatrixSchema[] input, StringBuilder stringBuilder) {
-        stringBuilder
-                .append("Convolution Layer:\n")
-                .append("\t\tchannels(")
-                .append(input.length)
-                .append(")\n");
-
-        for (MatrixSchema inputSchema : input) {
-            stringBuilder
-                    .append("\t\tInput matrix:\r")
-                    .append(inputSchema)
-                    .append("\n");
-        }
+    public MatrixSchema[] toString(MatrixSchema[] input, ConvolutionSchema convolutionSchema) {
 
         Schema schema = new Schema();
-
-        stringBuilder.append("\tOutput matrix:\n");
 
         MatrixSchema[] matrixSchemas = new MatrixSchema[input.length * filters.length];
         for (int i=0; i<input.length; i++) {
             for (int j=0; j<filters.length; j++) {
                 schema.compute(input[i].getRowCount(), input[i].getColumnCount(), filters[j].getKernelSize());
                 matrixSchemas[i * filters.length + j] = new LayerSchema(schema.rowsCount, schema.columnsCount);
-                stringBuilder
-                        .append("\t\tMatrix rows(")
-                        .append(schema.rowsCount)
-                        .append(") columns(")
-                        .append(schema.columnsCount)
-                        .append(")\n");
             }
         }
+
+        convolutionSchema.addRow(
+                "Convolution",
+                input.length,
+                filters.length,
+                input.length + "x" + filters.length + "x" + schema.rowsCount + "x" + schema.columnsCount
+        );
 
         return matrixSchemas;
     }

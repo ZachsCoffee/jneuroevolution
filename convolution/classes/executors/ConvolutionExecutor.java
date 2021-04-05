@@ -2,12 +2,16 @@ package executors;
 
 import convolution.Layer;
 import convolution.LayerSchema;
+import dnl.utils.text.table.MapBasedTableModel;
+import dnl.utils.text.table.TextTable;
+import dnl.utils.text.table.TextTableModel;
 import input.ImageInput;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixSchema;
+import schema.ConvolutionSchema;
 
-import java.util.ArrayList;
-import java.util.Objects;
+import javax.swing.table.TableModel;
+import java.util.*;
 
 public class ConvolutionExecutor {
 
@@ -86,43 +90,28 @@ public class ConvolutionExecutor {
         return output;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("==============================\n");
+    public void printSchema() {
+        ConvolutionSchema convolutionSchema = new ConvolutionSchema(new String[]{
+                "Layer type", "Channels", "Filters", "Output"
+        });
 
-        stringBuilder.append("Input channels:\n");
-
+        convolutionSchema.addRow("Initial", channels.length, "-", "-");
         int i = 0;
         for (MatrixReader channel : channels) {
-            stringBuilder
-                    .append("\tChannel ")
-                    .append(i)
-                    .append(" : rows(")
-                    .append(channel.getRowCount())
-                    .append(") columns(")
-                    .append(channel.getColumnCount())
-                    .append(") data size: ")
-                    .append(channel.getRowCount() * channel.getColumnCount())
-                    .append("\n");
+            convolutionSchema.addRow("Channel", "-", "-", channel.getRowCount() + "x" + channel.getColumnCount());
 
             MatrixSchema[] tempLayerSchema = new MatrixSchema[] {
-                new LayerSchema(channel.getRowCount(), channel.getColumnCount())
+                    new LayerSchema(channel.getRowCount(), channel.getColumnCount())
             };
 
             for (Layer channelLayer : channelsLayers[i]) {
-                stringBuilder.append("\t");
-                tempLayerSchema = channelLayer.toString(tempLayerSchema, stringBuilder);
-                stringBuilder.append("\n");
+                tempLayerSchema = channelLayer.toString(tempLayerSchema, convolutionSchema);
             }
 
             i++;
         }
 
-        return stringBuilder.toString();
-    }
-
-    public void printSchema() {
-        System.out.println(toString());
+        convolutionSchema.print();
     }
 
     protected MatrixReader[] computeChannel(int channelIndex) {
