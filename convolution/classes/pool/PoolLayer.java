@@ -68,6 +68,9 @@ public class PoolLayer implements Layer {
                 "Pool",
                 input.length,
                 "-",
+                sampleSize + "x" + sampleSize,
+                stride,
+                0,
                 input.length + "x" + dimensions[0] + "x" + dimensions[1]
         );
 

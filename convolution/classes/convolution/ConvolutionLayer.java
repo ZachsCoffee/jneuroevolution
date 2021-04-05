@@ -62,6 +62,9 @@ public class ConvolutionLayer implements Layer {
                 "Convolution",
                 input.length,
                 filters.length,
+                "-",
+                stride,
+                schema.paddingRows + "x" + schema.paddingColumns,
                 input.length + "x" + filters.length + "x" + schema.rowsCount + "x" + schema.columnsCount
         );
 

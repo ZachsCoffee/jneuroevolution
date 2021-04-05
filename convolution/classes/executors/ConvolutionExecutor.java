@@ -92,13 +92,13 @@ public class ConvolutionExecutor {
 
     public void printSchema() {
         ConvolutionSchema convolutionSchema = new ConvolutionSchema(new String[]{
-                "Layer type", "Channels", "Filters", "Output"
+                "Layer type", "Channels", "Filters", "Sample size", "Stride", "Padding", "Output"
         });
 
-        convolutionSchema.addRow("Initial", channels.length, "-", "-");
+        convolutionSchema.addRow("Initial", channels.length, "-", "-", "-", "-", "-");
         int i = 0;
         for (MatrixReader channel : channels) {
-            convolutionSchema.addRow("Channel", "-", "-", channel.getRowCount() + "x" + channel.getColumnCount());
+            convolutionSchema.addRow("Channel", "-", "-", channel.getRowCount() + "x" + channel.getColumnCount(), "-", "-", "-");
 
             MatrixSchema[] tempLayerSchema = new MatrixSchema[] {
                     new LayerSchema(channel.getRowCount(), channel.getColumnCount())
