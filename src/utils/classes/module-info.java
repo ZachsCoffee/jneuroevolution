@@ -10,4 +10,5 @@ module utils {
     exports files;
     exports maths;
     exports maths.matrix;
+    exports maths.matrix.implementations;
 }

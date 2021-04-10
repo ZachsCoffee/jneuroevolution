@@ -1,5 +1,7 @@
 package maths.matrix;
 
+import maths.matrix.MatrixReader;
+
 import java.util.Objects;
 
 public class MatrixReader2D implements MatrixReader {

@@ -4,6 +4,7 @@ import filters.Filter;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
 import maths.matrix.MatrixSchema;
+import maths.matrix.QubeSchema;
 import schema.ConvolutionSchema;
 
 import java.util.Objects;
@@ -46,8 +47,23 @@ public class ConvolutionLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] toString(MatrixSchema[] input, ConvolutionSchema convolutionSchema) {
+    public MatrixReader[] computeLayer(MatrixReader[] input, QubeSchema qubeSchema) {
+        Objects.requireNonNull(qubeSchema);
+        Objects.requireNonNull(input);
 
+        int outputDepth = filters.length * input.length;
+
+        if (outputDepth != qubeSchema.getDepth()) throw new RuntimeException(
+                "I can't create output of schema: " + qubeSchema + " with output depth "+outputDepth
+        );
+
+
+
+        return new MatrixReader[0];
+    }
+
+    @Override
+    public MatrixSchema[] toString(MatrixSchema[] input, ConvolutionSchema convolutionSchema) {
         Schema schema = new Schema();
 
         MatrixSchema[] matrixSchemas = new MatrixSchema[input.length * filters.length];
