@@ -1,4 +1,4 @@
-package pool;
+package layers.pool;
 
 public enum PoolFunction {
     MAX(new Function() {

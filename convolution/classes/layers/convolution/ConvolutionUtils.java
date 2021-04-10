@@ -1,4 +1,4 @@
-package convolution;
+package layers.convolution;
 
 public class ConvolutionUtils {
     private ConvolutionUtils() {}

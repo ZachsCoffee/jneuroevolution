@@ -4,10 +4,11 @@ module convolution {
     requires machine_learning;
     requires j.text.utils;
 
-    exports convolution;
+    exports layers.convolution;
     exports schema;
     exports filters;
     exports executors;
     exports input;
-    exports pool;
+    exports layers.pool;
+    exports layers;
 }

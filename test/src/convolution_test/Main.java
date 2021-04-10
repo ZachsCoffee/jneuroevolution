@@ -1,17 +1,15 @@
 package convolution_test;
 
-import convolution.ConvolutionLayer;
-import executors.ConvolutionExecutor;
+import layers.convolution.ConvolutionLayer;
 import executors.ConvolutionParallelExecutor;
 import filters.Filter;
 import filters.Kernel;
 import functions.ActivationFunctions;
 import input.HsbInput;
-import pool.PoolFunction;
-import pool.PoolLayer;
+import layers.pool.PoolFunction;
+import layers.pool.PoolLayer;
 
 import java.io.File;
-import java.nio.file.DirectoryStream;
 
 public class Main {
 

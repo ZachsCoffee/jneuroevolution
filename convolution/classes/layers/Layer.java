@@ -1,4 +1,4 @@
-package convolution;
+package layers;
 
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixSchema;

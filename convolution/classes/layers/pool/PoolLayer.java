@@ -1,8 +1,8 @@
-package pool;
+package layers.pool;
 
-import convolution.ConvolutionUtils;
-import convolution.Layer;
-import convolution.LayerSchema;
+import layers.convolution.ConvolutionUtils;
+import layers.Layer;
+import layers.LayerSchema;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
 import maths.matrix.MatrixSchema;

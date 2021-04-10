@@ -1,16 +1,12 @@
 package executors;
 
-import convolution.Layer;
-import convolution.LayerSchema;
-import dnl.utils.text.table.MapBasedTableModel;
-import dnl.utils.text.table.TextTable;
-import dnl.utils.text.table.TextTableModel;
+import layers.Layer;
+import layers.LayerSchema;
 import input.ImageInput;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixSchema;
 import schema.ConvolutionSchema;
 
-import javax.swing.table.TableModel;
 import java.util.*;
 
 public class ConvolutionExecutor {

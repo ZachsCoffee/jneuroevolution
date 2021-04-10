@@ -1,6 +1,8 @@
-package convolution;
+package layers.convolution;
 
 import filters.Filter;
+import layers.Layer;
+import layers.LayerSchema;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
 import maths.matrix.MatrixSchema;

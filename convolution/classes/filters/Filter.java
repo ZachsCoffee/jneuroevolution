@@ -48,7 +48,7 @@ public class Filter {
         for (int i = rowIndex, ki = 0; i < rowLength; i++, ki++) {
             for (int j = columnIndex, kj = 0; j < columnLength; j++, kj++) {
                 // if kernel value is zero then no need to compute
-                // if the input is outbounds no need to compute. (Is a valid case because the convolution can have padding)
+                // if the input is outbounds no need to compute. (Is a valid case because the layers.convolution can have padding)
                 if (kernel[ki][kj] == 0 || i < 0 || i >= matrixReader.getRowCount() || j < 0 || j >= matrixReader.getColumnCount()) {
                     continue;
                 }
