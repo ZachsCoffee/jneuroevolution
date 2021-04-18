@@ -2,13 +2,10 @@ package layers;
 
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixSchema;
-import maths.matrix.QubeSchema;
-import schema.ConvolutionSchema;
+import schema.ConvolutionSchemaPrinter;
 
 public interface Layer {
     MatrixReader[] computeLayer(MatrixReader[] input);
 
-    MatrixReader[] computeLayer(MatrixReader[] input, QubeSchema qubeSchema);
-
-    MatrixSchema[] toString(MatrixSchema[] input, ConvolutionSchema convolutionSchema);
+    MatrixSchema[] toString(MatrixSchema[] input, ConvolutionSchemaPrinter convolutionSchemaPrinter);
 }

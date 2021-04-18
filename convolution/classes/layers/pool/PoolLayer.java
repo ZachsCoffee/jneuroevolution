@@ -2,11 +2,11 @@ package layers.pool;
 
 import layers.convolution.ConvolutionUtils;
 import layers.Layer;
-import layers.LayerSchema;
+import schema.LayerSchema;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
 import maths.matrix.MatrixSchema;
-import schema.ConvolutionSchema;
+import schema.ConvolutionSchemaPrinter;
 
 import java.util.Objects;
 
@@ -48,7 +48,7 @@ public class PoolLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] toString(MatrixSchema[] input, ConvolutionSchema convolutionSchema) {
+    public MatrixSchema[] toString(MatrixSchema[] input, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
 
         MatrixSchema[] matrixSchemas = new MatrixSchema[input.length];
         int[] dimensions = null;
@@ -64,7 +64,7 @@ public class PoolLayer implements Layer {
             matrixSchemas[i] = new LayerSchema(dimensions[0], dimensions[1]);
         }
 
-        convolutionSchema.addRow(
+        convolutionSchemaPrinter.addRow(
                 "Pool",
                 input.length,
                 "-",

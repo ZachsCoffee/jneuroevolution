@@ -5,10 +5,11 @@ import maths.matrix.MatrixReader;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConvolutionParallelExecutor extends ConvolutionExecutor {
 
-    private int executedChannels;
+    private AtomicInteger executedChannels;
 
     public ConvolutionParallelExecutor(MatrixReader[] channels) {
         super(channels);
@@ -24,15 +25,14 @@ public class ConvolutionParallelExecutor extends ConvolutionExecutor {
 
         final ExecuteStateCallback checkedCallback = Objects.requireNonNull(executeStateCallback);
 
-        executedChannels = 0;
+        executedChannels = new AtomicInteger();
 
         for (int i=0; i<channels.length; i++) {
             int fixedI = i;
             threadPool.submit(() -> {
                 output[fixedI] = computeChannel(fixedI);
 
-                executedChannels++;
-                if (channels.length == executedChannels) {
+                if (channels.length == executedChannels.incrementAndGet()) {
                     threadPool.shutdown();
                     checkedCallback.finish(output);
                 }

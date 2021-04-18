@@ -1,11 +1,11 @@
 package executors;
 
 import layers.Layer;
-import layers.LayerSchema;
+import schema.LayerSchema;
 import input.ImageInput;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixSchema;
-import schema.ConvolutionSchema;
+import schema.ConvolutionSchemaPrinter;
 
 import java.util.*;
 
@@ -27,7 +27,7 @@ public class ConvolutionExecutor {
         }
 
         channelsLayers = (ArrayList<Layer>[]) new ArrayList[channels.length];
-        for (int i = 0; i< channelsLayers.length; i++) {
+        for (int i = 0; i<channelsLayers.length; i++) {
             channelsLayers[i] = new ArrayList<>();
         }
 
@@ -87,27 +87,27 @@ public class ConvolutionExecutor {
     }
 
     public void printSchema() {
-        ConvolutionSchema convolutionSchema = new ConvolutionSchema(new String[]{
+        ConvolutionSchemaPrinter convolutionSchemaPrinter = new ConvolutionSchemaPrinter(new String[]{
                 "Layer type", "Channels", "Filters", "Sample size", "Stride", "Padding", "Output"
         });
 
-        convolutionSchema.addRow("Initial", channels.length, "-", "-", "-", "-", "-");
+        convolutionSchemaPrinter.addRow("Initial", channels.length, "-", "-", "-", "-", "-");
         int i = 0;
         for (MatrixReader channel : channels) {
-            convolutionSchema.addRow("Channel", "-", "-", channel.getRowCount() + "x" + channel.getColumnCount(), "-", "-", "-");
+            convolutionSchemaPrinter.addRow("Channel", "-", "-", channel.getRowCount() + "x" + channel.getColumnCount(), "-", "-", "-");
 
             MatrixSchema[] tempLayerSchema = new MatrixSchema[] {
                     new LayerSchema(channel.getRowCount(), channel.getColumnCount())
             };
 
             for (Layer channelLayer : channelsLayers[i]) {
-                tempLayerSchema = channelLayer.toString(tempLayerSchema, convolutionSchema);
+                tempLayerSchema = channelLayer.toString(tempLayerSchema, convolutionSchemaPrinter);
             }
 
             i++;
         }
 
-        convolutionSchema.print();
+        convolutionSchemaPrinter.print();
     }
 
     protected MatrixReader[] computeChannel(int channelIndex) {

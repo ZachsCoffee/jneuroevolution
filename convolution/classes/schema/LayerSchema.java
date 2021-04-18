@@ -1,4 +1,4 @@
-package layers;
+package schema;
 
 import maths.matrix.MatrixSchema;
 

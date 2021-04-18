@@ -5,11 +5,11 @@ import dnl.utils.text.table.TextTable;
 import java.util.LinkedList;
 import java.util.Objects;
 
-public class ConvolutionSchema {
+public class ConvolutionSchemaPrinter {
     private final String[] columns;
     private final LinkedList<Object[]> data = new LinkedList<>();
 
-    public ConvolutionSchema(String[] columns) {
+    public ConvolutionSchemaPrinter(String[] columns) {
         this.columns = Objects.requireNonNull(columns);
     }
 
