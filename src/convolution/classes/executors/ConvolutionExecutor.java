@@ -34,6 +34,10 @@ public class ConvolutionExecutor {
         output = new MatrixReader[channels.length][];
     }
 
+    public MatrixReader[][] getChannelsOutput() {
+        return output;
+    }
+
     public ConvolutionExecutor addLayerForAllChannels(Layer layer) {
         for (ArrayList<Layer> channel : channelsLayers) {
             channel.add(layer);
@@ -52,40 +56,6 @@ public class ConvolutionExecutor {
         }
     }
 
-    public double[] flatten() {
-        double[] flat = new double[flatSize()];
-
-        int startCopyIndex = 0;
-        for (MatrixReader[] channel : output) {
-            for (MatrixReader filter: channel) {
-                int rows = filter.getRowCount();
-                int columns = filter.getColumnCount();
-                for (int i=0; i<rows; i++) {
-                    System.arraycopy(filter.getRow(i), 0, flat, startCopyIndex, columns);
-                    startCopyIndex += columns;
-                }
-            }
-        }
-
-        return flat;
-    }
-
-    public int flatSize() {
-        int flatSize = 0;
-
-        for (MatrixReader[] channel : output) {
-            for (MatrixReader filter: channel) {
-                flatSize += filter.getColumnCount() * filter.getRowCount();
-            }
-        }
-
-        return flatSize;
-    }
-
-    public MatrixReader[][] getChannelsOutput() {
-        return output;
-    }
-
     public void printSchema() {
         ConvolutionSchemaPrinter convolutionSchemaPrinter = new ConvolutionSchemaPrinter(new String[]{
                 "Layer type", "Channels", "Filters", "Sample size", "Stride", "Padding", "Output"
@@ -101,7 +71,7 @@ public class ConvolutionExecutor {
             };
 
             for (Layer channelLayer : channelsLayers[i]) {
-                tempLayerSchema = channelLayer.toString(tempLayerSchema, convolutionSchemaPrinter);
+                tempLayerSchema = channelLayer.getSchema(tempLayerSchema, convolutionSchemaPrinter);
             }
 
             i++;

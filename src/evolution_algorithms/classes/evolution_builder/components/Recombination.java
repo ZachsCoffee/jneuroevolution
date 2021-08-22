@@ -17,7 +17,7 @@ public class Recombination {
     
     private Recombination(){}
     
-    public static Population fixed(Population population, int breakSize, Genes genes){
+    public static <T> Population fixed(Population population, int breakSize, Genes<T> genes){
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
         
@@ -69,7 +69,7 @@ public class Recombination {
         return newPopulation;
     }
     
-    public static Population random(Population population, int breakSize, Genes genes){
+    public static <T> Population random(Population population, int breakSize, Genes<T> genes){
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
         int randomBreakSize;
@@ -123,7 +123,7 @@ public class Recombination {
         return newPopulation;
     }
     
-    public static Population randomWithFilter(Population population, int breakSize, Genes genes){
+    public static <T> Population randomWithFilter(Population population, int breakSize, Genes<T> genes){
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
         int randomBreakSize;
@@ -181,7 +181,7 @@ public class Recombination {
         return newPopulation;
     }
     
-    public static Population fixedWithFilter(Population population, int breakSize, Genes genes){
+    public static <T> Population fixedWithFilter(Population population, int breakSize, Genes<T> genes){
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
         
@@ -237,7 +237,7 @@ public class Recombination {
         return newPopulation;
     }
     
-    public static Population variableLength(Population population, int breakSize, Genes genes){
+    public static <T> Population variableLength(Population population, int breakSize, Genes<T> genes){
         int populationSize = population.getSize(), person1GenesCount;
         int personCount = 0;
         
@@ -350,7 +350,7 @@ public class Recombination {
 //        }
 //    }
     
-    private static int getPositionOf(Genes genes, Person a, Person b, long positionB){
+    private static <T> int getPositionOf(Genes<T> genes, Person a, Person b, long positionB){
         return (int)(positionB * genes.genesCount(a) / genes.genesCount(b));
 //                return (int)(positionB*(genes.genesCount(a) -1) / (genes.genesCount(b) -1));
 
