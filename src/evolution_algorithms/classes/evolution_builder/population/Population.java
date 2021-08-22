@@ -11,13 +11,12 @@ import java.util.Collections;
 /**
  *
  * @author main
- * @param <T>
  */
-public class Population{
+public class Population {
     private int size = 100;
-    private ArrayList<Person> population = new ArrayList<>();
+    private final ArrayList<Person> population = new ArrayList<>();
     
-    private PersonManager personManager;
+    private final PersonManager personManager;
     
     public Population(PersonManager personManager){
         if (personManager == null){
