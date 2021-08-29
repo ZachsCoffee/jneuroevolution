@@ -6,6 +6,7 @@ import filters.Filter;
 import filters.Kernel;
 import functions.ActivationFunctions;
 import input.HsbInput;
+import layers.flatten.FlatLayer;
 import layers.pool.PoolFunction;
 import layers.pool.PoolLayer;
 
@@ -34,6 +35,7 @@ public class Main {
                 .addLayerForAllChannels(new ConvolutionLayer(filters, 1, true))
                 .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
                 .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 3, 3))
+                .addLayerForAllChannels(new FlatLayer())
                 .printSchema();
     }
 }

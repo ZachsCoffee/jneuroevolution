@@ -12,4 +12,5 @@ module convolution {
     exports input;
     exports layers.pool;
     exports layers;
+    exports layers.flatten;
 }

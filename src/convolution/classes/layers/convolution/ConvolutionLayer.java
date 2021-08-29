@@ -49,21 +49,21 @@ public class ConvolutionLayer implements Layer {
         schemaComputer = new SchemaComputer(stride, keepSize);
     }
 
-    public MatrixReader[] computeLayer(MatrixReader[] channel) {
-        Objects.requireNonNull(channel);
+    public MatrixReader[] computeLayer(MatrixReader[] channels) {
+        Objects.requireNonNull(channels);
 
-        if (channel.length == 0) throw new IllegalArgumentException(
+        if (channels.length == 0) throw new IllegalArgumentException(
                 "Need at least one matrix reader!"
         );
 
-        MatrixReader[] output = new MatrixReader[filters.length * channel.length];
+        MatrixReader[] output = new MatrixReader[filters.length * channels.length];
 
         int position;
-        for (int i = 0; i< channel.length; i++) {
+        for (int i = 0; i< channels.length; i++) {
             for (int j=0; j<filters.length; j++) {
-                position = i * channel.length + j;
+                position = i * channels.length + j;
 
-                output[position] = computeForFilter(channel[i], filters[j]);
+                output[position] = computeForFilter(channels[i], filters[j]);
             }
         }
 
@@ -71,11 +71,11 @@ public class ConvolutionLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] channel, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
-        MatrixSchema[] matrixSchemas = new MatrixSchema[channel.length * filters.length];
-        for (int i = 0; i< channel.length; i++) {
+    public MatrixSchema[] getSchema(MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+        MatrixSchema[] matrixSchemas = new MatrixSchema[channels.length * filters.length];
+        for (int i = 0; i< channels.length; i++) {
             for (int j=0; j<filters.length; j++) {
-                schemaComputer.compute(channel[i].getRowCount(), channel[i].getColumnCount(), filters[j].getKernelSize());
+                schemaComputer.compute(channels[i].getRowCount(), channels[i].getColumnCount(), filters[j].getKernelSize());
 
                 matrixSchemas[i * filters.length + j] = new LayerSchema(schemaComputer.getRowsCount(), schemaComputer.getColumnsCount());
             }
@@ -83,12 +83,12 @@ public class ConvolutionLayer implements Layer {
 
         convolutionSchemaPrinter.addRow(
                 "Convolution",
-                channel.length,
+                channels.length,
                 filters.length,
                 "-",
                 schemaComputer.getStrideRows() + "x" + schemaComputer.getStrideColumns(),
                 schemaComputer.getPaddingRows() + "x" + schemaComputer.getPaddingColumns(),
-                channel.length + "x" + filters.length + "x" + schemaComputer.getRowsCount() + "x" + schemaComputer.getColumnsCount()
+                channels.length + "x" + filters.length + "x" + schemaComputer.getRowsCount() + "x" + schemaComputer.getColumnsCount()
         );
 
         return matrixSchemas;

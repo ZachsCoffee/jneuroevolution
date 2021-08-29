@@ -10,11 +10,11 @@ import schema.LayerSchema;
 public class FlatLayer implements Layer {
 
     @Override
-    public MatrixReader[] computeLayer(MatrixReader[] channel) {
-        double[] flat = new double[computeOutputSize(channel)];
+    public MatrixReader[] computeLayer(MatrixReader[] channels) {
+        double[] flat = new double[computeOutputSize(channels)];
 
         int startCopyIndex = 0;
-        for (MatrixReader filter: channel) {
+        for (MatrixReader filter : channels) {
             int rows = filter.getRowCount();
             int columns = filter.getColumnCount();
             for (int i=0; i<rows; i++) {
@@ -29,16 +29,17 @@ public class FlatLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] channel, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
-        int outputSize = computeOutputSize((MatrixReader[]) channel);
+    public MatrixSchema[] getSchema(MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+        int outputSize = computeOutputSize(channels);
 
         convolutionSchemaPrinter.addRow(
                 "Flatten",
-                channel.length,
+                channels.length,
                 '-',
                 '-',
                 '-',
-                outputSize
+                '-',
+                "1x"+outputSize
         );
 
         return new MatrixSchema[] {
@@ -46,10 +47,10 @@ public class FlatLayer implements Layer {
         };
     }
 
-    private int computeOutputSize(MatrixReader[] channel) {
+    private <T extends MatrixSchema> int computeOutputSize(T[] channel) {
         int flatSize = 0;
 
-        for (MatrixReader filter : channel) {
+        for (MatrixSchema filter : channel) {
             flatSize += filter.getColumnCount() * filter.getRowCount();
         }
 

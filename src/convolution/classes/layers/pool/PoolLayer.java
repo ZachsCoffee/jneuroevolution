@@ -32,30 +32,30 @@ public class PoolLayer implements Layer {
         this.stride = stride;
     }
 
-    public MatrixReader[] computeLayer(MatrixReader[] channel) {
-        Objects.requireNonNull(channel);
-        if (channel.length == 0) {
+    public MatrixReader[] computeLayer(MatrixReader[] channels) {
+        Objects.requireNonNull(channels);
+        if (channels.length == 0) {
             throw new IllegalArgumentException("Need at least one matrix reader!");
         }
 
-        MatrixReader[] output = new MatrixReader[channel.length];
+        MatrixReader[] output = new MatrixReader[channels.length];
 
         for (int i=0; i<output.length; i++) {
-            output[i] = computeMatrix(channel[i]);
+            output[i] = computeMatrix(channels[i]);
         }
 
         return output;
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] channel, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+    public MatrixSchema[] getSchema(MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
 
-        MatrixSchema[] matrixSchemas = new MatrixSchema[channel.length];
+        MatrixSchema[] matrixSchemas = new MatrixSchema[channels.length];
         int[] dimensions = null;
-        for (int i = 0; i< channel.length; i++) {
+        for (int i = 0; i< channels.length; i++) {
             dimensions = ConvolutionUtils.outputDimensions(
-                    channel[i].getRowCount(),
-                    channel[i].getColumnCount(),
+                    channels[i].getRowCount(),
+                    channels[i].getColumnCount(),
                     sampleSize,
                     0,
                     stride
@@ -66,12 +66,12 @@ public class PoolLayer implements Layer {
 
         convolutionSchemaPrinter.addRow(
                 "Pool",
-                channel.length,
+                channels.length,
                 "-",
                 sampleSize + "x" + sampleSize,
                 stride,
                 0,
-                channel.length + "x" + dimensions[0] + "x" + dimensions[1]
+                channels.length + "x" + dimensions[0] + "x" + dimensions[1]
         );
 
         return matrixSchemas;
