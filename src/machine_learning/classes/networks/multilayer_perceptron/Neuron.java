@@ -111,7 +111,11 @@ public class Neuron {
                 sum += allWeights[i] * features[i - START_POINT];
             }
             
-            sum = sum * allWeights[MUL_BIAS_POS] + allWeights[ADD_BIAS_POS];
+            sum = sum + allWeights[ADD_BIAS_POS];
+//            sum = (sum + allWeights[ADD_BIAS_POS]) * allWeights[MUL_BIAS_POS];
+
+//          origin  sum = sum * allWeights[MUL_BIAS_POS] + allWeights[ADD_BIAS_POS];
+
 //            sum += allWeights[ADD_BIAS_POS];
 //            sum *= allWeights[MUL_BIAS_POS];
             
@@ -125,7 +129,11 @@ public class Neuron {
                 sum += allWeights[i] * features[i - START_POINT];
             }
             
-            sum = sum * allWeights[MUL_BIAS_POS] + allWeights[ADD_BIAS_POS];
+            sum = sum + allWeights[ADD_BIAS_POS];
+
+//            sum = (sum + allWeights[ADD_BIAS_POS]) * allWeights[MUL_BIAS_POS];
+//          origin  sum = sum * allWeights[MUL_BIAS_POS] + allWeights[ADD_BIAS_POS];
+
 //            sum += allWeights[ADD_BIAS_POS];
 //            sum *= allWeights[MUL_BIAS_POS];
             

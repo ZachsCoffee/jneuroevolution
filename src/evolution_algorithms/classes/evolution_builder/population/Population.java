@@ -13,6 +13,23 @@ import java.util.Collections;
  * @author main
  */
 public class Population {
+
+    public synchronized static Population generate(PersonManager personManager) {
+        Population tempPopulation = new Population(personManager);
+
+        tempPopulation.createPopulation();
+
+        return tempPopulation;
+    }
+
+    public synchronized static Population generate(PersonManager personManager, int size) {
+        Population tempPopulation = new Population(personManager, size);
+
+        tempPopulation.createPopulation();
+
+        return tempPopulation;
+    }
+
     private int size = 100;
     private final ArrayList<Person> population = new ArrayList<>();
     
@@ -90,12 +107,12 @@ public class Population {
     public void sortPopulation(){
         Collections.sort(population);
     }
-    void restorePopulation(){//gia na mporw na ksana gemisw to population ama einai fixed size
-        int restoreCount = size - population.size();
-        for (int i=1; i<=restoreCount; i++){
-            population.add(personManager.newPerson());
-        }
-    }
+//    void restorePopulation(){//gia na mporw na ksana gemisw to population ama einai fixed size
+//        int restoreCount = size - population.size();
+//        for (int i=1; i<=restoreCount; i++){
+//            population.add(personManager.newPerson());
+//        }
+//    }
     //end methods
     
     private void computeFitnessForPopulation(){//returns the best person

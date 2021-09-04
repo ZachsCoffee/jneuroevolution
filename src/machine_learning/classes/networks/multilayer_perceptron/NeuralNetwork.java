@@ -5,16 +5,55 @@
  */
 package networks.multilayer_perceptron;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import functions.ActivationFunctions;
 import maths.Function;
 import networks.interfaces.Network;
 import maths.MinMax;
+import networks.representations.LayerImage;
+import networks.representations.NetworkImage;
 
 /**
  *
  * @author main
  */
 public class NeuralNetwork implements Network {
-    protected int maxStartValue = 1;
+    
+    
+    public static NeuralNetwork loadFromJson(String json) {
+        Gson gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
+        
+        NetworkImage networkImage = gson.fromJson(json, NetworkImage.class);
+        
+        LayerImage[] layerImages = networkImage.getLayers();
+        
+        NetworkLayer[] networkLayers = new NetworkLayer[layerImages.length];
+        
+        // build the schema of the network
+        for (int i=0; i<networkLayers.length; i++) {
+            networkLayers[i] = new NetworkLayer(
+                    layerImages[i].getNeuronsCount(), 
+                    layerImages[i].getWeightsPerNeuron(), 
+                    ActivationFunctions.getFunction(layerImages[i].getFunctionName())
+            );
+        }
+        
+        // fill the network with the weights
+        NeuralNetwork neuralNetwork = new NeuralNetwork(networkLayers);
+        int weightsCount = neuralNetwork.getWeightsCount();
+        for (int i=0; i<weightsCount; i++) {
+            neuralNetwork.setWeightAt(i, networkImage.getNetworkWeights()[i]);
+        }
+
+        return neuralNetwork;
+    }
+//    
+    public final int MAX_START_VALUE;
+    
     protected NetworkLayer[] layers;
     protected double[] weights;
     
@@ -26,6 +65,8 @@ public class NeuralNetwork implements Network {
         if (layers.length <= 0){
             throw new IllegalArgumentException("Layers length, must be greater than zero");
         }
+
+        MAX_START_VALUE = 1;
         
         this.layers = layers;
         
@@ -40,7 +81,7 @@ public class NeuralNetwork implements Network {
         for (int i=0; i<layers.length; i++){
             layers[i].buildNeurons(weights, startPoint);
             startPoint += layers[i].getNeuronsCount() * layers[i].getLayerInputCount();
-        }
+        }        
     }
     
     public NeuralNetwork(NetworkLayer[] layers, int maxStartValue){
@@ -61,9 +102,11 @@ public class NeuralNetwork implements Network {
         
         weights = new double[sumOfWeights];
         
+        MAX_START_VALUE = maxStartValue;
+        
         int startPoint = 0;
         for (int i=0; i<layers.length; i++){
-            layers[i].maxStartValue = maxStartValue;
+            layers[i].maxStartValue = MAX_START_VALUE;
             layers[i].buildNeurons(weights, startPoint);
             startPoint += layers[i].getNeuronsCount() * layers[i].getLayerInputCount();
         }
@@ -124,7 +167,7 @@ public class NeuralNetwork implements Network {
         
         int tempNeuronsPerlLayer = neuronPerLayer.randomBetween();
         NetworkLayer[] networkLayers = new NetworkLayer[networkLength.randomBetween()];
-        networkLayers[0] = new NetworkLayer(tempNeuronsPerlLayer, inputFeatures);
+//        networkLayers[0] = new NetworkLayer(tempNeuronsPerlLayer, inputFeatures);
 
         if (hiddenLayerF != null){
             networkLayers[0] = new NetworkLayer(tempNeuronsPerlLayer, inputFeatures, hiddenLayerF);

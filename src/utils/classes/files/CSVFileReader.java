@@ -19,25 +19,47 @@ public class CSVFileReader {
     
     private CSVFileReader(){}
     
-    public static double[][] readNumbersFile(File csvFile, String separator, DataParser dataParser) {
-        
-        if (separator == null || separator.equals("")) throw new IllegalArgumentException(
-                "arguments separetor not null and at least one character"
+    public static String[][] readStrings(File csvFile, String delimiter, DataParser dataParser) {
+        if (delimiter == null || delimiter.equals("")) throw new IllegalArgumentException(
+                "argument delimiter not null and at least one character"
         );
         if (dataParser == null) throw new IllegalArgumentException(
-                "arguments dataParser not null"
+                "argument dataParser not null"
         );
         
-        return readNumbersFile(csvFile.getPath(), separator, dataParser);
+                
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), "UTF-8"))){
+            
+            ArrayList<String[]> data = new ArrayList();
+            
+            String[] splitedLine;
+            String line;
+            while ((line = reader.readLine()) != null){
+                splitedLine = line.split(delimiter);
+                
+                dataParser.dataParser(splitedLine);
+                
+                data.add(splitedLine);
+            }
+            
+            return data.toArray(new String[][]{});
+        } 
+        catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
-    public static double[][] readNumbersFile(String csvFilePath, String separator, DataParser dataParser) {
+    public static double[][] readNumbersFile(File csvFile, String delimiter, DataParser dataParser) {
+        return readNumbersFile(csvFile.getPath(), delimiter, dataParser);
+    }
+    
+    public static double[][] readNumbersFile(String csvFilePath, String delimiter, DataParser dataParser) {
         
-        if (separator == null || separator.equals("")) throw new IllegalArgumentException(
-                "arguments separetor not null and at least one character"
+        if (delimiter == null || delimiter.equals("")) throw new IllegalArgumentException(
+                "argument delimiter not null and at least one character"
         );
         if (dataParser == null) throw new IllegalArgumentException(
-                "arguments dataParser not null"
+                "argument dataParser not null"
         );
         
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(csvFilePath), "UTF-8"))){
@@ -48,7 +70,7 @@ public class CSVFileReader {
             double[] doubleArray;
             String line;
             while ((line = reader.readLine()) != null){
-                splitedLine = line.split(separator);
+                splitedLine = line.split(delimiter);
                 doubleArray = new double[splitedLine.length];
                 
                 for (int i=0; i<splitedLine.length; i++){
@@ -67,13 +89,8 @@ public class CSVFileReader {
         }
     }
     
-    public static double[][] readNumbersFile(File csvFile, String separator){
-        
-        if (separator == null || separator.equals("")) throw new IllegalArgumentException(
-                "arguments separetor not null and at least one character"
-        );
-        
-        return readNumbersFile(csvFile.getPath(), separator);
+    public static double[][] readNumbersFile(File csvFile, String delimiter){
+        return readNumbersFile(csvFile.getPath(), delimiter);
     }
     
     
@@ -81,13 +98,13 @@ public class CSVFileReader {
     /**
      * Read a csv file of numbers ONLY. The character set must be UTF-8. 
      * @param csvFilePath The path to csv file
-     * @param separator The column separator (delimiter) of csv file. 
+     * @param delimiter The column delimiter (delimiter) of csv file. 
      * @return The data from the file
      */
-    public static double[][] readNumbersFile(String csvFilePath, String separator){
+    public static double[][] readNumbersFile(String csvFilePath, String delimiter){
         
-        if (separator == null || separator.equals("")) throw new IllegalArgumentException(
-                "arguments separetor not null and at least one character"
+        if (delimiter == null || delimiter.equals("")) throw new IllegalArgumentException(
+                "argument delimiter not null and at least one character"
         );
         
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(csvFilePath), "UTF-8"))){
@@ -98,7 +115,7 @@ public class CSVFileReader {
             double[] doubleArray;
             String line;
             while ((line = reader.readLine()) != null){
-                splitedLine = line.split(separator);
+                splitedLine = line.split(delimiter);
                 doubleArray = new double[splitedLine.length];
                 
                 for (int i=0; i<splitedLine.length; i++){
@@ -117,6 +134,8 @@ public class CSVFileReader {
     
     public interface DataParser {
         
-        public void dataParser(double[] csvData);
+        default void dataParser(double[] csvData) {};
+        
+        default void dataParser(String[] csvData) {};
     }
 }

@@ -5,12 +5,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/classes" isTestSource="false" />
     </content>
-<<<<<<<< HEAD:src/machine_learning/machine_learning.iml
     <orderEntry type="inheritedJdk" />
-========
-    <orderEntry type="jdk" jdkName="9" jdkType="JavaSDK" />
->>>>>>>> feature/utils_for_datasets:machine_learning/machine_learning.iml
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="utils" exported="" />
   </component>
 </module>

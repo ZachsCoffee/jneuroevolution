@@ -75,15 +75,20 @@ class Person extends Genes implements PersonManager {
             pastLayerNeurons = tempLayer.getNeuronsCount();
         }
         
-        return new evolution_builder.population.Person(new NeuralNetwork(networkLayers, 20));
-//        return new evolution_builder.population.Person(
-//                new BackpropagationMLP(
-//                        networkLayers, 
-//                        5, 
-//                        mlProblem.getProblem().getTrainingDataset(), 
-//                        mlProblem.getProblem().getTrainingData()
-//                )
-//        );
+        // TODO: make generic the network type e.g backpropagationmlp
+        if (givenNetwork instanceof BackpropagationMLP) {
+            return new evolution_builder.population.Person(
+                    new BackpropagationMLP(
+                            networkLayers, 
+                            ((BackpropagationMLP) givenNetwork).LEARN_RATE, 
+                            mlProblem.getProblem().getTrainingDataset().features, 
+                            mlProblem.getProblem().getTrainingDataset().targets
+                    )
+            ); 
+        }
+        else {
+            return new evolution_builder.population.Person(new NeuralNetwork(networkLayers, 2));
+        }
     }
     
     @Override

@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 public class Gui extends javax.swing.JFrame implements DataBinder {
-    private LinkedList<JLabel> resultsLabels = new LinkedList<>();
+    private final LinkedList<JLabel> resultsLabels = new LinkedList<>();
 
     private CardLayout evolutionCardLayout, predictionCardLayout;
     private static ProblemExecutor problemExecutor;
@@ -196,7 +196,6 @@ public class Gui extends javax.swing.JFrame implements DataBinder {
     }
 
     private void previousButtonActionPerformed(java.awt.event.ActionEvent evt) {
-
         // clear the text color
         resultsLabels.peek().setForeground(null);
 
@@ -211,7 +210,7 @@ public class Gui extends javax.swing.JFrame implements DataBinder {
 
 
         predictionCardLayout.previous(predictionPanel);
-        evolutionCardLayout.previous(evolutionPanel);
+        evolutionCardLayout.previous(evolutionPanel);            
     }
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {
@@ -227,37 +226,38 @@ public class Gui extends javax.swing.JFrame implements DataBinder {
         resultsLabels.peek().setForeground(Color.red);
 
         predictionCardLayout.next(predictionPanel);
-        evolutionCardLayout.next(evolutionPanel);
+        evolutionCardLayout.next(evolutionPanel);            
     }
 
     @Override
     public void addResults(ResultsData resultsData) {
+        synchronized(resultsLabels) {
+            JLabel newResult = new JLabel(resultsData.resultsString);
+            resultsLabels.add(newResult);
 
-        JLabel newResult = new JLabel(resultsData.resultsString);
-        resultsLabels.add(newResult);
+            resultsPanel.add(newResult);
 
-        resultsPanel.add(newResult);
+            int labelsCount = resultsLabels.size();
+            switch (labelsCount) {
+                case 1:
+                    newResult.setForeground(Color.red);
 
-        int labelsCount = resultsLabels.size();
-        switch (labelsCount) {
-            case 1:
-                newResult.setForeground(Color.red);
+                    break;
+                case 2:
+                    nextButton.setEnabled(true);
+                    previousButton.setEnabled(true);
+                    newResult.setForeground(Color.LIGHT_GRAY);
 
-                break;
-            case 2:
-                nextButton.setEnabled(true);
-                previousButton.setEnabled(true);
-                newResult.setForeground(Color.LIGHT_GRAY);
+                    break;
+                default:
+                    newResult.setForeground(Color.LIGHT_GRAY);
 
-                break;
-            default:
-                newResult.setForeground(Color.LIGHT_GRAY);
-
-                break;
+                    break;
+            }
+            System.out.println(resultsLabels.size());
+            buildEvolutionChart(resultsData);
+            buildPredictionChart(resultsData);             
         }
-
-        buildEvolutionChart(resultsData);
-        buildPredictionChart(resultsData);
     }
 
     @Override

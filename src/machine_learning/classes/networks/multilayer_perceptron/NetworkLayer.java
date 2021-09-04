@@ -14,7 +14,7 @@ import maths.Function;
 public class NetworkLayer{
     int maxStartValue = 1;
     
-    protected int numberOfWeights;
+    protected final int NUMBER_OR_WEIGHTS;
     protected Function function;
     protected Neuron[] neuros;
     
@@ -24,7 +24,7 @@ public class NetworkLayer{
             throw new IllegalArgumentException("Number of nodes and number of weights must be greater than zero.");
         }
         
-        this.numberOfWeights = numberOfWeights + Neuron.EXTRA_WEIGHTS;// the weights for one neuron
+        NUMBER_OR_WEIGHTS = numberOfWeights + Neuron.EXTRA_WEIGHTS;// the weights for one neuron
         neuros = new Neuron[numberOfNeurons];
     }
     
@@ -45,7 +45,7 @@ public class NetworkLayer{
         return neuros.length;
     }
     public int getLayerInputCount(){
-        return numberOfWeights;
+        return NUMBER_OR_WEIGHTS;
     }
     public Function getFunction(){
         return function;
@@ -56,7 +56,7 @@ public class NetworkLayer{
     }
     
     protected void buildNeurons(double[] weights, int startPoint){
-        int endPoint = startPoint + numberOfWeights;
+        int endPoint = startPoint + NUMBER_OR_WEIGHTS;
         for (int i=0; i<neuros.length; i++){
             if (function == null){
                 neuros[i] = new Neuron(weights, startPoint, endPoint, maxStartValue);  
@@ -65,8 +65,8 @@ public class NetworkLayer{
                 neuros[i] = new Neuron(weights, startPoint, endPoint, maxStartValue, function);
             }
             
-            startPoint += numberOfWeights;
-            endPoint += numberOfWeights;
+            startPoint += NUMBER_OR_WEIGHTS;
+            endPoint += NUMBER_OR_WEIGHTS;
         }
     }
     

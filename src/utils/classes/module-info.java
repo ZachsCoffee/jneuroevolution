@@ -6,7 +6,6 @@
 
 module utils {
     requires json.simple;
-
     exports files;
     exports maths;
     exports maths.matrix;
