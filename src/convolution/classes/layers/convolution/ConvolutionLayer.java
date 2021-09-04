@@ -17,7 +17,7 @@ public class ConvolutionLayer implements Layer {
     private final Filter[] filters;
     private final SchemaComputer schemaComputer;
 
-    public ConvolutionLayer(Filter filter, int rows, int columns) {
+    public ConvolutionLayer(Filter[] filters, int rows, int columns) {
         if (rows <= 0) throw new IllegalArgumentException(
                 "Rows must be a positive number."
         );
@@ -25,9 +25,11 @@ public class ConvolutionLayer implements Layer {
                 "Columns must be a positive number."
         );
 
-        this.filters = new Filter[] {
-                Objects.requireNonNull(filter)
-        };
+//        this.filters = new Filter[] {
+//                Objects.requireNonNull(filter)
+//        };
+
+        this.filters = Objects.requireNonNull(filters);
 
         schemaComputer = new SchemaComputer(new LayerSchema(rows, columns));
     }
@@ -104,21 +106,24 @@ public class ConvolutionLayer implements Layer {
         schemaComputer.compute(inputRows, inputColumns, kernelSize);
 
         double[][] output = new double[schemaComputer.getRowsCount()][schemaComputer.getColumnsCount()];
-
+//        int outI = 0, outJ = 0, i, j;
         for (
                 int i = - schemaComputer.getPaddingRows(), outI = 0;
-                i < inputRows + schemaComputer.getPaddingRows() - kernelSize;
+                i < inputRows + schemaComputer.getPaddingRows() - kernelSize + schemaComputer.getStrideRows();
                 i += schemaComputer.getStrideRows(), outI++
         ) {
             for (
                     int j = - schemaComputer.getPaddingColumns(), outJ = 0;
-                    j < inputColumns + schemaComputer.getPaddingColumns() - kernelSize;
-                    j += schemaComputer.getColumnsCount(), outJ++
+                    j < inputColumns + schemaComputer.getPaddingColumns() - kernelSize + schemaComputer.getStrideColumns();
+                    j += schemaComputer.getStrideColumns(), outJ++
             ) {
+//                if (outI == output.length-1 || outJ == output[0].length -1) {
+//                    System.out.println("ok");
+//                }
                 output[outI][outJ] = filter.compute(i, j, matrixReader);
             }
         }
-
+//        System.out.println(output[output.length-1][output[0].length -1]);
         return new MatrixReader2D(output);
     }
 }

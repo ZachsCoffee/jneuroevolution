@@ -11,5 +11,8 @@
     <orderEntry type="module" module-name="utils" />
     <orderEntry type="module" module-name="machine_learning" />
     <orderEntry type="library" name="commons-lang3-3.12.0" level="project" />
+    <orderEntry type="module" module-name="neuroevolution" />
+    <orderEntry type="module" module-name="evolution_algorithms" />
+    <orderEntry type="module" module-name="neuroevolution_gui" />
   </component>
 </module>

@@ -18,7 +18,7 @@ public class HsbInput implements ImageInput {
                 new AbstractImageInput(image) {
                     @Override
                     public double valueAt(int rowIndex, int columnIndex) {
-                        return getHsb(columnIndex, rowIndex)[0];
+                        return getHsb(rowIndex, columnIndex)[0];
                     }
 
                     @Override
@@ -29,7 +29,7 @@ public class HsbInput implements ImageInput {
                 new AbstractImageInput(image) {
                     @Override
                     public double valueAt(int rowIndex, int columnIndex) {
-                        return getHsb(columnIndex, rowIndex)[1];
+                        return getHsb(rowIndex, columnIndex)[1];
                     }
 
                     @Override
@@ -40,7 +40,7 @@ public class HsbInput implements ImageInput {
                 new AbstractImageInput(image) {
                     @Override
                     public double valueAt(int rowIndex, int columnIndex) {
-                        return getHsb(columnIndex, rowIndex)[2];
+                        return getHsb(rowIndex, columnIndex)[2];
                     }
 
                     @Override

@@ -14,9 +14,10 @@ public class FlatLayer implements Layer {
         double[] flat = new double[computeOutputSize(channels)];
 
         int startCopyIndex = 0;
+        int rows, columns;
         for (MatrixReader filter : channels) {
-            int rows = filter.getRowCount();
-            int columns = filter.getColumnCount();
+            rows = filter.getRowCount();
+            columns = filter.getColumnCount();
             for (int i=0; i<rows; i++) {
                 System.arraycopy(filter.getRow(i), 0, flat, startCopyIndex, columns);
                 startCopyIndex += columns;

@@ -13,4 +13,5 @@ module convolution {
     exports layers.pool;
     exports layers;
     exports layers.flatten;
+    exports utils;
 }

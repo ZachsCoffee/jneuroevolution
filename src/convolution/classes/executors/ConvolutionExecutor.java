@@ -50,10 +50,12 @@ public class ConvolutionExecutor {
         channelsLayers[channelPosition].add(layer);
     }
 
-    public void execute() {
+    public ConvolutionExecutor execute() {
         for (int i=0; i<channels.length; i++) {
             output[i] = computeChannel(i);
         }
+
+        return this;
     }
 
     public void printSchema() {

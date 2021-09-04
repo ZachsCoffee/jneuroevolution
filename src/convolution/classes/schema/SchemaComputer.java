@@ -10,20 +10,20 @@ public class SchemaComputer {
 
     private final LayerSchema fixedSchema;
     private final boolean keepSize;
-    private final int inputStride;
 
     private int paddingRows, paddingColumns;
-    private int rowsCount, columnsCount;
     private int strideRows, strideColumns;
+    private int rowsCount, columnsCount;
 
     public SchemaComputer(int stride, boolean keepSize) {
         if (stride < 1) throw new IllegalArgumentException(
                 "Stride must be at least 1 not "+stride
         );
 
-        this.inputStride = stride;
         this.keepSize = keepSize;
         fixedSchema = null;
+
+        strideRows = strideColumns = stride;
     }
 
     public SchemaComputer(LayerSchema fixedSchema) {
@@ -31,16 +31,16 @@ public class SchemaComputer {
         this.fixedSchema = fixedSchema;
         keepSize = false;
 
-        this.inputStride = DEFAULT_STRIDE;
+        strideRows = strideColumns = DEFAULT_STRIDE;
     }
 
     public void compute(int inputRows, int inputColumns, int kernelSize) {
         if (keepSize) {
-            paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, inputStride, inputRows);
-            paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, inputStride, inputColumns);
+            paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, strideRows, inputRows);
+            paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, strideColumns, inputColumns);
 
-            rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, inputStride);
-            columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, inputStride);
+            rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, strideRows);
+            columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, strideColumns);
 
             // validate
             if (rowsCount != inputRows || columnsCount != inputColumns) throw new RuntimeException(
@@ -77,8 +77,8 @@ public class SchemaComputer {
         else {
             paddingRows = paddingColumns = 0;
 
-            rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, inputStride);
-            columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, inputStride);
+            rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, strideRows);
+            columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, strideColumns);
         }
     }
 
@@ -99,14 +99,10 @@ public class SchemaComputer {
     }
 
     public int getStrideRows() {
-        return fixedSchema == null
-            ? inputStride
-            : strideRows;
+        return strideRows;
     }
 
     public int getStrideColumns() {
-        return fixedSchema == null
-            ? inputStride
-            : strideColumns;
+        return strideColumns;
     }
 }
