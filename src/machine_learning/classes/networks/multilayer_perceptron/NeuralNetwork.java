@@ -15,6 +15,8 @@ import maths.MinMax;
 import networks.representations.LayerImage;
 import networks.representations.NetworkImage;
 
+import java.util.List;
+
 /**
  * @author main
  */
@@ -195,11 +197,11 @@ public class NeuralNetwork implements Network {
     }
 
     public String toString() {
-        String output = "";
+        StringBuilder output = new StringBuilder();
 
         int layersCount = layers.length;
         for (int i = 0; i < layersCount; i++) {
-            output += "Layer " + (i + 1) + ": neurons(" + layers[i].getNeuronsCount() + ")\n";
+            output.append("Layer ").append(i + 1).append(": neurons(").append(layers[i].getNeuronsCount()).append(")\n");
         }
 
         return output + "\n";
