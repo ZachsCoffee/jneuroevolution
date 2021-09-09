@@ -11,5 +11,6 @@
     <orderEntry type="module" module-name="evolution_algorithms" />
     <orderEntry type="module" module-name="machine_learning" />
     <orderEntry type="module" module-name="utils" />
+    <orderEntry type="library" name="jcommon-1.0.24-javadoc1" level="project" />
   </component>
 </module>
