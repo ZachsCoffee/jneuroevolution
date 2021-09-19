@@ -75,5 +75,14 @@ public final class Maths {
                 
         return distance * (value - minValue) / (maxValue - minValue) + scaleMin;
     }
-    
+
+    public static int digitsCount(int number) {
+        int count = 1;
+
+        while ((number /= 10) != 0) {
+            count++;
+        }
+
+        return count;
+    }
 }

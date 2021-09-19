@@ -302,19 +302,26 @@ public class Gui extends javax.swing.JFrame implements DataBinder {
                 predictedDataSeries = new XYSeries("Predicted values");
 
 
+        int period = (int) Math.ceil(resultsData.realData.length / 100d);
+        int p = 0;
 
         for (int i=0; i<resultsData.realData.length; i++) {
 
             for (int j=0; j<resultsData.realData[i].length; j++) {
 
+//                if (i % period != 0) {
+//                    continue;
+//                }
 //                if (resultsData.realData[i][j] == resultsData.predictedData[i][j]) {
-                    predictedDataSeries.add(i, resultsData.predictedData[i][j]);
+                    predictedDataSeries.add(i, resultsData.predictedData[i][0]);
 
 //                }
 //                else {
-                    realDataSeries.add(i, resultsData.realData[i][j]);
+//                realDataSeries.add(p, resultsData.realData[i][0]);
+                realDataSeries.add(i, resultsData.predictedData[i][1]);
 
 //                }
+                p++;
             }
         }
 

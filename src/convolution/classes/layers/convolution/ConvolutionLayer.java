@@ -63,7 +63,7 @@ public class ConvolutionLayer implements Layer {
         int position;
         for (int i = 0; i< channels.length; i++) {
             for (int j=0; j<filters.length; j++) {
-                position = i * channels.length + j;
+                position = i * filters.length + j;
 
                 output[position] = computeForFilter(channels[i], filters[j]);
             }
@@ -106,24 +106,34 @@ public class ConvolutionLayer implements Layer {
         schemaComputer.compute(inputRows, inputColumns, kernelSize);
 
         double[][] output = new double[schemaComputer.getRowsCount()][schemaComputer.getColumnsCount()];
-//        int outI = 0, outJ = 0, i, j;
-        for (
-                int i = - schemaComputer.getPaddingRows(), outI = 0;
-                i < inputRows + schemaComputer.getPaddingRows() - kernelSize + schemaComputer.getStrideRows();
-                i += schemaComputer.getStrideRows(), outI++
-        ) {
+
+        int inputRowsBound = inputRows + schemaComputer.getPaddingRows() - kernelSize;
+        int inputColumnsBound = inputColumns + schemaComputer.getPaddingColumns() - kernelSize;
+
+        try {
             for (
-                    int j = - schemaComputer.getPaddingColumns(), outJ = 0;
-                    j < inputColumns + schemaComputer.getPaddingColumns() - kernelSize + schemaComputer.getStrideColumns();
-                    j += schemaComputer.getStrideColumns(), outJ++
+                    int i = - schemaComputer.getPaddingRows(), outI = 0;
+                    i < inputRowsBound;
+                    i += schemaComputer.getStrideRows(), outI++
             ) {
+                for (
+                        int j = - schemaComputer.getPaddingColumns(), outJ = 0;
+                        j < inputColumnsBound;
+                        j += schemaComputer.getStrideColumns(), outJ++
+                ) {
 //                if (outI == output.length-1 || outJ == output[0].length -1) {
 //                    System.out.println("ok");
 //                }
-                output[outI][outJ] = filter.compute(i, j, matrixReader);
+//                    if (outI < output.length && outJ < output[0].length) {
+                        output[outI][outJ] = filter.compute(i, j, matrixReader);
+//                    }
+                }
             }
         }
-//        System.out.println(output[output.length-1][output[0].length -1]);
+        catch (ArrayIndexOutOfBoundsException ex) {
+            throw new RuntimeException("Input rows bound: "+inputColumnsBound+" input columns bound: "+inputColumnsBound, ex);
+        }
+
         return new MatrixReader2D(output);
     }
 }

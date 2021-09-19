@@ -6,9 +6,9 @@
 
 module machine_learning {
     requires utils;
-    requires com.google.gson;
 //    requires jocl;
-    requires jcommon;
+    requires java.logging;
+    requires com.google.gson;
 
     exports functions;
     exports networks.interfaces;

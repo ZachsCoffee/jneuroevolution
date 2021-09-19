@@ -35,7 +35,7 @@ public class BinaryDatasetWriter implements AutoCloseable {
 
     public void write(double... data) throws IOException {
         if (writeHeader) {
-            outputStream.write(data.length);
+            outputStream.writeInt(data.length);
 
             byteBuffer = ByteBuffer.allocate(data.length * 8);
             doubleBuffer = byteBuffer.asDoubleBuffer();
@@ -43,6 +43,7 @@ public class BinaryDatasetWriter implements AutoCloseable {
             writeHeader = false;
         }
 
+        doubleBuffer.clear();
         doubleBuffer.put(data);
 
         outputStream.write(byteBuffer.array());

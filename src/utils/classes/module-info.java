@@ -5,8 +5,11 @@
  */
 
 module utils {
+    requires java.desktop;
     requires json.simple;
-    exports files;
+
+    exports files.binary;
+    exports files.csv;
     exports maths;
     exports maths.matrix;
 }

@@ -27,6 +27,24 @@ public class Kernel {
             {-1, -1, -1}
     };
 
+    public static final double[][] SOBEL_EDGE_HORIZONTAL  = {
+            {-1, -2, -1},
+            {0, 0, 0},
+            {1, 2, 1}
+    };
+
+    public static final double[][] SOBEL_EDGE_VERTICAL  = {
+            {-1, 0, 1},
+            {-2, 0, 2},
+            {-1, 0, 1}
+    };
+
+    public static final double[][] LAPLACIAN = {
+            {0, 1, 0},
+            {1, -4, 1},
+            {0, 1, 0}
+    };
+
     public static final double[][] SHARPEN = {
             {0, -1, 0},
             {-1, 5, -1},

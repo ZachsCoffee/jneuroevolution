@@ -7,4 +7,6 @@ module test {
     requires neuroevolution;
     requires evolution_algorithms;
     requires neuroevolution_gui;
+
+    exports convolution_test;
 }

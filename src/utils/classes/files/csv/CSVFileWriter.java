@@ -3,119 +3,100 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package files;
+package files.csv;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.Iterator;
 
 /**
  *
  * @author Zachs
  */
 public class CSVFileWriter implements AutoCloseable {
-    
+
     private final String DEFAULT_DELIMITER = ",";
-    
+
     private final String DELIMITER, NEXT_LINE = "\n";
-    
+
     private File csvFile;
-    private FileWriter fileWriter;
+    private PrintWriter printWriter;
     private String stringBuffer = "";
-    
+
     public CSVFileWriter(String filePath){
-        
+
         this(new File(filePath));
     }
     public CSVFileWriter(String filePath, String delimiter){
-        
+
         this(new File(filePath), delimiter);
     }
     public CSVFileWriter(File csvFile){
         open(csvFile);
-        
+
         this.csvFile = csvFile;
-        
+
         DELIMITER = DEFAULT_DELIMITER;
     }
     public CSVFileWriter(File csvFile, String delimiter){
         open(csvFile);
-        
+
         this.csvFile = csvFile;
-        
+
         DELIMITER = delimiter;
     }
-    
+
     public String getBuffer(){
         return stringBuffer;
     }
     public File getCsvFile(){
         return csvFile;
     }
-    
+
     public void clearBuffer(){
         stringBuffer = "";
     }
-    
+
     public final void open(File csvFile){
-        if (fileWriter == null){
+        if (printWriter == null){
             try {
-                fileWriter = new FileWriter(csvFile);
-            } 
+                printWriter = new PrintWriter(new BufferedWriter(new FileWriter(csvFile)));
+            }
             catch (IOException ex) {
                 throw new RuntimeException(ex.getMessage());
             }
         }
     }
-    
-    public void addToBuffer(Object... object){
+
+    public void addToBuffer(Object... objects){
         if (stringBuffer.equals("")){
-            stringBuffer += join(object);        
+            stringBuffer += join(objects);
         }
         else{
-            stringBuffer += DELIMITER+join(object);
+            stringBuffer += DELIMITER+join(objects);
         }
     }
-    
+
     public void writeLine(){
-        try {
-            fileWriter.write(stringBuffer+NEXT_LINE);
-            fileWriter.flush();
-        } 
-        catch (IOException ex) {
-            throw new RuntimeException(ex.getMessage());
-        }
-        
+        printWriter.write(stringBuffer+NEXT_LINE);
+
         stringBuffer = "";
     }
-    
-    public void writeLine(Object... objects){
-        try {
-            if (stringBuffer.equals("")){
-                fileWriter.write(join(objects)+NEXT_LINE);
-            }
-            else{
-                fileWriter.write(stringBuffer+DELIMITER+join(objects)+NEXT_LINE);
-            }
-            
-            fileWriter.flush();
-        } 
-        catch (IOException ex) {
-            throw new RuntimeException(ex.getMessage());
+
+    public void writeLine(Object... objects) {
+        if (stringBuffer.equals("")){
+            printWriter.write(join(objects)+NEXT_LINE);
         }
-        
+        else{
+            printWriter.write(stringBuffer+DELIMITER+join(objects)+NEXT_LINE);
+        }
+        printWriter.flush();
         stringBuffer = "";
     }
-    
+
     @Override
-    public void close(){
-        try {
-            fileWriter.flush();
-            fileWriter.close();
-        } 
-        catch (IOException ex) {
-            throw new RuntimeException(ex.getMessage());
-        }
+    public void close() {
+            printWriter.flush();
+            printWriter.close();
     }
     
     private String join(Object[] objects){

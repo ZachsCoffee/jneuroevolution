@@ -42,7 +42,7 @@ public final class DatasetSplitter {
                 problemDatasets.testingDataset = Dataset.create(datasets[0], features);
             }
             else {
-                problemDatasets.testingDataset = Dataset.create(split(datasetSpecs.getData(), datasetSpecs.getTestingSize())[1], features);
+                problemDatasets.testingDataset = Dataset.create(split(datasets[1], datasetSpecs.getTestingSize())[0], features);
             }
         }
 

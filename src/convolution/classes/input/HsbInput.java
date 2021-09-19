@@ -2,19 +2,19 @@ package input;
 
 import maths.matrix.MatrixReader;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Objects;
 
 
-public class HsbInput implements ImageInput {
+public class HsbInput implements ConvolutionInput {
 
-    private final File image;
     private final MatrixReader[] channels;
 
-    public HsbInput(File image) {
-        this.image = Objects.requireNonNull(image);
+    public HsbInput(BufferedImage image) {
+        Objects.requireNonNull(image);
 
-        channels = new MatrixReader[]{
+        channels = new MatrixReader[] {
                 new AbstractImageInput(image) {
                     @Override
                     public double valueAt(int rowIndex, int columnIndex) {

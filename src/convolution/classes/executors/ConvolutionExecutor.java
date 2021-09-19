@@ -2,7 +2,7 @@ package executors;
 
 import layers.Layer;
 import schema.LayerSchema;
-import input.ImageInput;
+import input.ConvolutionInput;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixSchema;
 import schema.ConvolutionSchemaPrinter;
@@ -11,8 +11,8 @@ import java.util.*;
 
 public class ConvolutionExecutor {
 
-    public static ConvolutionExecutor initialize(ImageInput imageInput) {
-        return new ConvolutionExecutor(imageInput.getChannels());
+    public static ConvolutionExecutor initialize(ConvolutionInput convolutionInput) {
+        return new ConvolutionExecutor(convolutionInput.getChannels());
     }
 
     private final ArrayList<Layer>[] channelsLayers;
@@ -84,10 +84,23 @@ public class ConvolutionExecutor {
         }
     }
 
+    public ConvolutionExecutor changeInput(ConvolutionInput convolutionInput) {
+        output = new MatrixReader[channels.length][];
+
+        return this;
+    }
+
     protected MatrixReader[] computeChannel(int channelIndex) {
         MatrixReader[] previousMatrixReader = new MatrixReader[]{channels[channelIndex]};
-        for (Layer layer : channelsLayers[channelIndex]) {
-            previousMatrixReader = layer.computeLayer(previousMatrixReader);
+        int i = 1;
+        try {
+            for (Layer layer : channelsLayers[channelIndex]) {
+                previousMatrixReader = layer.computeLayer(previousMatrixReader);
+                i++;
+            }
+        }
+        catch (Exception ex) {
+            throw new RuntimeException("Error at channel: "+(channelIndex +1)+" and layer: "+i, ex);
         }
 
         return previousMatrixReader;

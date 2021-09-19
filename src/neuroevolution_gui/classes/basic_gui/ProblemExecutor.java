@@ -3,17 +3,15 @@ package basic_gui;
 import data_manipulation.CrossValidation;
 import data_manipulation.Dataset;
 import data_manipulation.DatasetSpecs;
-import data_manipulation.DatasetSplitter;
 import data_manipulation.ProblemDatasets;
 import evolution_builder.Evolution;
 import evolution_builder.population.PersonMigration;
 import evolution_builder.population.Population;
 import execution.EvaluationTarget;
-import files.CSVFileReader;
-import files.CSVFileWriter;
+import files.csv.CSVFileReader;
+import files.csv.CSVFileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -61,7 +59,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
         this.dataBinder = dataBinder;
     }
 
-    public abstract EvaluationResult evaluation(Network network, Dataset testingDataset);
+    public abstract EvaluationResult evaluation(Network network, Dataset dataset);
 
     public double getMeanFitness() {
         return meanFitness;
@@ -70,29 +68,32 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
     
     @Override
     public Dataset getTrainingDataset() {
-        int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
+        if (CROSS_VALIDATION_LEARNING) {
+            int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
+            return problemDatasetses[datasetPos].getTrainingDataset();
+        }
 
-        return CROSS_VALIDATION_LEARNING 
-                ? problemDatasetses[datasetPos].getTrainingDataset()
-                : trainingDataset;
+        return trainingDataset;
     }
 
     @Override
     public Dataset getValidationDataset() {
-        int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
-        
-        return CROSS_VALIDATION_LEARNING 
-                ? problemDatasetses[datasetPos].getValidationDataset()
-                : validationDataset;
+        if (CROSS_VALIDATION_LEARNING) {
+            int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
+            return problemDatasetses[datasetPos].getValidationDataset();
+        }
+
+        return validationDataset;
     }
 
     @Override
     public Dataset getTestingDataset() {
-        int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
-        
-        return CROSS_VALIDATION_LEARNING 
-                ? problemDatasetses[datasetPos].getTestingDataset()
-                : testingDataset;
+        if (CROSS_VALIDATION_LEARNING) {
+            int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
+            return problemDatasetses[datasetPos].getTestingDataset();
+        }
+
+        return testingDataset;
     }
     
     public void setCrossValidationLearning(double[][] data) {
@@ -112,7 +113,9 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
         totalEpochs = THREADS * EPOCHS;
 
         evolutionBest = new double[THREADS];
-        
+
+        threadToDatasetMap = new HashMap<>();
+
         PersonMigration personMigration = new PersonMigration(MIGRATION_PERCENT, EPOCHS, THREADS);
 
         final String resultsFolder = DateTimeFormatter.ofPattern("dd_MM_yyy__HH_mm_ss").format(LocalDateTime.now());
@@ -130,7 +133,6 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
 //                    .setValidationSize(0.25)
 //                    .setTestingSize(0.25).setup(), THREADS);
 
-            threadToDatasetMap = new HashMap<>();
         }
         
         AtomicLong meanSum = new AtomicLong(0);
@@ -144,7 +146,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
                 
                 long threadId = Thread.currentThread().getId();
                 
-                if (CROSS_VALIDATION_LEARNING) threadToDatasetMap.put(threadId, internalI);
+                threadToDatasetMap.put(threadId, internalI);
                 
                 Evolution evolution = new Evolution(Population.generate(getPersonManager(), POPULATION_SIZE), PERCENT_OF_FITNESS, this);
 
@@ -170,7 +172,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
                         break;
                 }
 
-                customCode(resultsFolder, threadId, network);
+//                customCode(resultsFolder, threadId, network);
                 
                 EvaluationResult testResult = evaluation(network, getTestingDataset());
                 
@@ -208,7 +210,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
         for (int i=0; i<testingData.length; i++) {
 //            System.out.println(Math.round(network.compute(testingData[i])[0]) >= 0 ? 1 : 0);
             
-            csvFileWriter.writeLine(ids[i][0], Math.round(network.compute(testingData[i])[0]) >= 0 ? 1 : 0);
+//            csvFileWriter.writeLine(ids[i][0], Math.round(network.compute(testingData[i])[0]) >= 0 ? 1 : 0);
         }
         
         csvFileWriter.close();
