@@ -6,9 +6,14 @@ import static org.jocl.CL.*;
 
 public class Gpu {
     private static final long DEVICE_TYPE = CL_DEVICE_TYPE_GPU;
+    private static Gpu gpu = null;
 
     public static Gpu getInstance() {
-        return new Gpu();
+        if (gpu == null) {
+            gpu = new Gpu();
+        }
+
+        return gpu;
     }
 
     private cl_context context = null;

@@ -41,7 +41,7 @@ public class NetworkLayer {
     }
 
     public int getLayerInputCount() {
-        return NUMBER_OR_WEIGHTS;
+        return NUMBER_OR_WEIGHTS - Neuron.EXTRA_WEIGHTS;
     }
 
     public Function getFunction() {

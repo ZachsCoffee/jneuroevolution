@@ -2,28 +2,56 @@ package networks.multilayer_perceptron;
 
 import networks.gpu.GpuProgram;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 public class GpuLayerProgram {
     public static GpuProgram gpuProgram;
 
     static {
-        gpuProgram = new GpuProgram(
-                "fastLayer",
-                "__kernel void fastLayer(\n" +
-                        "    __global const int neuronWeights,\n" +
-                        "    __global const int weightsCount,\n" +
-                        "    __global const float *input,\n" +
-                        "    __global const float *weights,\n" +
-                        "    __global float *output\n" +
-                        ") {\n" +
-                        "    int gid = get_global_id(0);\n" +
-                        "\n" +
-                        "    if (gid == weightsCount - 2) {\n" +
-                        "        output[gid / neuronWeights] += weights[gid];\n" +
-                        "    }\n" +
-                        "    else {\n" +
-                        "        output[gid / neuronWeights] += weights[gid] * input[gid];\n" +
-                        "    }\n" +
-                        "}"
-        );
+        try {
+            byte[] bytes = Files.readAllBytes(Paths.get(GpuLayerProgram.class.getResource("kernel.c").getFile()));
+            String kernelSourceCode = new String(bytes, StandardCharsets.UTF_8);
+
+            gpuProgram = new GpuProgram(
+                    "fastLayer", kernelSourceCode
+            );
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void main(String[] args) {
+        float[] features = new float[] {1,2,3,4,5};
+
+        int weightsOffset = 0;
+        int outputOffset = features.length;
+        int lastOutputOffset = 0;
+        int lastOutputNeurons = features.length;
+        int neuronWeights = 6;
+        float[] weights = new float[30];
+        float[] output = new float[11];
+        Arrays.fill(weights, 1);
+
+        System.arraycopy(features, 0, output, 0, features.length);
+
+        for (int i=0; i<weights.length; i++) {
+            int gid = i;
+            int outputIndex = (gid - weightsOffset) / neuronWeights + outputOffset;
+
+            if ((gid + weightsOffset) % neuronWeights == neuronWeights - 1) {
+                output[outputIndex] += weights[gid + weightsOffset];
+            }
+            else {
+                output[outputIndex] += weights[gid + weightsOffset] * output[(outputIndex - lastOutputOffset + gid) % lastOutputNeurons];
+            }
+        }
+
     }
 }

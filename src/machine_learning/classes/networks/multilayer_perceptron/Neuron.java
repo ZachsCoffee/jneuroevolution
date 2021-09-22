@@ -11,7 +11,7 @@ import maths.Function;
  * @author main
  */
 public class Neuron {
-    public static final int EXTRA_WEIGHTS = 2;
+    public static final int EXTRA_WEIGHTS = 1;
     protected final int START_POINT, END_POINT, ADD_BIAS_POS, MUL_BIAS_POS;
     protected final Function function;
     protected float[] allWeights;
@@ -34,9 +34,9 @@ public class Neuron {
 
         ADD_BIAS_POS = endPoint - 1;
         MUL_BIAS_POS = endPoint - 2;
-
+        int j = 0;
         for (int i = startPoint; i < endPoint; i++) {
-            allWeights[i] = (float) (Math.random() * (maxStartValue * 2) - maxStartValue);
+            allWeights[i] = 1;//(float) (Math.random() * (maxStartValue * 2) - maxStartValue);
         }
 
         this.function = function;

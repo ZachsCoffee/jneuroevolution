@@ -11,7 +11,7 @@ public class GpuProgram {
 
     private final cl_program program;
     private final cl_kernel kernel;
-    private final List<cl_mem> allocations = new LinkedList<>();
+    private final List<GpuBufferAllocation> allocations = new LinkedList<>();
     private cl_command_queue commandQueue;
     private int argumentIndex = 0;
 
@@ -40,17 +40,20 @@ public class GpuProgram {
     }
 
     public GpuProgram addArgument(int number) {
-        clSetKernelArg(kernel, argumentIndex++, Sizeof.cl_int4, Pointer.to(new int[] { number }));
+        clSetKernelArg(kernel, argumentIndex++, Sizeof.cl_uint, Pointer.to(new int[] { number }));
 
         return this;
     }
 
-    public cl_mem allocateBuffer(float[] data, AllocationType allocationType) {
-        cl_mem bufferAllocation = clCreateBuffer(
+    public GpuBufferAllocation allocateBuffer(float[] data, AllocationType allocationType) {
+        GpuBufferAllocation bufferAllocation = new GpuBufferAllocation();
+
+        bufferAllocation.pointer = Pointer.to(data);
+        bufferAllocation.gpgMemory = clCreateBuffer(
                 Gpu.getInstance().getContext(),
                 allocationType.getType(),
                 Sizeof.cl_float * data.length,
-                Pointer.to(data),
+                bufferAllocation.pointer,
                 null
         );
 
@@ -59,14 +62,14 @@ public class GpuProgram {
         return bufferAllocation;
     }
 
-    public GpuProgram deallocateBuffer(cl_mem buffer) {
-        allocations.remove(buffer);
-        clReleaseMemObject(buffer);
+    public GpuProgram deallocateBuffer(GpuBufferAllocation bufferAllocation) {
+        allocations.remove(bufferAllocation);
+        clReleaseMemObject(bufferAllocation.gpgMemory);
 
         return this;
     }
 
-    public void executeNDRangeKernel(long globalWorkSize) {
+    public void executeNDRangeKernel(long globalWorkSize, long localSize) {
         clEnqueueNDRangeKernel(
                 commandQueue,
                 kernel,
@@ -75,7 +78,9 @@ public class GpuProgram {
                 new long[] {
                         globalWorkSize
                 },
-                null,
+                new long[] {
+                        localSize
+                },
                 0,
                 null,
                 null
@@ -84,14 +89,14 @@ public class GpuProgram {
         argumentIndex = 0;
     }
 
-    public void getFloatBufferResult(cl_mem buffer, long bufferSize) {
+    public void getFloatBufferResult(GpuBufferAllocation buffer, long bufferSize) {
         clEnqueueReadBuffer(
                 commandQueue,
-                buffer,
+                buffer.gpgMemory,
                 CL_TRUE,
                 0,
                 bufferSize * Sizeof.cl_float,
-                Pointer.to(buffer),
+                buffer.pointer,
                 0,
                 null,
                 null
@@ -112,8 +117,8 @@ public class GpuProgram {
     @Override
     protected void finalize() throws Throwable {
 
-        for (cl_mem allocation : allocations) {
-            clReleaseMemObject(allocation);
+        for (GpuBufferAllocation allocation : allocations) {
+            clReleaseMemObject(allocation.gpgMemory);
         }
 
         clReleaseKernel(kernel);
@@ -125,7 +130,8 @@ public class GpuProgram {
 
     public enum AllocationType {
         READ(CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR),
-        WRITE(CL_MEM_READ_WRITE);
+        WRITE(CL_MEM_READ_WRITE),
+        READ_WRITE(CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR);
 
         private final long type;
         AllocationType(long type) {

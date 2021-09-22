@@ -72,7 +72,7 @@ public class NeuralNetwork implements Network {
 
         int sumOfWeights = 0;
         for (int i = 0; i < layers.length; i++) {
-            sumOfWeights += layers[i].getNeuronsCount() * layers[i].getLayerInputCount();//plus one for BIAS weight
+            sumOfWeights += layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS;//plus one for BIAS weight
         }
 
         weights = new float[sumOfWeights];
@@ -80,7 +80,7 @@ public class NeuralNetwork implements Network {
         int startPoint = 0;
         for (int i = 0; i < layers.length; i++) {
             layers[i].buildNeurons(weights, startPoint);
-            startPoint += layers[i].getNeuronsCount() * layers[i].getLayerInputCount();
+            startPoint += layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS;
         }
     }
 
@@ -97,7 +97,7 @@ public class NeuralNetwork implements Network {
 
         int sumOfWeights = 0;
         for (int i = 0; i < layers.length; i++) {
-            sumOfWeights += layers[i].getNeuronsCount() * layers[i].getLayerInputCount();
+            sumOfWeights += layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS;
         }
 
         weights = new float[sumOfWeights];
@@ -108,7 +108,7 @@ public class NeuralNetwork implements Network {
         for (int i = 0; i < layers.length; i++) {
             layers[i].maxStartValue = MAX_START_VALUE;
             layers[i].buildNeurons(weights, startPoint);
-            startPoint += layers[i].getNeuronsCount() * layers[i].getLayerInputCount();
+            startPoint += layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS;
         }
     }
 
