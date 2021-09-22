@@ -62,24 +62,24 @@ public class MultilayerRNN implements TimeNetwork{
     public void endCompute() {}
 
     @Override
-    public double[] compute(double[] features) {
+    public float[] compute(float[] features) {
         
-        double result = RNN_LAYERS[0].compute(features)[0];
+        float result = RNN_LAYERS[0].compute(features)[0];
         for (int i=1; i<RNN_LAYERS.length; i++){
             RNN_LAYERS[i].setHiddenValue(result);
             result = RNN_LAYERS[i].compute(features)[0];
         }
         
-        return new double[]{result};
+        return new float[]{result};
     }
 
     @Override
-    public double getWeightAt(int position) {
+    public float getWeightAt(int position) {
         return RNN_LAYERS[position / RNN_LAYERS[0].getWeightsCount()].getWeightAt(position % RNN_LAYERS[0].getWeightsCount());
     }
 
     @Override
-    public void setWeightAt(int position, double weight) {
+    public void setWeightAt(int position, float weight) {
         RNN_LAYERS[position / RNN_LAYERS[0].getWeightsCount()].setWeightAt(position % RNN_LAYERS[0].getWeightsCount(), weight);
     }
 

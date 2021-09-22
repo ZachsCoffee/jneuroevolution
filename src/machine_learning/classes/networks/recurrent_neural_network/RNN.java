@@ -17,8 +17,10 @@ public class RNN implements TimeNetwork{
     
     private Function hiddenFunction, outputFunction;
     
-    private double[][] allArrays;
-    private double[] wVector, uVector, vVector;
+    private float[][] allArrays;
+    private float[] wVector;
+    private float[] uVector;
+    private float[] vVector;
     private double hiddenValue = 0;
     
     private int numberOfFeatures;
@@ -40,11 +42,11 @@ public class RNN implements TimeNetwork{
         this.outputFunction = outputFunction;
         this.numberOfFeatures = numberOfFeatures;
         
-        wVector = new double[numberOfFeatures];
-        uVector = new double[numberOfFeatures];
-        vVector = new double[numberOfFeatures];
+        wVector = new float[numberOfFeatures];
+        uVector = new float[numberOfFeatures];
+        vVector = new float[numberOfFeatures];
         
-        allArrays = new double[][]{
+        allArrays = new float[][]{
             wVector, uVector, vVector
         };
         
@@ -59,12 +61,14 @@ public class RNN implements TimeNetwork{
         this.outputFunction = outputFunction;
         this.numberOfFeatures = numberOfFeatures;
         
-        Random randomGeneretor = new Random();
-        wVector = randomGeneretor.doubles(numberOfFeatures, -1, 1).toArray();
-        uVector = randomGeneretor.doubles(numberOfFeatures, -1, 1).toArray();
-        vVector = randomGeneretor.doubles(numberOfFeatures, -1, 1).toArray();
-        
-        allArrays = new double[][]{
+        Random randomGenerator = new Random();
+        for (int i=0; i<numberOfFeatures; i++) {
+            wVector[i] = randomGenerator.nextFloat() * 2 -1;
+            uVector[i] = randomGenerator.nextFloat() * 2 -1;
+            vVector[i] = randomGenerator.nextFloat() * 2 -1;
+        }
+
+        allArrays = new float[][]{
             wVector, uVector, vVector
         };
         
@@ -76,7 +80,7 @@ public class RNN implements TimeNetwork{
     }
     
     @Override
-    public double getWeightAt(int position) {
+    public float getWeightAt(int position) {
         return allArrays[position / numberOfFeatures][position % numberOfFeatures];
     }
     @Override
@@ -84,12 +88,12 @@ public class RNN implements TimeNetwork{
         return weightsCount;
     }
     @Override
-    public void setWeightAt(int position, double weight) {
+    public void setWeightAt(int position, float weight) {
         allArrays[position / numberOfFeatures][position % numberOfFeatures] = weight;
     }
     
     @Override
-    public double[] compute(double[] features){
+    public float[] compute(float[] features){
         double sum = 0;
         
         for (int i=0; i<numberOfFeatures; i++){
@@ -103,10 +107,10 @@ public class RNN implements TimeNetwork{
             sum += hiddenValue * vVector[i];
         }
 
-        return new double[]{outputFunction.compute(sum)};// + Functions.groundRelu().compute(sum))};
+        return new float[]{outputFunction.compute(sum)};// + Functions.groundRelu().compute(sum))};
     }
 
-    protected double simpleCompute(double[] features) {
+    protected float simpleCompute(float[] features) {
         double sum = 0;
         
         for (int i=0; i<numberOfFeatures; i++){

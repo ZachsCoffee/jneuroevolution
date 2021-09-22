@@ -5,11 +5,8 @@
  */
 package data_manipulation;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import maths.ArrayUtils;
 
 /**
  *
@@ -28,14 +25,14 @@ public class CrossValidation {
                 "Validation percent range must be [0, 1]"
         );
         
-        double[][][] folds = new double[foldsNumber][][];
+        float[][][] folds = new float[foldsNumber][][];
         
         int dataPerFold = data.length / foldsNumber;
         int extraData = data.length % foldsNumber;
         int startCopyPos = 0;
         
         int tempCopySize;
-        double[][] tempCopyHolder;
+        float[][] tempCopyHolder;
         for (int i=0; i<folds.length; i++) {
             if (i < extraData) {
                 tempCopySize = dataPerFold + 1;
@@ -44,7 +41,7 @@ public class CrossValidation {
                 tempCopySize = dataPerFold;
             }
             
-            tempCopyHolder = new double[tempCopySize][];
+            tempCopyHolder = new float[tempCopySize][];
 
             System.arraycopy(data, startCopyPos, tempCopyHolder, 0, tempCopySize);
 
@@ -54,7 +51,7 @@ public class CrossValidation {
         }
         
         ProblemDatasets[] problemDatasets = new ProblemDatasets[foldsNumber];
-        ArrayList<double[]> tempDataset = new ArrayList<>();
+        ArrayList<float[]> tempDataset = new ArrayList<>();
         
         ProblemDatasets tempProblemDatasets; // holds the trainingset and validation set from DatasetSpliter
         for (int i=0; i<folds.length; i++) {
@@ -70,7 +67,7 @@ public class CrossValidation {
             }
             
             tempProblemDatasets = DatasetSplitter.split(
-                    DatasetSpecs.init(tempDataset.toArray(new double[][]{}))
+                    DatasetSpecs.init(tempDataset.toArray(new float[][]{}))
                         .setTrainingSize(1 - validationPercent)
                         .setValidationSize(validationPercent)
                         .setup()
@@ -96,7 +93,7 @@ public class CrossValidation {
         
         int extraItems = datasetSpecs.getDataSize() % foldsNumber;
         
-        double[][] data = datasetSpecs.getData();
+        float[][] data = datasetSpecs.getData();
         
         int startPoint = 0;
         int tempLength;

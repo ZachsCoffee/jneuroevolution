@@ -53,12 +53,12 @@ public class LinearValues {
         }
     }
     
-    public double computeD(int currentEpoch){
+    public float computeD(int currentEpoch){
         if (isAsc){
-            return ((minMaxValues.dmax - minMaxValues.dmin)*currentEpoch + epochs*minMaxValues.dmin) / epochs;
+            return (float) ((minMaxValues.dmax - minMaxValues.dmin)*currentEpoch + epochs*minMaxValues.dmin) / epochs;
         }
         else{
-            return ((minMaxValues.dmin - minMaxValues.dmax)*currentEpoch + epochs*minMaxValues.dmax) / epochs;
+            return (float) ((minMaxValues.dmin - minMaxValues.dmax)*currentEpoch + epochs*minMaxValues.dmax) / epochs;
         }
 //        return (minMaxValues.dmin - minMaxValues.dmax)*currentEpoch / (epochs + minMaxValues.dmax);
     }

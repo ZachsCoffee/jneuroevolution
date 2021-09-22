@@ -14,13 +14,9 @@ import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
 import execution.EvaluationTarget;
 import files.binary.BinaryDatasetUtils;
-import files.csv.CSVFileReader;
 import functions.ActivationFunctions;
-import maths.Function;
 import maths.MinMax;
 import networks.interfaces.Network;
-import networks.multilayer_perceptron.NetworkLayer;
-import networks.multilayer_perceptron.NeuralNetwork;
 import networks.multilayer_perceptron.NeuralNetworkBuilder;
 import neuroevolution.Problem;
 
@@ -35,13 +31,13 @@ public class BackgroundProblem extends ProblemExecutor {
 //                new File("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset1.csv"), ","
 //        );
 
-        double[][] allData = BinaryDatasetUtils.loadFrom(
+        float[][] allData = BinaryDatasetUtils.loadFrom(
                 new File("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset3.b")
         );
 
         double someDataSize = 100_000d;
         int period = (int) Math.ceil(allData.length / someDataSize);
-        double[][] someData = new double[(int)Math.ceil(allData.length / (double)period)][];
+        float[][] someData = new float[(int)Math.ceil(allData.length / (double)period)][];
 //
         int p=0;
         for (int i=0; i<allData.length; i++) {
@@ -83,7 +79,7 @@ public class BackgroundProblem extends ProblemExecutor {
     @Override
     public EvaluationResult evaluation(Network network, Dataset dataset) {
 
-        double[][] predictionValues = new double[dataset.SIZE][2];
+        float[][] predictionValues = new float[dataset.SIZE][2];
 
         double error = datasetEvaluation(network, dataset, predictionValues);
 
@@ -128,20 +124,20 @@ public class BackgroundProblem extends ProblemExecutor {
     }
 
     @Override
-    public double evaluateNetwork(Network network, Dataset dataset) {
-        double evaluation = datasetEvaluation(network, dataset, null);
+    public float evaluateNetwork(Network network, Dataset dataset) {
+        float evaluation = datasetEvaluation(network, dataset, null);
         if (dataset.SIZE < evaluation) {
             throw new RuntimeException("kkk");
         }
         return dataset.SIZE - evaluation;
     }
 
-    private double datasetEvaluation(Network network, Dataset dataset, final double[][] predictionValues) {
-        double errorSum = 0;
+    private float datasetEvaluation(Network network, Dataset dataset, final float[][] predictionValues) {
+        float errorSum = 0;
         int p = 0;
 
         for (int i=0; i<dataset.SIZE; i++) {
-            double[] result = network.compute(dataset.features[i]);
+            float[] result = network.compute(dataset.features[i]);
             int errorCount = 0;
 
             for (int j=0; j < result.length; j++) {
@@ -149,7 +145,7 @@ public class BackgroundProblem extends ProblemExecutor {
                     errorCount++;
                 }
             }
-            double prediction = (double) errorCount / dataset.targets[i].length;
+            float prediction = (float) errorCount / dataset.targets[i].length;
             if (predictionValues != null && i < predictionValues.length) {
                 predictionValues[i][0] = prediction;
                 predictionValues[i][1] = prediction != 0 ? 1 : 0;

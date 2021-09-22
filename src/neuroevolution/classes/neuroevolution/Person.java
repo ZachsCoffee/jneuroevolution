@@ -10,7 +10,6 @@ import networks.interfaces.Network;
 import networks.interfaces.TimeNetwork;
 import evolution_builder.population.PersonManager;
 import maths.Function;
-import java.util.Arrays;
 import networks.multilayer_perceptron.BackpropagationMLP;
 import networks.multilayer_perceptron.NetworkLayer;
 import networks.multilayer_perceptron.NeuralNetwork;
@@ -92,13 +91,13 @@ class Person extends Genes implements PersonManager {
     }
     
     @Override
-    public double computeFitness(evolution_builder.population.Person person) {
+    public float computeFitness(evolution_builder.population.Person person) {
 
         return computeFitness(person, mlProblem.getProblem().getTrainingDataset());
     }
 
-    static double computeFitness(evolution_builder.population.Person person, Dataset dataset){
-        double fitness;
+    static float computeFitness(evolution_builder.population.Person person, Dataset dataset){
+        float fitness;
         
         if (person.getGeneCode() instanceof TimeNetwork){
             TimeNetwork timeNetwork = (TimeNetwork) person.getGeneCode();

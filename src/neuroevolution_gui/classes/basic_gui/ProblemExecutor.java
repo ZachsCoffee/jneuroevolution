@@ -238,10 +238,10 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
     
     public static class EvaluationResult {
 
-        public double[][] predictionValues;
+        public float[][] predictionValues;
         public double evaluationError;
 
-        public EvaluationResult(double[][] predictionValues, double evaluationError) {
+        public EvaluationResult(float[][] predictionValues, double evaluationError) {
             this.predictionValues = predictionValues;
             this.evaluationError = evaluationError;
         }

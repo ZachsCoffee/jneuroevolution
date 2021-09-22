@@ -4,18 +4,18 @@ import maths.Maths;
 
 public final class DatasetSpecs {
     
-    public static DatasetSpecs init(double[][] data) {
+    public static DatasetSpecs init(float[][] data) {
         
         return new DatasetSpecs(data);
     }
     
-    public static DatasetSpecs init(double[][] data, double trainingPercent, double testingPercent) {
+    public static DatasetSpecs init(float[][] data, double trainingPercent, double testingPercent) {
         return new DatasetSpecs(data, trainingPercent, testingPercent);
     }
     
     private boolean haveSetupCalled = false;
     
-    private double[][] data;
+    private float[][] data;
     private double 
             trainingPercent, 
             testingPercent, 
@@ -27,7 +27,7 @@ public final class DatasetSpecs {
             validationSize,
             targetsCount = 1;
 
-    private DatasetSpecs(double[][] data) {
+    private DatasetSpecs(float[][] data) {
         if (data == null) throw new IllegalArgumentException(
                 "Argument data not null"
         );
@@ -35,7 +35,7 @@ public final class DatasetSpecs {
         this.data = data;
     }
     
-    private DatasetSpecs(double[][] data, double trainingPercent, double testingPercent) {
+    private DatasetSpecs(float[][] data, double trainingPercent, double testingPercent) {
         this(data);
         
         setBasicSets(trainingPercent, testingPercent);
@@ -108,7 +108,7 @@ public final class DatasetSpecs {
         return data.length;
     }
     
-    public double[][] getData() {
+    public float[][] getData() {
         return data;
     }
 

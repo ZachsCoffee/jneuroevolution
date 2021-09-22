@@ -22,5 +22,5 @@ public interface PersonManager {
      */
     public Person newSameLengthAs(Person person);
     
-    public double computeFitness(Person person);
+    public float computeFitness(Person person);
 }

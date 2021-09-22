@@ -52,7 +52,7 @@ public class NetworkLayer {
         neurons[position] = neuron;
     }
 
-    protected void buildNeurons(double[] weights, int startPoint) {
+    protected void buildNeurons(float[] weights, int startPoint) {
         int endPoint = startPoint + NUMBER_OR_WEIGHTS;
         for (int i = 0; i < neurons.length; i++) {
             if (function == null) {
@@ -66,8 +66,8 @@ public class NetworkLayer {
         }
     }
 
-    protected double[] computeLayer(double[] layerInputs) {
-        double[] results = new double[neurons.length];
+    protected float[] computeLayer(float[] layerInputs) {
+        float[] results = new float[neurons.length];
         for (int i = 0; i < neurons.length; i++) {
             results[i] = neurons[i].compute(layerInputs);
         }

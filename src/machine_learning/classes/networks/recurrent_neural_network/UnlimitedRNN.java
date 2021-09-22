@@ -6,7 +6,6 @@
 package networks.recurrent_neural_network;
 
 import maths.Function;
-import networks.interfaces.TimeNetwork;
 
 /**
  *
@@ -14,7 +13,7 @@ import networks.interfaces.TimeNetwork;
  */
 public class UnlimitedRNN extends RNN {
     
-    private double[] networkResults;
+    private float[] networkResults;
     private RNN[] rnns;
 
     public UnlimitedRNN(int numberOfFeatures, int numberOfOutputs, Function hiddenFunction, Function outputFunction) {
@@ -24,7 +23,7 @@ public class UnlimitedRNN extends RNN {
                 "number of outputs must be at least one"
         );
         
-        networkResults = new double[numberOfOutputs];
+        networkResults = new float[numberOfOutputs];
         
         rnns = new RNN[numberOfOutputs];
         for (int i=0; i<numberOfOutputs; i++) {
@@ -40,7 +39,7 @@ public class UnlimitedRNN extends RNN {
     }
 
     @Override
-    public double[] compute(double[] features) {
+    public float[] compute(float[] features) {
                 
         for (int i=0; i<networkResults.length; i++) {
             networkResults[i] = rnns[i].simpleCompute(features);

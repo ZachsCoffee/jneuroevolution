@@ -10,10 +10,10 @@ package networks.interfaces;
  * @author Zachs
  */
 public interface Network {
-    public double[] compute(double[] features);
+    float[] compute(float[] features);
     
-    public double getWeightAt(int position);
-    public void setWeightAt(int position, double weight);
+    float getWeightAt(int position);
+    void setWeightAt(int position, float weight);
     
-    public int getWeightsCount();
+    int getWeightsCount();
 }

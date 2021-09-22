@@ -36,7 +36,7 @@ public interface MLProblem {
      * @param dataset The dataset for evaluation
      * @return The score of network for the specific dataset
      */
-    double evaluateNetwork(Network network, Dataset dataset);
+    float evaluateNetwork(Network network, Dataset dataset);
     
     Problem getProblem();
     

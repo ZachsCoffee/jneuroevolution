@@ -16,7 +16,7 @@ public final class DatasetSplitter {
 
         int features = datasetSpecs.getData()[0].length - datasetSpecs.getTargetsCount();
 
-        double[][][] datasets = null;
+        float[][][] datasets = null;
         
         if (datasetSpecs.haveTrainingSet()) {
             datasets = split(datasetSpecs.getData(), datasetSpecs.getTrainingSize());
@@ -55,22 +55,22 @@ public final class DatasetSplitter {
      * @param firstSetSize The size of the first dataset
      * @return The new cross over split arrays.
      */
-    private static double[][][] split(double[][] data, int firstSetSize) {
+    private static float[][][] split(float[][] data, int firstSetSize) {
         int[][] crossData = split(firstSetSize, data.length);
 
         final int firstDatasetPosition = 0, secondDatasetPosition = 1;
 
-        double[][] dataset1 = new double[crossData[firstDatasetPosition].length][];
+        float[][] dataset1 = new float[crossData[firstDatasetPosition].length][];
         for (int i=0; i<crossData[firstDatasetPosition].length; i++) {
             dataset1[i] = data[crossData[firstDatasetPosition][i]];
         }
 
-        double[][] dataset2 = new double[crossData[secondDatasetPosition].length][];
+        float[][] dataset2 = new float[crossData[secondDatasetPosition].length][];
         for (int i=0; i<crossData[secondDatasetPosition].length; i++) {
             dataset2[i] = data[crossData[secondDatasetPosition][i]];
         }
 
-        return new double[][][] {dataset1, dataset2};
+        return new float[][][] {dataset1, dataset2};
     }
     
     /**

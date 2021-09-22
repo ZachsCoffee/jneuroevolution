@@ -15,8 +15,6 @@ import maths.MinMax;
 import networks.representations.LayerImage;
 import networks.representations.NetworkImage;
 
-import java.util.List;
-
 /**
  * @author main
  */
@@ -57,7 +55,7 @@ public class NeuralNetwork implements Network {
     public final int MAX_START_VALUE;
 
     protected final NetworkLayer[] layers;
-    protected final double[] weights;
+    protected final float[] weights;
 
     public NeuralNetwork(NetworkLayer[] layers) {
         if (layers == null) {
@@ -77,7 +75,7 @@ public class NeuralNetwork implements Network {
             sumOfWeights += layers[i].getNeuronsCount() * layers[i].getLayerInputCount();//plus one for BIAS weight
         }
 
-        weights = new double[sumOfWeights];
+        weights = new float[sumOfWeights];
 
         int startPoint = 0;
         for (int i = 0; i < layers.length; i++) {
@@ -102,7 +100,7 @@ public class NeuralNetwork implements Network {
             sumOfWeights += layers[i].getNeuronsCount() * layers[i].getLayerInputCount();
         }
 
-        weights = new double[sumOfWeights];
+        weights = new float[sumOfWeights];
 
         MAX_START_VALUE = maxStartValue;
 
@@ -120,12 +118,12 @@ public class NeuralNetwork implements Network {
     }
 
     @Override
-    public double getWeightAt(int position) {
+    public float getWeightAt(int position) {
         return weights[position];
     }
 
     @Override
-    public void setWeightAt(int position, double value) {
+    public void setWeightAt(int position, float value) {
         weights[position] = value;
     }
 
@@ -138,8 +136,8 @@ public class NeuralNetwork implements Network {
     }
 
     @Override
-    public double[] compute(double[] features) {
-        double[] results = features;
+    public float[] compute(float[] features) {
+        float[] results = features;
         for (NetworkLayer layer : layers) {
             results = layer.computeLayer(results);
         }

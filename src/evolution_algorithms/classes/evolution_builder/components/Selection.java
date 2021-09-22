@@ -5,9 +5,7 @@
  */
 package evolution_builder.components;
 
-import evolution_builder.population.Person;
 import evolution_builder.population.Population;
-import java.util.ArrayList;
 
 /**
  *

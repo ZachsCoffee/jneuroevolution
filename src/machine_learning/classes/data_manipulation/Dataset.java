@@ -15,9 +15,10 @@ public class Dataset {
 
     public final int SIZE;
     
-    public double[][] features, targets;
+    public float[][] features;
+    public float[][] targets;
     
-    public Dataset(double[][] features, double[][] targets) {
+    public Dataset(float[][] features, float[][] targets) {
 
         if (features.length != targets.length) throw new IllegalArgumentException(
                 "features and targets must have equal size"
@@ -29,9 +30,9 @@ public class Dataset {
         this.targets = targets;
     }
     
-    public static Dataset create(double[][] rawData, int splitPoint) {
+    public static Dataset create(float[][] rawData, int splitPoint) {
         
-        Dataset dataset = new Dataset(new double[rawData.length][], new double[rawData.length][]);
+        Dataset dataset = new Dataset(new float[rawData.length][], new float[rawData.length][]);
         
         for (int i=0; i<rawData.length; i++) {
             
@@ -42,9 +43,9 @@ public class Dataset {
         return dataset;
     }
         
-    public static Dataset create(double[][] rawData, int splitPoint, DataParser dataParser) {
+    public static Dataset create(float[][] rawData, int splitPoint, DataParser dataParser) {
         
-        Dataset dataset = new Dataset(new double[rawData.length][], new double[rawData.length][]);
+        Dataset dataset = new Dataset(new float[rawData.length][], new float[rawData.length][]);
         
         for (int i=0; i<rawData.length; i++) {
             
@@ -111,6 +112,6 @@ public class Dataset {
     }
     
     public interface DataParser {
-        public void parse(double[] dataRow);
+        public void parse(float[] dataRow);
     }
 }

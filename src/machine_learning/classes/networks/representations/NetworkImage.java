@@ -11,10 +11,10 @@ package networks.representations;
  * @author zachs
  */
 public class NetworkImage {
-    private double[] networkWeights;
+    private float[] networkWeights;
     private LayerImage[] layers;
 
-    public double[] getNetworkWeights() {
+    public float[] getNetworkWeights() {
         return networkWeights;
     }
 

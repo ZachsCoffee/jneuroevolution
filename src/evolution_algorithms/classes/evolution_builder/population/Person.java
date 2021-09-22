@@ -14,7 +14,7 @@ public class Person implements Comparable<Person>, Cloneable {
     private final boolean ALLOW_NEGATIVE_FITNESS;
     
     private Object person;
-    private double fitness;
+    private float fitness;
     private int percentOfFitness;
 
     /**
@@ -48,7 +48,7 @@ public class Person implements Comparable<Person>, Cloneable {
      * @param person The object that represents a person at the population
      * @param fitness The fitness of person
      */
-    public Person(Object person, double fitness) {
+    public Person(Object person, float fitness) {
         this(person);
         
         setFitness(fitness);
@@ -75,7 +75,7 @@ public class Person implements Comparable<Person>, Cloneable {
      * @param fitness The fitness of person
      * @param allowNegativeFitness Allow negative values for person fitness. Default is false
      */
-    public Person(Object person, double fitness, boolean allowNegativeFitness){
+    public Person(Object person, float fitness, boolean allowNegativeFitness){
         this(person, allowNegativeFitness);
         
         setFitness(fitness);
@@ -123,11 +123,11 @@ public class Person implements Comparable<Person>, Cloneable {
         
         this.person = person;
     }
-    public double getFitness() {
+    public float getFitness() {
         return fitness;
     }
 
-    final void setFitness(double fitness) {
+    final void setFitness(float fitness) {
         if (ALLOW_NEGATIVE_FITNESS){
             this.fitness = fitness;
         }

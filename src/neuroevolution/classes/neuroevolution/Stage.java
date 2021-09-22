@@ -21,7 +21,8 @@ public class Stage implements EvolutionStage {
     private Problem problem;
     private ProgressListener progressListener;
     
-    private double[] evolutionStatistics, validationStatistics;
+    private float[] evolutionStatistics;
+    private float[] validationStatistics;
             
     private double validationMaxFitness = 0;
     
@@ -37,8 +38,8 @@ public class Stage implements EvolutionStage {
 //        this.totalEpochs = totalEpochs;
         this.problem = problem;
 
-        evolutionStatistics = new double[totalEpochs];
-        validationStatistics = new double[totalEpochs];
+        evolutionStatistics = new float[totalEpochs];
+        validationStatistics = new float[totalEpochs];
     }
     
     public void setMigration(final PersonMigration personMigration) {
@@ -56,11 +57,11 @@ public class Stage implements EvolutionStage {
     public double getValidationBestFitness(){
         return validationMaxFitness;
     }
-    public double[] getEvolutionStatistics() {
+    public float[] getEvolutionStatistics() {
         return evolutionStatistics;
     }
 
-    public double[] getValidationStatistics() {
+    public float[] getValidationStatistics() {
         return validationStatistics;
     }
     
@@ -99,11 +100,11 @@ public class Stage implements EvolutionStage {
 
     @Override
     public boolean stopEvolution(Population population, evolution_builder.population.Person totalBestPerson, int epoch) {
-        double
-                validationCurrentFitness,
-                validationEpochBestFitness = 0,
-                evolutionCurrentFitness,
-                evolutionEpochBestFitness = 0;
+        float
+                validationCurrentFitness;
+        float validationEpochBestFitness = 0;
+        float evolutionCurrentFitness;
+        float evolutionEpochBestFitness = 0;
 
         int populationSize = population.getSize();
         evolution_builder.population.Person currentPerson;
