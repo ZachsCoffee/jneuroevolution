@@ -6,7 +6,7 @@
 
 module machine_learning {
     requires utils;
-//    requires jocl;
+    requires jocl;
     requires java.logging;
     requires com.google.gson;
 

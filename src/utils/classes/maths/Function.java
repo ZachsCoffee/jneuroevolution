@@ -10,5 +10,5 @@ package maths;
  * @author main
  */
 public interface Function {
-    public double compute(double x);
+    float compute(double x);
 }

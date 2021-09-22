@@ -43,9 +43,7 @@ public class ActivationFunctions {
      */
     @ActivationFunction("tanh")
     public static Function tanh(){
-        return x -> {
-            return Math.tanh(x);
-        };
+        return x -> (float) Math.tanh(x);
     }
     
     /**
@@ -54,9 +52,7 @@ public class ActivationFunctions {
      */
     @ActivationFunction("tansig")
     public static Function tansig(){
-        return (x) -> { 
-            return 2/(1+Math.exp(-2*x)) - 1;
-        };
+        return (x) -> (float) (2/(1+Math.exp(-2*x)) - 1);
     }
     
     /**
@@ -65,9 +61,7 @@ public class ActivationFunctions {
      */
     @ActivationFunction("logsig")
     public static Function logsig(){
-        return (x) -> {
-            return 1/(1 + Math.exp(-3*x));
-        };
+        return (x) -> (float) (1/(1 + Math.exp(-3*x)));
     } 
     
     /**
@@ -76,9 +70,7 @@ public class ActivationFunctions {
      */
     @ActivationFunction("sigmoid2")
     public static Function sigmoid2(){
-        return (x) -> {
-            return x/(1 + Math.abs(x));
-        };
+        return (x) -> (float) (x/(1 + Math.abs(x)));
     }
     
     /**
@@ -87,9 +79,7 @@ public class ActivationFunctions {
      */
     @ActivationFunction("sigmoid")
     public static Function sigmoid(){
-        return (x) -> {
-            return 1 / (1 + Math.exp(-x));
-        };
+        return (x) -> (float) (1 / (1 + Math.exp(-x)));
     }
     
     /**
@@ -98,9 +88,7 @@ public class ActivationFunctions {
      */
     @ActivationFunction("gauss")
     public static Function gauss(){
-        return (x) -> {
-            return Math.exp(-Math.pow(x, 2));
-        };
+        return (x) -> (float) (Math.exp(-Math.pow(x, 2)));
     }
     
     /**
@@ -109,9 +97,7 @@ public class ActivationFunctions {
      */
     @ActivationFunction("relu")
     public static Function relu(){
-        return (x) -> {
-            return Math.log(1 + Math.exp(x));
-        };
+        return (x) -> (float) Math.log(1 + Math.exp(x));
     }
     
     /**
@@ -120,9 +106,7 @@ public class ActivationFunctions {
      */
     @ActivationFunction("groundRelu")
     public static Function groundRelu(){
-        return (x) -> {
-            return Math.max(0, x);
-        };
+        return (x) -> (float) Math.max(0, x);
     }
     
     /**
@@ -131,22 +115,16 @@ public class ActivationFunctions {
      */
     @ActivationFunction("leakyRelu")
     public static Function leakyRelu(){
-        return (x) -> {
-            return Math.max(x * 0.1, x);
-        };
+        return (x) -> (float) Math.max(x * 0.1, x);
     }
     
     @ActivationFunction("swish")
     public static Function swish(){
-        return (x) -> {
-            return x / (1 + Math.exp(-x));
-        };
+        return (x) -> (float) (x / (1 + Math.exp(-x)));
     }
     
     @ActivationFunction("test")
     public static Function test(){
-        return (x) -> {
-            return Math.pow(Math.abs(x), 2);
-        };
+        return (x) -> (float) Math.pow(Math.abs(x), 2);
     }
 }
