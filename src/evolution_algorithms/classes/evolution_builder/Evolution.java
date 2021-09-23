@@ -5,29 +5,27 @@
  */
 package evolution_builder;
 
-import evolution_builder.components.EvolutionComponents;
+import evolution_builder.components.EvolutionPhases;
 import evolution_builder.population.Person;
 import evolution_builder.population.Population;
+
+import java.util.Objects;
 
 /**
  *
  * @author main
  */
 public class Evolution {
-    private EvolutionComponents components;
+    private final EvolutionPhases components;
+    private final boolean withPercentOfFitness;
+
     private Population population;
     private Person totalBestPerson = null;
-//    private long lastRunningTime = -1;
-    private boolean withPercentOfFitness, earlyStoped = false;
+    private boolean earlyStopped = false;
     
-    public Evolution(Population population, boolean withPercentOfFitness, EvolutionComponents components) {
-        if (components == null){
-            throw new IllegalArgumentException("Argument, at pos 2: not null.");
-        }
-        
-        if (population == null){
-            throw new IllegalArgumentException("Argument, at pos 1: not null.");
-        }
+    public Evolution(Population population, boolean withPercentOfFitness, EvolutionPhases components) {
+        Objects.requireNonNull(components);
+        Objects.requireNonNull(population);
         
         this.population = population;
         this.components = components;
@@ -37,17 +35,14 @@ public class Evolution {
     public Person getTotalBestPerson(){
         return totalBestPerson;
     }
-    
-//    public long getLastRunningTime(){
-//        return lastRunningTime;
-//    }
+
     
     public boolean withPercentOfFitness(){
         return withPercentOfFitness;
     }
     
-    public boolean earlyStoped(){
-        return earlyStoped;
+    public boolean earlyStopped(){
+        return earlyStopped;
     }
     
     public Population startEvolution(int epochs){
@@ -56,7 +51,7 @@ public class Evolution {
         }
         
         if (withPercentOfFitness){
-            totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+            computeFitnessForPopulation();
             components.computePercentOfFitness(population);
 
             for (int i=0; i<epochs; i++){ 
@@ -64,35 +59,34 @@ public class Evolution {
                 population = components.recombinationOperator(population, i);
                 components.mutationMethod(population, i, epochs);
 
-                totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+                computeFitnessForPopulation();
                 components.computePercentOfFitness(population);
             }
         }
         else{
-            totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+            computeFitnessForPopulation();
 
             for (int i=0; i<epochs; i++){ 
                 population = components.selectionMethod(population);
                 population = components.recombinationOperator(population, i);
                 components.mutationMethod(population, i, epochs);
 
-                totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+                computeFitnessForPopulation();
             }
         }
         return population;
     }
     
     public Population startEvolution(int epochs, EvolutionStage stage){
+        Objects.requireNonNull(stage);
+
         if (epochs < 1){
-            throw new IllegalArgumentException("Argument, at pos 1: must be greater than one.");
-        }
-        if (stage == null){
-            throw new IllegalArgumentException("Argument, at pos 2: not null.");
+            throw new IllegalArgumentException("Epochs can't be smaller than 1.");
         }
         
         if (withPercentOfFitness){
-//            long first = System.nanoTime();
-            totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+            computeFitnessForPopulation();
+
             components.computePercentOfFitness(population);
             for (int i=0; i<epochs; i++){
                 population = components.selectionMethod(population);
@@ -100,13 +94,13 @@ public class Evolution {
                 components.mutationMethod(population, i, epochs);
                 
                 stage.beforeEndEpoch(population, i);
-                
-                totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+
+                computeFitnessForPopulation();
                 components.computePercentOfFitness(population);
                 
                 stage.onEndEpoch(population, totalBestPerson, i);
 
-                if (earlyStoped = stage.stopEvolution(population, totalBestPerson, i)){
+                if (earlyStopped = stage.stopEvolution(population, totalBestPerson, i)){
                     break;
                 }
             }
@@ -114,7 +108,7 @@ public class Evolution {
         }
         else{
 //            long first = System.nanoTime();
-            totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+            computeFitnessForPopulation();
             
             for (int i=0; i<epochs; i++){
                 population = components.selectionMethod(population);
@@ -122,8 +116,8 @@ public class Evolution {
                 components.mutationMethod(population, i, epochs);
                 
                 stage.beforeEndEpoch(population, i);
-                
-                totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+
+                computeFitnessForPopulation();
                 
                 stage.onEndEpoch(population, totalBestPerson, i);
 
@@ -138,6 +132,19 @@ public class Evolution {
     }
     
     public void reComputeFitness(){
-        totalBestPerson = population.computeFitnessForPopulation(totalBestPerson);
+        computeFitnessForPopulation();
+    }
+
+    private void computeFitnessForPopulation() {
+        population.computeFitnessForPopulation();
+
+        Person populationBest = population.getBestPerson();
+
+        if (totalBestPerson == null) {
+            totalBestPerson = populationBest;
+        }
+        else if (populationBest.getFitness() > totalBestPerson.getFitness()) {
+            totalBestPerson = populationBest;
+        }
     }
 }

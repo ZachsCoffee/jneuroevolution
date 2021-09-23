@@ -34,6 +34,7 @@ public class Population {
     private final ArrayList<Person> population = new ArrayList<>();
     
     private final PersonManager personManager;
+    private Person bestPerson = null;
     
     public Population(PersonManager personManager){
         if (personManager == null){
@@ -75,6 +76,15 @@ public class Population {
     public PersonManager getPersonManager(){
         return personManager;
     }
+
+    public Person getBestPerson() {
+        if (bestPerson == null) throw new IllegalStateException(
+                "Can't give the best person if the fitness isn't computed"
+        );
+
+        return bestPerson;
+    }
+
     //end get/set
     
     //start methods
@@ -107,49 +117,34 @@ public class Population {
     public void sortPopulation(){
         Collections.sort(population);
     }
-//    void restorePopulation(){//gia na mporw na ksana gemisw to population ama einai fixed size
-//        int restoreCount = size - population.size();
-//        for (int i=1; i<=restoreCount; i++){
-//            population.add(personManager.newPerson());
-//        }
-//    }
-    //end methods
-    
-    private void computeFitnessForPopulation(){//returns the best person
-        int populationSize = population.size();
+
+    /**
+     * Computes the fitness for all the population persons. At the same time search's for the best population person.
+     */
+    public void computeFitnessForPopulation() {
+        Person populationBestPerson = population.get(0);
+        populationBestPerson.setFitness(personManager.computeFitness(populationBestPerson));
+
         Person tempPerson;
-        for (int i=0; i<populationSize; i++){
+        for (int i=1; i<population.size(); i++) {
             tempPerson = population.get(i);
             tempPerson.setFitness(personManager.computeFitness(tempPerson));
-        }
-    }
-    
-    public Person computeFitnessForPopulation(Person totalBest){//returns the best person
-        //gia best person
-        if (totalBest == null){
-            totalBest = population.get(0);
-            totalBest.setFitness(personManager.computeFitness(totalBest));
-        }
-        
-        int populationSize = population.size();
-        Person tempPerson;
-        for (int i=0; i<populationSize; i++){
-            tempPerson = population.get(i);
-            tempPerson.setFitness(personManager.computeFitness(tempPerson));
-            
-            if (totalBest.getFitness() < tempPerson.getFitness()){
-                totalBest = tempPerson;
+
+            if (tempPerson.getFitness() > populationBestPerson.getFitness()) {
+                populationBestPerson = tempPerson;
             }
         }
-        return Person.copyPerson(totalBest);
+
+        bestPerson = Person.copyPerson(populationBestPerson);
     }
     
     public String toString(){
-        String print = "";
+        StringBuilder print = new StringBuilder();
+
         for (int i=0; i<size; i++){
-            print += population.get(i)+"\n";
+            print.append(population.get(i)).append("\n");
         }
         
-        return print;
+        return print.toString();
     }
 }

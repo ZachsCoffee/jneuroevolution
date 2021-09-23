@@ -83,17 +83,7 @@ public class Person implements Comparable<Person>, Cloneable {
 
     @Override
     public int compareTo(Person otherPerson) {
-        if (fitness > otherPerson.fitness){
-            return 1;
-        }
-        else if (fitness < otherPerson.fitness){
-            return -1;
-        }
-        else{
-            return 0;
-        }
-            
-//        return (int)(fitness - o.fitness);
+        return Double.compare(fitness, otherPerson.fitness);
     }
     
     public int getPercentOfFitness() {
