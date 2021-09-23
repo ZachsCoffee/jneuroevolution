@@ -269,8 +269,8 @@ public class Gui extends javax.swing.JFrame implements DataBinder {
 
         XYSeriesCollection evolutionCollection = new XYSeriesCollection();
         XYSeries
-                evolutionSeries = new XYSeries("Evolution"),
-                validationSeries = new XYSeries("Validation error");
+                evolutionSeries = new XYSeries("Evolution fitness"),
+                validationSeries = new XYSeries("Validation fitness");
 
         for (int i=0; i<resultsData.evolutionStatistics.length; i++) {
 
