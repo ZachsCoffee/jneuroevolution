@@ -71,13 +71,13 @@ public class BackgroundProblem extends ProblemExecutor {
         );
 
         POPULATION_SIZE = 20;
-        THREADS = 5;
-        EPOCHS = 100;
+        THREADS = 10;
+        EPOCHS = 1000;
         MIGRATION_PERCENT = .1;
 
 
         EVALUATION_TARGET = EvaluationTarget.EVOLUTION_BEST;
-        setDynamicMutation(new MinMax(500, 2000), EPOCHS);
+        setDynamicMutation(new MinMax(800, 2000), EPOCHS);
     }
 
     @Override
@@ -112,12 +112,12 @@ public class BackgroundProblem extends ProblemExecutor {
 
     @Override
     public Network buildNetwork(int maxStartValue) {
-        hiddenLayerFunction = ActivationFunctions.logsig();
+        hiddenLayerFunction = ActivationFunctions.gauss();
 //        Function middleFunction = ActivationFunctions.gauss();
         outputLayerFunction = ActivationFunctions.sigmoid();
 
-        return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 25, hiddenLayerFunction)
-                .addLayer(25, hiddenLayerFunction)
+        return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 9, hiddenLayerFunction)
+                .addLayer(5, hiddenLayerFunction)
                 .addLayer(36, outputLayerFunction)
                 .build();
     }
