@@ -99,38 +99,19 @@ public class Stage implements EvolutionStage {
 
     @Override
     public boolean stopEvolution(Population population, evolution_builder.population.Person totalBestPerson, int epoch) {
-        double
-                validationCurrentFitness,
-                validationEpochBestFitness = 0,
-                evolutionCurrentFitness,
-                evolutionEpochBestFitness = 0;
+        evolution_builder.population.Person epochBestPerson = population.getBestPerson();
 
-        int populationSize = population.getSize();
-        evolution_builder.population.Person currentPerson;
-        for (int i=0; i<populationSize; i++){
-            
-            currentPerson = population.getPersonAt(i);
-            evolutionCurrentFitness = currentPerson.getFitness();
-            validationCurrentFitness = Person.computeFitness(currentPerson, problem.getValidationDataset());
+        double currentBestValidationFitness = Person.computeFitness(epochBestPerson, problem.getValidationDataset());
 
-            if (evolutionCurrentFitness > evolutionEpochBestFitness) {
-                evolutionEpochBestFitness = evolutionCurrentFitness;
-            }
-
-            if (validationCurrentFitness > validationMaxFitness){
-                validationMaxFitness = validationCurrentFitness;
-                validationBestPerson = currentPerson;
-            }
-            if (validationCurrentFitness > validationEpochBestFitness){
-                validationEpochBestFitness = validationCurrentFitness;
-            }
-            
+        if (currentBestValidationFitness > validationMaxFitness){
+            validationMaxFitness = currentBestValidationFitness;
+            validationBestPerson = population.getBestPerson();
         }
         
-        progressListener.evolutionBestUpdate(evolutionEpochBestFitness);
+        progressListener.evolutionBestUpdate(epochBestPerson.getFitness());
         
-        evolutionStatistics[epoch] = evolutionEpochBestFitness;
-        validationStatistics[epoch] = validationEpochBestFitness;
+        evolutionStatistics[epoch] = epochBestPerson.getFitness();
+        validationStatistics[epoch] = currentBestValidationFitness;
 
         return false;
     }
