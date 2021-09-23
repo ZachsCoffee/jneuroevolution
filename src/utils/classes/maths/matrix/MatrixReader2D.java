@@ -1,14 +1,12 @@
 package maths.matrix;
 
-import maths.matrix.MatrixReader;
-
 import java.util.Objects;
 
 public class MatrixReader2D implements MatrixReader {
 
-    private final double[][] data;
+    private final float[][] data;
 
-    public MatrixReader2D(double[][] data) {
+    public MatrixReader2D(float[][] data) {
         this.data = Objects.requireNonNull(data);
     }
     @Override
@@ -22,12 +20,12 @@ public class MatrixReader2D implements MatrixReader {
     }
 
     @Override
-    public double valueAt(int rowIndex, int columnIndex) {
+    public float valueAt(int rowIndex, int columnIndex) {
         return data[rowIndex][columnIndex];
     }
 
     @Override
-    public double[] getRow(int position) {
+    public float[] getRow(int position) {
         return data[position];
     }
 }

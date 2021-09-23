@@ -85,7 +85,7 @@ public class GpuProgram {
                 null,
                 null
         );
-
+        clFinish(commandQueue);
         argumentIndex = 0;
     }
 

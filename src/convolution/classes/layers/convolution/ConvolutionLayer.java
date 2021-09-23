@@ -105,7 +105,7 @@ public class ConvolutionLayer implements Layer {
 
         schemaComputer.compute(inputRows, inputColumns, kernelSize);
 
-        double[][] output = new double[schemaComputer.getRowsCount()][schemaComputer.getColumnsCount()];
+        float[][] output = new float[schemaComputer.getRowsCount()][schemaComputer.getColumnsCount()];
 
         int inputRowsBound = inputRows + schemaComputer.getPaddingRows() - kernelSize;
         int inputColumnsBound = inputColumns + schemaComputer.getPaddingColumns() - kernelSize;

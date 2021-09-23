@@ -8,17 +8,17 @@ __kernel void fastLayer(
     __global const float *weights,
     __global float *output
 ) {
-    int gid = groupIndex + (neuronWeights * get_local_id(0)) + weightsOffset;
-    int outputIndex = (gid - weightsOffset) / neuronWeights + outputOffset;
+    int weightIndex = groupIndex + (neuronWeights * get_global_id(0)) + weightsOffset;
+    int outputIndex = (weightIndex - weightsOffset) / neuronWeights + outputOffset;
 // barrier(CLK_GLOBAL_MEM_FENCE);
 // barrier(CLK_GLOBAL_MEM_FENCE);
-    if ((gid + weightsOffset) % neuronWeights == neuronWeights - 1) {
+    if ((weightIndex + weightsOffset) % neuronWeights == neuronWeights - 1) {
         // atomicWrite(output, weights[gid + weightsOffset], outputIndex);
-        output[outputIndex] += weights[gid + weightsOffset];
+        output[outputIndex] += weights[weightIndex];
     }
     else {
         // atomicWrite(output, weights[gid + weightsOffset] * output[(outputIndex - lastOutputOffset + gid) % lastOutputNeurons], outputIndex);
-        output[outputIndex] += weights[gid + weightsOffset] * output[(outputIndex - lastOutputOffset + gid) % lastOutputNeurons];
+        output[outputIndex] += weights[weightIndex] * output[lastOutputOffset + groupIndex];
     }
 // barrier(CLK_GLOBAL_MEM_FENCE);
     // output[outputIndex] = get_local_size(0);

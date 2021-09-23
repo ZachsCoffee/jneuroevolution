@@ -11,7 +11,7 @@ public class FlatLayer implements Layer {
 
     @Override
     public MatrixReader[] computeLayer(MatrixReader[] channels) {
-        double[] flat = new double[computeOutputSize(channels)];
+        float[] flat = new float[computeOutputSize(channels)];
 
         int startCopyIndex = 0;
         int rows, columns;

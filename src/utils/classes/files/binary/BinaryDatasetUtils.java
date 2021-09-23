@@ -10,9 +10,9 @@ public class BinaryDatasetUtils {
 
         try (BinaryDatasetReader binaryDatasetReader = new BinaryDatasetReader(binaryFile)) {
             float[] feature;
-//            while ((feature = binaryDatasetReader.read()) != null) {
-//                data.add(feature);
-//            }
+            while ((feature = binaryDatasetReader.read()) != null) {
+                data.add(feature);
+            }
 
             return data.toArray(new float[0][]);
         }

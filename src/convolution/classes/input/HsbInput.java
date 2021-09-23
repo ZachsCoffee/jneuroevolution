@@ -3,7 +3,6 @@ package input;
 import maths.matrix.MatrixReader;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.Objects;
 
 
@@ -17,34 +16,34 @@ public class HsbInput implements ConvolutionInput {
         channels = new MatrixReader[] {
                 new AbstractImageInput(image) {
                     @Override
-                    public double valueAt(int rowIndex, int columnIndex) {
+                    public float valueAt(int rowIndex, int columnIndex) {
                         return getHsb(rowIndex, columnIndex)[0];
                     }
 
                     @Override
-                    public double[] getRow(int position) {
+                    public float[] getRow(int position) {
                         throw new UnsupportedOperationException();
                     }
                 },
                 new AbstractImageInput(image) {
                     @Override
-                    public double valueAt(int rowIndex, int columnIndex) {
+                    public float valueAt(int rowIndex, int columnIndex) {
                         return getHsb(rowIndex, columnIndex)[1];
                     }
 
                     @Override
-                    public double[] getRow(int position) {
+                    public float[] getRow(int position) {
                         throw new UnsupportedOperationException();
                     }
                 },
                 new AbstractImageInput(image) {
                     @Override
-                    public double valueAt(int rowIndex, int columnIndex) {
+                    public float valueAt(int rowIndex, int columnIndex) {
                         return getHsb(rowIndex, columnIndex)[2];
                     }
 
                     @Override
-                    public double[] getRow(int position) {
+                    public float[] getRow(int position) {
                         throw new UnsupportedOperationException();
                     }
                 }

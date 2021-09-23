@@ -17,6 +17,9 @@ import files.binary.BinaryDatasetUtils;
 import functions.ActivationFunctions;
 import maths.MinMax;
 import networks.interfaces.Network;
+import networks.multilayer_perceptron.FastNetwork;
+import networks.multilayer_perceptron.GpuLayerProgram;
+import networks.multilayer_perceptron.NetworkLayer;
 import networks.multilayer_perceptron.NeuralNetworkBuilder;
 import neuroevolution.Problem;
 
@@ -103,15 +106,20 @@ public class BackgroundProblem extends ProblemExecutor {
 
     @Override
     public void mutationMethod(Population population, int epoch, int maxEpoch) {
-        Mutation.mutation(population, getMutationChange(epoch), 5, true, PERSON);
+        Mutation.mutation(population, getMutationChange(epoch), 1, true, PERSON);
     }
 
     @Override
     public Network buildNetwork(int maxStartValue) {
-        hiddenLayerFunction = ActivationFunctions.logsig();
+        hiddenLayerFunction = ActivationFunctions.gauss();
 //        Function middleFunction = ActivationFunctions.gauss();
         outputLayerFunction = ActivationFunctions.sigmoid();
 
+//        return new FastNetwork(GpuLayerProgram.gpuProgram, new NetworkLayer[] {
+//                new NetworkLayer(25, trainingDataset.features[0].length),
+//                new NetworkLayer(25, 25),
+//                new NetworkLayer(36, 25)
+//        });
         return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 25, hiddenLayerFunction)
                 .addLayer(25, hiddenLayerFunction)
                 .addLayer(36, outputLayerFunction)
@@ -120,7 +128,7 @@ public class BackgroundProblem extends ProblemExecutor {
 
     @Override
     public Network buildRandomNetwork(int maxStartValue) {
-        return buildNetwork(maxStartValue);
+        return buildNetwork(1);
     }
 
     @Override
@@ -139,19 +147,23 @@ public class BackgroundProblem extends ProblemExecutor {
         for (int i=0; i<dataset.SIZE; i++) {
             float[] result = network.compute(dataset.features[i]);
             int errorCount = 0;
-
+            boolean ok = true;
             for (int j=0; j < result.length; j++) {
-                if ((int) Math.round(result[j]) != dataset.targets[i][j]) {
-                    errorCount++;
+                if (Math.round(result[j]) != dataset.targets[i][j]) {
+                    ok = false;
+                    break;
                 }
             }
-            float prediction = (float) errorCount / dataset.targets[i].length;
+//            float prediction = (float) errorCount / dataset.targets[i].length;
             if (predictionValues != null && i < predictionValues.length) {
-                predictionValues[i][0] = prediction;
-                predictionValues[i][1] = prediction != 0 ? 1 : 0;
+                predictionValues[i][0] = ok ? 1 : 0;
+                predictionValues[i][1] = ! ok ? 1 : 0;
             }
 
-            errorSum += prediction;
+            if (! ok) {
+                errorSum++;
+            }
+//            errorSum += prediction;
         }
 
         return errorSum;

@@ -49,7 +49,7 @@ public class FastNetwork extends NeuralNetwork {
                         .executeNDRangeKernel(layers[i].getNeuronsCount(), layers[i].getNeuronsCount());
             }
 
-            lastOutputOffset += layers[i].getNeuronsCount();
+            lastOutputOffset += lastOutputNeurons;
             lastOutputNeurons = layers[i].getNeuronsCount();
             weightsOffset += layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS;
             outputOffset += layers[i].getNeuronsCount();
@@ -57,17 +57,17 @@ public class FastNetwork extends NeuralNetwork {
 
         gpuProgram.getFloatBufferResult(outputsPointer, allOutputs.length);
 
-//        float[] result = new float[layers[layers.length -1].getNeuronsCount()];
-//        System.arraycopy(allOutputs, allOutputs.length - result.length, result, 0, result.length);
+        float[] result = new float[layers[layers.length -1].getNeuronsCount()];
+        System.arraycopy(allOutputs, allOutputs.length - result.length, result, 0, result.length);
 
         gpuProgram.deallocateBuffer(outputsPointer);
         System.out.println(System.currentTimeMillis() - a);
 
-        a = System.currentTimeMillis();
+//        a = System.currentTimeMillis();
 
-        super.compute(features);
-        System.out.println(System.currentTimeMillis() - a);
-        return allOutputs;
+//        super.compute(features);
+//        System.out.println(System.currentTimeMillis() - a);
+        return result;
     }
 
     public static void main(String[] args) {
@@ -75,7 +75,9 @@ public class FastNetwork extends NeuralNetwork {
                 GpuLayerProgram.gpuProgram,
                 new NetworkLayer[] {
                         new NetworkLayer(5, 5),
-                        new NetworkLayer(5, 5),
+                        new NetworkLayer(2, 5),
+                        new NetworkLayer(1, 2),
+                        new NetworkLayer(1, 1),
                 }
         );
 

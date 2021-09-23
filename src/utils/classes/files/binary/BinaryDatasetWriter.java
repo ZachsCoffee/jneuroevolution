@@ -2,11 +2,11 @@ package files.binary;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
 
 public class BinaryDatasetWriter implements AutoCloseable {
     private final DataOutputStream outputStream;
-    private DoubleBuffer doubleBuffer;
+    private FloatBuffer doubleBuffer;
     private ByteBuffer byteBuffer;
     private boolean writeHeader = true;
 
@@ -24,21 +24,21 @@ public class BinaryDatasetWriter implements AutoCloseable {
     }
 
     public void write(Object... data) throws IOException {
-        double[] array = new double[data.length];
+        float[] array = new float[data.length];
 
         for (int i=0; i<data.length; i++) {
-            array[i] = Double.parseDouble(data[0].toString());
+            array[i] = Float.parseFloat(data[0].toString());
         }
 
         write(array);
     }
 
-    public void write(double... data) throws IOException {
+    public void write(float... data) throws IOException {
         if (writeHeader) {
             outputStream.writeInt(data.length);
 
-            byteBuffer = ByteBuffer.allocate(data.length * 8);
-            doubleBuffer = byteBuffer.asDoubleBuffer();
+            byteBuffer = ByteBuffer.allocate(data.length * 4);
+            doubleBuffer = byteBuffer.asFloatBuffer();
 
             writeHeader = false;
         }

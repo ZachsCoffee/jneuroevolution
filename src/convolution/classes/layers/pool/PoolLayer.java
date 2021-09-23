@@ -86,7 +86,7 @@ public class PoolLayer implements Layer {
                 stride
         );
 
-        double[][] output = new double[dimensions[0]][dimensions[1]];
+        float[][] output = new float[dimensions[0]][dimensions[1]];
 
         int rowsCount = input.getRowCount();
         int columnsCount = input.getColumnCount();
@@ -100,7 +100,7 @@ public class PoolLayer implements Layer {
         return new MatrixReader2D(output);
     }
 
-    private double computeSample(MatrixReader input, int rowIndex, int columnIndex) {
+    private float computeSample(MatrixReader input, int rowIndex, int columnIndex) {
         int sampleRowEnd = rowIndex + sampleSize;
         int sampleColumnEnd = columnIndex + sampleSize;
 

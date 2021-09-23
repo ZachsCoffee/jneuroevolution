@@ -61,7 +61,7 @@ public class GridInputIterator implements Iterator<ConvolutionInput> {
         }
 
         @Override
-        public double valueAt(int rowIndex, int columnIndex) {
+        public float valueAt(int rowIndex, int columnIndex) {
             if (rowIndex >= rowBound || columnIndex >= columnBound) throw new IndexOutOfBoundsException(
                     "Given rowIndex: "+rowIndex+" columnIndex: "+columnIndex+" row bound: "+rowBound+" column bound: "+columnBound
             );
@@ -70,7 +70,7 @@ public class GridInputIterator implements Iterator<ConvolutionInput> {
         }
 
         @Override
-        public double[] getRow(int position) {
+        public float[] getRow(int position) {
             throw new UnsupportedOperationException("Can't get the row");
         }
 

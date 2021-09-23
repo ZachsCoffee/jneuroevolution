@@ -35,7 +35,7 @@ public class Filter {
      * @param columnIndex The column index to start the filter.
      * @return The result.
      */
-    public double compute(int rowIndex, int columnIndex, MatrixReader matrixReader) {
+    public float compute(int rowIndex, int columnIndex, MatrixReader matrixReader) {
         Objects.requireNonNull(matrixReader);
         if (matrixReader.getRowCount() == 0) {
             throw new IllegalArgumentException("Argument input don't have any rows!");
@@ -44,7 +44,7 @@ public class Filter {
         int rowLength = rowIndex + kernel.length;
         int columnLength = columnIndex + kernel.length;
 
-        double sum = 0;
+        float sum = 0;
         for (int i = rowIndex, ki = 0; i < rowLength; i++, ki++) {
             for (int j = columnIndex, kj = 0; j < columnLength; j++, kj++) {
                 // if kernel value is zero then no need to compute

@@ -107,18 +107,18 @@ public class Main {
         ConvolutionInput convolutionInput = mainImageInput.next(), maskConvolutionInput = maskInput.next();
 
         ConvolutionExecutor convolutionExecutor = ConvolutionParallelExecutor.initialize(convolutionInput)
-                .addLayerForAllChannels(new ConvolutionLayer(filters, 1))
-//                .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
-                .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 2, 2))
+                .addLayerForAllChannels(new ConvolutionLayer(filters, 1, true))
+                .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
+                .addLayerForAllChannels(new PoolLayer(PoolFunction.MAX, 2, 2))
 //                    .addLayerForAllChannels(new ConvolutionLayer(filters, 10, 10))
                 .addLayerForAllChannels(new FlatLayer());
-        double[] features = null;
+        float[] features = null;
 
         for (; mainImageInput.hasNext() && maskInput.hasNext(); convolutionInput = mainImageInput.next(), maskConvolutionInput = maskInput.next()) {
             MatrixReader[][] channels = convolutionExecutor
                     .changeInput(convolutionInput).execute().getChannelsOutput();
             if (features == null) {
-                features = new double[channels.length * channels[0][0].getColumnCount() + 36];
+                features = new float[channels.length * channels[0][0].getColumnCount() + 36];
             }
             createDataset(channels, features, (GridInputIterator.GridBlock) maskConvolutionInput.getChannels()[0], mask, binaryDatasetWriter);
         }
@@ -126,7 +126,7 @@ public class Main {
 
     private static void createDataset(
             MatrixReader[][] channels,
-            double[] dataForCsv,
+            float[] dataForCsv,
             GridInputIterator.GridBlock block,
             BufferedImage mask,
             BinaryDatasetWriter binaryDatasetWriter

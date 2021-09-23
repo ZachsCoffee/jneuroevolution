@@ -2,53 +2,53 @@ package layers.pool;
 
 public enum PoolFunction {
     MAX(new Function() {
-        double max;
+        float max;
         @Override
-        public void compute(double value) {
+        public void compute(float value) {
             if (value > max) {
                 max = value;
             }
         }
 
         @Override
-        public double getResult() {
-            double temp = max;
+        public float getResult() {
+            float temp = max;
             max = 0;
             return temp;
         }
     }),
 
     AVERAGE(new Function() {
-        double sum;
+        float sum;
         int count;
         @Override
-        public void compute(double value) {
+        public void compute(float value) {
             sum += value;
             count++;
         }
 
         @Override
-        public double getResult() {
+        public float getResult() {
             if (count == 0) {
                 return 0;
             }
 
-            double temp = sum / count;
+            float temp = sum / count;
             sum = count = 0;
             return temp;
         }
     }),
 
     SUM(new Function() {
-        double sum;
+        float sum;
         @Override
-        public void compute(double value) {
+        public void compute(float value) {
             sum += value;
         }
 
         @Override
-        public double getResult() {
-            double temp = sum;
+        public float getResult() {
+            float temp = sum;
             sum = 0;
             return temp;
         }
@@ -65,8 +65,8 @@ public enum PoolFunction {
     }
 
     public interface Function {
-        void compute(double value);
+        void compute(float value);
 
-        double getResult();
+        float getResult();
     }
 }

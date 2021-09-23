@@ -4,19 +4,19 @@ import java.util.Objects;
 
 public class VectorReader implements MatrixReader {
 
-    private final double[] data;
+    private final float[] data;
 
-    public VectorReader(double[] data) {
+    public VectorReader(float[] data) {
         this.data = Objects.requireNonNull(data);
     }
 
     @Override
-    public double valueAt(int rowIndex, int columnIndex) {
+    public float valueAt(int rowIndex, int columnIndex) {
         return data[columnIndex];
     }
 
     @Override
-    public double[] getRow(int position) {
+    public float[] getRow(int position) {
         return data;
     }
 
