@@ -3,6 +3,8 @@ package networks.multilayer_perceptron;
 import networks.gpu.GpuBufferAllocation;
 import networks.gpu.GpuProgram;
 
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -22,6 +24,7 @@ public class FastNetwork extends NeuralNetwork {
 
         allOutputs = new float[count + layers[0].getLayerInputCount()];
         weightsPointer = gpuProgram.allocateBuffer(weights, GpuProgram.AllocationType.READ);
+//        outputsPointer = gpuProgram.allocatePinned(allOutputs, GpuProgram.AllocationType.READ_WRITE);
     }
 
     @Override
@@ -29,39 +32,42 @@ public class FastNetwork extends NeuralNetwork {
         long a = System.currentTimeMillis();
 
         System.arraycopy(features, 0, allOutputs, 0, features.length);
-        outputsPointer = gpuProgram.allocateBuffer(allOutputs, GpuProgram.AllocationType.READ_WRITE);
+        outputsPointer = gpuProgram.allocatePinned(allOutputs, GpuProgram.AllocationType.READ_WRITE);
+        outputsPointer.getPinnedMemory().order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer().put(allOutputs);
 
         int weightsOffset = 0;
         int outputOffset = features.length;
         int lastOutputOffset = 0;
         int lastOutputNeurons = features.length;
         for (int i=0; i<layers.length; i++) {
-            for (int j=0; j<layers[i].NUMBER_OR_WEIGHTS; j++) {
-                gpuProgram
-                        .addArgument(j)
-                        .addArgument(weightsOffset)
-                        .addArgument(outputOffset)
-                        .addArgument(layers[i].NUMBER_OR_WEIGHTS)
-                        .addArgument(lastOutputOffset)
-                        .addArgument(lastOutputNeurons)
-                        .addArgument(weightsPointer.getGpuMemory())
-                        .addArgument(outputsPointer.getGpuMemory())
-                        .executeNDRangeKernel(layers[i].getNeuronsCount(), layers[i].getNeuronsCount());
-            }
+            gpuProgram
+                    .addArgument(weightsOffset)
+                    .addArgument(lastOutputNeurons)
+                    .addArgument(lastOutputOffset)
+                    .addArgumentFloatArray(layers[i].NUMBER_OR_WEIGHTS)
+                    .addArgument(weightsPointer.getGpuMemory())
+                    .addArgument(outputsPointer.getGpuMemory())
+                    .executeNDRangeKernel(layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS, layers[i].NUMBER_OR_WEIGHTS);
 
             lastOutputOffset += lastOutputNeurons;
             lastOutputNeurons = layers[i].getNeuronsCount();
             weightsOffset += layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS;
             outputOffset += layers[i].getNeuronsCount();
         }
+        gpuProgram.finish();
 
-        gpuProgram.getFloatBufferResult(outputsPointer, allOutputs.length);
 
+//        outputsPointer = gpuProgram.allocateBufferOverwrite(GpuProgram.AllocationType.READ_MAPPED, outputsPointer, allOutputs.length);
+//        gpuProgram.getFloatBufferPinned(outputsPointer);
+        System.out.println(System.currentTimeMillis() - a);
+
+        FloatBuffer floatBuffer = outputsPointer.getPinnedMemory().order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
         float[] result = new float[layers[layers.length -1].getNeuronsCount()];
+        floatBuffer.get(allOutputs);
+        System.out.println(Arrays.toString(allOutputs));
         System.arraycopy(allOutputs, allOutputs.length - result.length, result, 0, result.length);
 
         gpuProgram.deallocateBuffer(outputsPointer);
-        System.out.println(System.currentTimeMillis() - a);
 
 //        a = System.currentTimeMillis();
 

@@ -14,11 +14,11 @@ public class GpuLayerProgram {
 
     static {
         try {
-            byte[] bytes = Files.readAllBytes(Paths.get(GpuLayerProgram.class.getResource("kernel.c").getFile()));
+            byte[] bytes = Files.readAllBytes(Paths.get(GpuLayerProgram.class.getResource("kernel2.cl").getFile()));
             String kernelSourceCode = new String(bytes, StandardCharsets.UTF_8);
 
             gpuProgram = new GpuProgram(
-                    "fastLayer", kernelSourceCode
+                    "networkKernel", kernelSourceCode
             );
         }
         catch (IOException e) {

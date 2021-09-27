@@ -70,7 +70,7 @@ public class BackgroundProblem extends ProblemExecutor {
         );
 
         POPULATION_SIZE = 20;
-        THREADS = 5;
+        THREADS = 1;
         EPOCHS = 100;
         MIGRATION_PERCENT = .1;
 
@@ -115,15 +115,15 @@ public class BackgroundProblem extends ProblemExecutor {
 //        Function middleFunction = ActivationFunctions.gauss();
         outputLayerFunction = ActivationFunctions.sigmoid();
 
-//        return new FastNetwork(GpuLayerProgram.gpuProgram, new NetworkLayer[] {
-//                new NetworkLayer(25, trainingDataset.features[0].length),
-//                new NetworkLayer(25, 25),
-//                new NetworkLayer(36, 25)
-//        });
-        return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 25, hiddenLayerFunction)
-                .addLayer(25, hiddenLayerFunction)
-                .addLayer(36, outputLayerFunction)
-                .build();
+        return new FastNetwork(GpuLayerProgram.gpuProgram, new NetworkLayer[] {
+                new NetworkLayer(25, trainingDataset.features[0].length),
+                new NetworkLayer(25, 25),
+                new NetworkLayer(36, 25)
+        });
+//        return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 25, hiddenLayerFunction)
+//                .addLayer(25, hiddenLayerFunction)
+//                .addLayer(36, outputLayerFunction)
+//                .build();
     }
 
     @Override

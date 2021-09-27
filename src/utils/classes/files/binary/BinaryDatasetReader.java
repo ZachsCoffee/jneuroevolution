@@ -2,14 +2,13 @@ package files.binary;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 
 public class BinaryDatasetReader implements AutoCloseable {
     private final DataInputStream dataInputStream;
     private final BufferedInputStream bufferedInputStream;
     private boolean readHeader = true;
-    private FloatBuffer doubleBuffer;
+    private FloatBuffer floatBuffer;
     private ByteBuffer byteBuffer;
     private byte[] tempByteBuffer;
     private int featureSize;
@@ -39,7 +38,7 @@ public class BinaryDatasetReader implements AutoCloseable {
             tempByteBuffer = new byte[bufferSize];
 
             byteBuffer = ByteBuffer.allocate(bufferSize);
-            doubleBuffer = byteBuffer.asFloatBuffer();
+            floatBuffer = byteBuffer.asFloatBuffer();
 
             readHeader = false;
         }
@@ -48,12 +47,12 @@ public class BinaryDatasetReader implements AutoCloseable {
 
         if (readCount == tempByteBuffer.length) {
             byteBuffer.clear();
-            doubleBuffer.clear();
+            floatBuffer.clear();
 
             byteBuffer.put(tempByteBuffer);
 
             float[] tempDoubleBuffer = new float[featureSize];
-            doubleBuffer.get(tempDoubleBuffer);
+            floatBuffer.get(tempDoubleBuffer);
 
             return tempDoubleBuffer;
         }
@@ -69,7 +68,7 @@ public class BinaryDatasetReader implements AutoCloseable {
     public void close() throws Exception {
         dataInputStream.close();
         byteBuffer = null;
-        doubleBuffer = null;
+        floatBuffer = null;
         tempByteBuffer = null;
     }
 }

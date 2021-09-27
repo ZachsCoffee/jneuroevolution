@@ -2,6 +2,7 @@ package networks.gpu;
 
 import org.jocl.*;
 
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ public class GpuProgram {
     private final List<GpuBufferAllocation> allocations = new LinkedList<>();
     private cl_command_queue commandQueue;
     private int argumentIndex = 0;
+    private ByteBuffer byteBuffer;
 
     public GpuProgram(String programName, String sourceCode) {
         createCommandQueue();
@@ -45,11 +47,17 @@ public class GpuProgram {
         return this;
     }
 
+    public GpuProgram addArgumentFloatArray(int size) {
+        clSetKernelArg(kernel, argumentIndex++, Sizeof.cl_float * size, null);
+
+        return this;
+    }
+
     public GpuBufferAllocation allocateBuffer(float[] data, AllocationType allocationType) {
         GpuBufferAllocation bufferAllocation = new GpuBufferAllocation();
 
         bufferAllocation.pointer = Pointer.to(data);
-        bufferAllocation.gpgMemory = clCreateBuffer(
+        bufferAllocation.gpuMemory = clCreateBuffer(
                 Gpu.getInstance().getContext(),
                 allocationType.getType(),
                 Sizeof.cl_float * data.length,
@@ -62,9 +70,94 @@ public class GpuProgram {
         return bufferAllocation;
     }
 
+    public GpuBufferAllocation allocateBufferOverwrite(AllocationType allocationType, GpuBufferAllocation gpuBufferAllocation, long dataLength) {
+        GpuBufferAllocation bufferAllocation = new GpuBufferAllocation();
+        long mapFlag;
+
+        switch (allocationType) {
+            case READ_MAPPED:
+            case READ:
+                mapFlag = CL_MAP_READ;
+                break;
+            case WRITE:
+                mapFlag = CL_MAP_WRITE;
+                break;
+            case READ_WRITE:
+                mapFlag = CL_MAP_READ | CL_MAP_WRITE;
+                break;
+            default:
+                throw new RuntimeException("Unexpected allocation type "+allocationType);
+        }
+        bufferAllocation.gpuMemory = gpuBufferAllocation.gpuMemory;
+        bufferAllocation.pinnedMemory = clEnqueueMapBuffer(
+                commandQueue,
+                gpuBufferAllocation.gpuMemory,
+                CL_TRUE,
+                mapFlag,
+                0,
+                Sizeof.cl_float * dataLength,
+                0,
+                null,
+                null,
+                null
+        );
+
+        return bufferAllocation;
+    }
+
+    public GpuBufferAllocation allocatePinned(float[] data, AllocationType allocationType) {
+        GpuBufferAllocation bufferAllocation = new GpuBufferAllocation();
+
+        long mapFlag;
+
+        switch (allocationType) {
+            case READ_MAPPED:
+            case READ:
+                mapFlag = CL_MAP_READ;
+                break;
+            case WRITE:
+                mapFlag = CL_MAP_WRITE;
+                break;
+            case READ_WRITE:
+                mapFlag = CL_MAP_READ | CL_MAP_WRITE;
+                break;
+            default:
+                throw new RuntimeException("Unexpected allocation type "+allocationType);
+        }
+
+        bufferAllocation.gpuMemory = clCreateBuffer(
+                Gpu.getInstance().getContext(),
+                allocationType.getType(),
+                Sizeof.cl_float * data.length,
+                null,
+                null
+        );
+
+        bufferAllocation.pinnedMemory = clEnqueueMapBuffer(
+                commandQueue,
+                bufferAllocation.gpuMemory,
+                CL_TRUE,
+                mapFlag,
+                0,
+                Sizeof.cl_float * data.length,
+                0,
+                null,
+                null,
+                null
+        );
+
+        allocations.add(bufferAllocation);
+
+        return bufferAllocation;
+    }
+
+    public void finish() {
+        clFinish(commandQueue);
+    }
+
     public GpuProgram deallocateBuffer(GpuBufferAllocation bufferAllocation) {
         allocations.remove(bufferAllocation);
-        clReleaseMemObject(bufferAllocation.gpgMemory);
+        clReleaseMemObject(bufferAllocation.gpuMemory);
 
         return this;
     }
@@ -85,18 +178,29 @@ public class GpuProgram {
                 null,
                 null
         );
-        clFinish(commandQueue);
+
         argumentIndex = 0;
     }
 
     public void getFloatBufferResult(GpuBufferAllocation buffer, long bufferSize) {
         clEnqueueReadBuffer(
                 commandQueue,
-                buffer.gpgMemory,
+                buffer.gpuMemory,
                 CL_TRUE,
                 0,
                 bufferSize * Sizeof.cl_float,
                 buffer.pointer,
+                0,
+                null,
+                null
+        );
+    }
+
+    public void getFloatBufferPinned(GpuBufferAllocation bufferAllocation) {
+        clEnqueueUnmapMemObject(
+                commandQueue,
+                bufferAllocation.gpuMemory,
+                bufferAllocation.pinnedMemory,
                 0,
                 null,
                 null
@@ -118,7 +222,7 @@ public class GpuProgram {
     protected void finalize() throws Throwable {
 
         for (GpuBufferAllocation allocation : allocations) {
-            clReleaseMemObject(allocation.gpgMemory);
+            clReleaseMemObject(allocation.gpuMemory);
         }
 
         clReleaseKernel(kernel);
@@ -129,9 +233,10 @@ public class GpuProgram {
     }
 
     public enum AllocationType {
-        READ(CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR),
-        WRITE(CL_MEM_READ_WRITE),
-        READ_WRITE(CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR);
+        READ(CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR),
+        READ_MAPPED(CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR),
+        WRITE(CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR),
+        READ_WRITE(CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR);
 
         private final long type;
         AllocationType(long type) {
