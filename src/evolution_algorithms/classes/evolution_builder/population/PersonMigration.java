@@ -10,8 +10,7 @@ import evolution_builder.Evolution;
 import java.util.ArrayList;
 import maths.MinMax;
 import maths.SquareFunction;
-import networks.multilayer_perceptron.BackpropagationMLP;
-
+import networks.multilayer_perceptron.optimizer.BackpropagationMLP;
 
 /**
  *
@@ -36,7 +35,7 @@ public class PersonMigration {
         if (percent <= 0 || percent >= 1) throw new IllegalArgumentException("Percent must be a float number between the (0,1) without the zero and one. percent="+percent);
 
         migrationPersons = new Person[populationsCount];
-        SAMPLE_RATE = (int)(epochs * percent);
+        SAMPLE_RATE = (int) Math.ceil(epochs * percent);
         dynamicLinearValues = new LinearValues(new MinMax(0.00001, 0.1), SAMPLE_RATE, LinearValues.Order.DESC);
 //        squareFunction = new SquareFunction(0.1, epochs);
     }

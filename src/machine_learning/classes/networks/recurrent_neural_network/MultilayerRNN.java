@@ -6,7 +6,7 @@
 package networks.recurrent_neural_network;
 
 import maths.Function;
-import functions.ActivationFunctions;
+import functions.ActivationFunction;
 import networks.interfaces.TimeNetwork;
 
 /**
@@ -24,7 +24,7 @@ public class MultilayerRNN implements TimeNetwork{
         
         RNN[] rnnLayers = new RNN[layers];
         for (int i=0; i<layers -1; i++){
-            rnnLayers[i] = new RNN(numberOfFeatures, hiddenFunction, ActivationFunctions.tanh());
+            rnnLayers[i] = new RNN(numberOfFeatures, hiddenFunction, ActivationFunction.TANH.getFunction());
 //            rnnLayers[i] = new RNN(numberOfFeatures, hiddenFunction, outputFunction);
         }
         rnnLayers[rnnLayers.length-1] = new RNN(numberOfFeatures, hiddenFunction, outputFunction);
@@ -40,7 +40,7 @@ public class MultilayerRNN implements TimeNetwork{
         RNN[] rnnLayers = new RNN[layers];
         for (int i=0; i<layers -1; i++){
 //            rnnLayers[i] = new RNN(numberOfFeatures, hiddenFunction, outputFunction, true);
-            rnnLayers[i] = new RNN(numberOfFeatures, hiddenFunction, ActivationFunctions.tanh(), true);
+            rnnLayers[i] = new RNN(numberOfFeatures, hiddenFunction, ActivationFunction.TANH.getFunction(), true);
         }
         rnnLayers[rnnLayers.length -1] = new RNN(numberOfFeatures, hiddenFunction, outputFunction, true);
         

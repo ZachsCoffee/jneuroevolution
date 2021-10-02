@@ -1,6 +1,7 @@
 package convolution_test;
 
 import basic_gui.DataBinder;
+import basic_gui.ExecutionResponse;
 import basic_gui.Gui;
 import basic_gui.ProblemExecutor;
 import data_manipulation.Dataset;
@@ -14,17 +15,19 @@ import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
 import execution.EvaluationTarget;
 import files.binary.BinaryDatasetUtils;
-import files.csv.CSVFileReader;
-import functions.ActivationFunctions;
-import maths.Function;
+import functions.ActivationFunction;
 import maths.MinMax;
 import networks.interfaces.Network;
-import networks.multilayer_perceptron.NetworkLayer;
-import networks.multilayer_perceptron.NeuralNetwork;
-import networks.multilayer_perceptron.NeuralNetworkBuilder;
+import networks.multilayer_perceptron.builders.NeuralNetworkBuilder;
+import networks.multilayer_perceptron.network.NeuralNetwork;
+import networks.multilayer_perceptron.serializers.NetworkJsonSerializer;
 import neuroevolution.Problem;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class BackgroundProblem extends ProblemExecutor {
 
@@ -72,12 +75,13 @@ public class BackgroundProblem extends ProblemExecutor {
 
         POPULATION_SIZE = 20;
         THREADS = 10;
-        EPOCHS = 1000;
+        EPOCHS = 100;
         MIGRATION_PERCENT = .1;
 
+//        PERCENT_OF_FITNESS = true;
 
-        EVALUATION_TARGET = EvaluationTarget.EVOLUTION_BEST;
-        setDynamicMutation(new MinMax(800, 2000), EPOCHS);
+        EVALUATION_TARGET = EvaluationTarget.VALIDATION_BEST;
+        setDynamicMutation(new MinMax(600, 2000), EPOCHS);
     }
 
     @Override
@@ -91,30 +95,45 @@ public class BackgroundProblem extends ProblemExecutor {
     }
 
     @Override
+    public void executionEnds(ExecutionResponse[] responses) {
+        ExecutionResponse executionResponse = findBest(responses);
+
+        try {
+            Files.write(
+                    Paths.get("/home/zachs/Develop/Java/artificialintelligence/networks/network1.json"),
+                    NetworkJsonSerializer.toJson((NeuralNetwork)executionResponse.getNetwork()).getBytes(StandardCharsets.UTF_8)
+            );
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void computePercentOfFitness(Population population) {
         PercentOfFitness.percentFromCurrentBestRanked(population);
     }
 
     @Override
     public Population recombinationOperator(Population population, int epoch) {
-        return Recombination.random(population, 5, PERSON);
+        return Recombination.random(population, 2, PERSON);
     }
 
     @Override
     public Population selectionMethod(Population population) {
-        return Selection.tournament(population, 5, PERCENT_OF_FITNESS);
+        return Selection.tournament(population, 3, PERCENT_OF_FITNESS);
     }
 
     @Override
     public void mutationMethod(Population population, int epoch, int maxEpoch) {
-        Mutation.mutation(population, getMutationChange(epoch), 5, true, PERSON);
+        Mutation.mutation(population, getMutationChange(epoch), 1, true, PERSON);
     }
 
     @Override
     public Network buildNetwork(int maxStartValue) {
-        hiddenLayerFunction = ActivationFunctions.gauss();
+        hiddenLayerFunction = ActivationFunction.GAUSS.getFunction();
 //        Function middleFunction = ActivationFunctions.gauss();
-        outputLayerFunction = ActivationFunctions.sigmoid();
+        outputLayerFunction = ActivationFunction.SIGMOID.getFunction();
 
         return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 9, hiddenLayerFunction)
                 .addLayer(5, hiddenLayerFunction)

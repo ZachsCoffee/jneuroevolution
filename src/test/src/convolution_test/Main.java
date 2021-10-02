@@ -4,18 +4,14 @@ import executors.ConvolutionExecutor;
 import executors.ConvolutionParallelExecutor;
 import files.binary.BinaryDatasetWriter;
 import files.csv.CSVDatasetUtils;
-import files.csv.CSVFileReader;
-import files.csv.CSVFileWriter;
 import input.*;
 import layers.convolution.ConvolutionLayer;
 import filters.Filter;
 import filters.Kernel;
-import functions.ActivationFunctions;
+import functions.ActivationFunction;
 import layers.flatten.FlatLayer;
 import layers.pool.PoolFunction;
 import layers.pool.PoolLayer;
-import maths.Maths;
-import maths.matrix.Matrix;
 import maths.matrix.MatrixReader;
 import utils.ConvolutionDataPresenter;
 
@@ -23,8 +19,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 
 public class Main {
@@ -39,11 +33,11 @@ public class Main {
 
         Filter[] filters = {
 //                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunctions.groundRelu()),
+                new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.EDGE_DETECTION_MEDIUM, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunctions.groundRelu()),
+                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
+                new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GROUND_RELU.getFunction()),
+                new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
 
@@ -51,8 +45,8 @@ public class Main {
         };
 
         Filter[] filters2 = {
-                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
+                new Filter(Kernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
+                new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.CUSTOM_1, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.CUSTOM_2, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.CUSTOM_3, ActivationFunctions.groundRelu()),

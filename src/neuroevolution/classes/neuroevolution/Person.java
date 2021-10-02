@@ -10,10 +10,9 @@ import networks.interfaces.Network;
 import networks.interfaces.TimeNetwork;
 import evolution_builder.population.PersonManager;
 import maths.Function;
-import java.util.Arrays;
-import networks.multilayer_perceptron.BackpropagationMLP;
-import networks.multilayer_perceptron.NetworkLayer;
-import networks.multilayer_perceptron.NeuralNetwork;
+import networks.multilayer_perceptron.optimizer.BackpropagationMLP;
+import networks.multilayer_perceptron.network.NetworkLayer;
+import networks.multilayer_perceptron.network.NeuralNetwork;
 /**
  *
  * @author Zachs

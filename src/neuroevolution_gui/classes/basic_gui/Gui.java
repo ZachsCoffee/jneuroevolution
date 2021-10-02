@@ -14,9 +14,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 public class Gui extends javax.swing.JFrame implements DataBinder {
-    private final LinkedList<JLabel> resultsLabels = new LinkedList<>();
-
-    private CardLayout evolutionCardLayout, predictionCardLayout;
     private static ProblemExecutor problemExecutor;
 
     public static void create(Class<? extends ProblemExecutor> problemExecutor) {
@@ -45,6 +42,9 @@ public class Gui extends javax.swing.JFrame implements DataBinder {
             }
         });
     }
+
+    private final LinkedList<JLabel> resultsLabels = new LinkedList<>();
+    private final CardLayout evolutionCardLayout, predictionCardLayout;
 
     /**
      * Creates new form GUI

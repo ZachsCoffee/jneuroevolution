@@ -5,17 +5,66 @@
  */
 package functions;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import maths.Function;
 
 /**
  *
- * @author zachs
+ * @author Zachs
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ActivationFunction {
-    String value();
+public enum ActivationFunction {
+    TANH(
+            Math::tanh
+    ),
+    TANSIG(
+            x -> 2 / (1 + Math.exp(-2 * x)) - 1
+    ),
+    LOGSIG(
+            x -> 1 / (1 + Math.exp(-3 * x))
+
+    ),
+    SIGMOID2(
+            x -> x / (1 + Math.abs(x))
+    ),
+    SIGMOID(
+            x -> 1 / (1 + Math.exp(-x))
+    ),
+    GAUSS(
+            x -> Math.exp(-Math.pow(x, 2))
+    ),
+    RELU(
+            x -> Math.log(1 + Math.exp(x))
+    ),
+    GROUND_RELU(
+            x -> Math.max(0, x)
+    ),
+    LEAKY_RELU(
+            x -> Math.max(x * 0.1, x)
+    ),
+    SWISH(
+            x -> x / (1 + Math.exp(-x))
+    ),
+    TEST(
+            x -> Math.pow(Math.abs(x), 2)
+    );
+
+    private final Function function;
+
+    ActivationFunction(Function function) {
+        this.function = function;
+    }
+
+    public Function getFunction() {
+        return function;
+    }
+
+    public static ActivationFunction getByFunction(Function function) {
+
+        for (ActivationFunction activationFunction : ActivationFunction.values()) {
+            if (activationFunction.function.equals(function)) {
+                return activationFunction;
+            }
+        }
+
+        throw new FunctionNotFoundException("Failed to find activation function with object reference: "+function);
+    }
 }
