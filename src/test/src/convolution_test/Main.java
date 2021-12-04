@@ -27,17 +27,19 @@ public class Main {
     private static Plot plot;
     
     public static void main(String[] args) throws IOException {
-//        writeToBinary();
-//        plot = new Plot();
-//        plot.open();
+        plot = new Plot();
+        plot.open();
 
         Filter[] filters = {
 //                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
+//                new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.EDGE_DETECTION_MEDIUM, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
-                new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GROUND_RELU.getFunction()),
-                new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GROUND_RELU.getFunction()),
+//                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
+                new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GAUSS.getFunction()),
+                new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GAUSS.getFunction()),
+                new Filter(Kernel.IDENTITY, ActivationFunction.GAUSS.getFunction()),
+                new Filter(Kernel.SHARPEN, ActivationFunction.GAUSS.getFunction()),
+                new Filter(Kernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
 //                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
 
@@ -56,7 +58,7 @@ public class Main {
         String inputPath = "/home/zachs/Develop/Java/artificialintelligence/datasets/input_images/scaled";
 //        convolveImage(filters, filters2, new File(inputPath+"/")).printSchema();
 //        CSVFileWriter csvFileWriter = new CSVFileWriter("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset3.csv");
-        BinaryDatasetWriter binaryDatasetWriter = new BinaryDatasetWriter("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset3.b");
+        BinaryDatasetWriter binaryDatasetWriter = new BinaryDatasetWriter("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset_border.b");
 
         ConvolutionParallelExecutor output = null;
         for (int i = 2; i <= 12; i++) {
@@ -85,25 +87,18 @@ public class Main {
 //        outputAsImages(output.getChannelsOutput(), "/home/zachs/Develop/Java/artificialintelligence/datasets/test_images");
     }
 
-    private static void writeToBinary() {
-        CSVDatasetUtils.csvToBinary(
-                new File("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset1.csv"),
-                new File("/home/zachs/Develop/Java/artificialintelligence/datasets/binary_dataset1.b")
-        );
-    }
-
     private static void convolveImage(Filter[] filters, Filter[] filters2, File image, File fileMaks, BinaryDatasetWriter binaryDatasetWriter) throws IOException {
 //        //        ConvolutionExecutor output = ConvolutionExecutor.initialize(new HsbInput(new File("/home/zachs/Downloads/ΟΔ 5396.jpg")))
         BufferedImage mask = ImageIO.read(fileMaks);
 
-        Iterator<ConvolutionInput> mainImageInput = new GridInput(new HsbInput(ImageIO.read(image)), 6, 6).iterator();
-        Iterator<ConvolutionInput> maskInput = new GridInput(new ImageInput(mask), 6, 6).iterator();
+        Iterator<ConvolutionInput> mainImageInput = new GridInput(new HsbInput(ImageIO.read(image)), 4, 4).iterator();
+        Iterator<ConvolutionInput> maskInput = new GridInput(new ImageInput(mask), 4, 4).iterator();
         ConvolutionInput convolutionInput = mainImageInput.next(), maskConvolutionInput = maskInput.next();
 
         ConvolutionExecutor convolutionExecutor = ConvolutionParallelExecutor.initialize(convolutionInput)
                 .addLayerForAllChannels(new ConvolutionLayer(filters, 1))
 //                .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
-                .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 2, 2))
+//                .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 2, 1))
 //                    .addLayerForAllChannels(new ConvolutionLayer(filters, 10, 10))
                 .addLayerForAllChannels(new FlatLayer());
         double[] features = null;
@@ -112,7 +107,7 @@ public class Main {
             MatrixReader[][] channels = convolutionExecutor
                     .changeInput(convolutionInput).execute().getChannelsOutput();
             if (features == null) {
-                features = new double[channels.length * channels[0][0].getColumnCount() + 36];
+                features = new double[channels.length * channels[0][0].getColumnCount() + 1];
             }
             createDataset(channels, features, (GridInputIterator.GridBlock) maskConvolutionInput.getChannels()[0], mask, binaryDatasetWriter);
         }
@@ -144,20 +139,45 @@ public class Main {
             channelPosition += channelLength;
         }
 
+        int sum = 0;
+        int blackCount = 0;
+        int whiteCount = 0;
         for (int i=0; i<block.getRowCount(); i++) {
             for (int j=0; j<block.getColumnCount(); j++) {
-                int target = 1 - (mask.getRGB(block.getRealColumn() + j, block.getRealRow() + i) & 0xFF / THRESHOLD);
-                dataForCsv[channelPosition++] = target;
+                int normalize = (mask.getRGB(block.getRealColumn() + j, block.getRealRow() + i) & 0xFF) / 0xFF;
+
+                if (normalize == 1) {
+                    whiteCount++;
+                }
+                else {
+                    blackCount++;
+                }
 //                int byteRgb = 255 * target;
 //                plot.main.paintPixel(block.getRealRow() + i, block.getRealColumn() + j, byteRgb);
 
             }
         }
 
+
+        double colorAvg =( (double)sum / (block.getRowCount() * block.getColumnCount()));
+//        System.out.println(colorAvg);
+//        dataForCsv[channelPosition] = (int) (colorAvg) != 1 && (int) (colorAvg) != 0 ? 1 : 0;
+        dataForCsv[channelPosition] = (whiteCount != 0 && blackCount != 0) && Math.abs(whiteCount - blackCount) < 20 ? 1 : 0;
         binaryDatasetWriter.write(dataForCsv);
 //        binaryDatasetWriter.writeLine(Arrays.stream(dataForCsv).boxed().toArray());
-
+//        for (int i=0; i<block.getRowCount(); i++) {
+//            for (int j=0; j<block.getColumnCount(); j++) {
+//                plot.main.paintPixel(block.getRealRow() + i, block.getRealColumn() + j, dataForCsv[channelPosition] == 1 ? 0xFFFFFF : 0x0);
+//
+//            }
+//        }
 //        plot.main.repaint();
+
+//        try {
+//            Thread.sleep(10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private static int averageColor(int[] rgbArray) {

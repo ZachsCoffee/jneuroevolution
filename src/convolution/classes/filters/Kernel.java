@@ -51,6 +51,12 @@ public class Kernel {
             {0, -1, 0}
     };
 
+    public static final double[][] SHARPEN2 = {
+            {0, -2, 0},
+            {-2, 10, -2},
+            {0, -2, 0}
+    };
+
     public static final double[][] CUSTOM_1 = {
             {-1, -1, -1},
             {-1, -1, -1},

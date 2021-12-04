@@ -26,17 +26,16 @@ import java.util.Iterator;
 
 public class ClearBackground {
     public static void main(String[] args) throws IOException {
-        byte[] bytes = Files.readAllBytes(Paths.get("/home/zachs/Develop/Java/artificialintelligence/networks/network1.json"));
+        byte[] bytes = Files.readAllBytes(Paths.get("/home/zachs/Develop/Java/artificialintelligence/networks/network3.json"));
 
         NeuralNetwork neuralNetwork = NetworkJsonSerializer.fromJson(new String(bytes, StandardCharsets.UTF_8));
 
         Filter[] filters = {
-//                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
-//                new Filter(Kernel.EDGE_DETECTION_MEDIUM, ActivationFunctions.groundRelu()),
-                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
-                new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GROUND_RELU.getFunction()),
-                new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GROUND_RELU.getFunction()),
+                new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GAUSS.getFunction()),
+                new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GAUSS.getFunction()),
+                new Filter(Kernel.IDENTITY, ActivationFunction.GAUSS.getFunction()),
+                new Filter(Kernel.SHARPEN, ActivationFunction.GAUSS.getFunction()),
+                new Filter(Kernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
 //                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
 
@@ -45,8 +44,8 @@ public class ClearBackground {
         File imageFile = new File("/home/zachs/Develop/Java/artificialintelligence/networks/object1.jpg");
         GridInput gridInput = new GridInput(
                 new HsbInput(ImageIO.read(imageFile)),
-                6,
-                6
+                4,
+                4
         );
 
         BufferedImage resultImage = new BufferedImage(1200, 1600, BufferedImage.TYPE_INT_RGB);
@@ -58,7 +57,7 @@ public class ClearBackground {
             convolutionExecutor = ConvolutionParallelExecutor.initialize(convolutionInput)
                     .addLayerForAllChannels(new ConvolutionLayer(filters, 1))
 //                .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
-                    .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 2, 2))
+//                    .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 2, 2))
 //                    .addLayerForAllChannels(new ConvolutionLayer(filters, 10, 10))
                     .addLayerForAllChannels(new FlatLayer())
                     .execute();
@@ -76,19 +75,24 @@ public class ClearBackground {
 
             double[] output = neuralNetwork.compute(features);
             GridInputIterator.GridBlock gridBlock = (GridInputIterator.GridBlock) convolutionInput.getChannels()[0];
+            int color = Math.round(output[0]) == 1
+                    ? 0xFFFFFF
+                    : 0x0;
 
             for (int i=0; i<output.length; i++) {
-                int rowIndex = i / 6;
-                int columnIndex = i % 6;
+                int rowIndex = i / 4;
+                int columnIndex = i % 4;
 
                 int imageRow = gridBlock.getRealRow() + rowIndex;
                 int imageColumn = gridBlock.getRealColumn() + columnIndex;
 
-                if (Math.round(output[i]) == 1) {
-                    resultImage.setRGB(imageColumn, imageRow, 0xFF << 16);
-                } else {
-                    resultImage.setRGB(imageColumn, imageRow, testImage.getRGB(imageColumn, imageRow));
-                }
+                resultImage.setRGB(imageColumn, imageRow, color);
+
+//                if (Math.round(output[i]) == 1) {
+//                    resultImage.setRGB(imageColumn, imageRow, 0xFFFFFF);
+//                } else {
+//                    resultImage.setRGB(imageColumn, imageRow, 0xFF << 16);
+//                }
             }
         }
 

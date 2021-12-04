@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 
 public class BackgroundProblem extends ProblemExecutor {
 
@@ -39,22 +41,38 @@ public class BackgroundProblem extends ProblemExecutor {
 //        );
 
         double[][] allData = BinaryDatasetUtils.loadFrom(
-                new File("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset3.b")
+                new File("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset_border.b")
         );
 
         double someDataSize = 100_000d;
         int period = (int) Math.ceil(allData.length / someDataSize);
-        double[][] someData = new double[(int)Math.ceil(allData.length / (double)period)][];
+        List<double[]> someData = new LinkedList<>();
+//        double[][] someData = new double[(int)Math.ceil(allData.length / (double)period)][];
 //
+        int good = 0, bad = 0;
         int p=0;
         for (int i=0; i<allData.length; i++) {
-            if (i % period == 0) {
-                someData[p++] = allData[(int) (Math.random() * allData.length)];
+//            if (i % period == 0) {
+//                someData[p++] = allData[(int) (Math.random() * allData.length)];
+//            }
+//            someData.add(allData[i]);
+//
+            if (allData[i][allData[i].length -1] == 1) {
+                if (good <= bad) {
+                    someData.add(allData[i]);
+                    good++;
+                }
+            }
+            else {
+                if (bad <= good) {
+                    someData.add(allData[i]);
+                    bad++;
+                }
             }
         }
 
-        DatasetSpecs datasetSpecs = DatasetSpecs.init(someData, .6, .2)
-                .setTargetsCount(36)
+        DatasetSpecs datasetSpecs = DatasetSpecs.init(someData.toArray(new double[0][]), .6, .2)
+                .setTargetsCount(1)
                 .setValidationSize(.2)
                 .setup();
 
@@ -66,16 +84,16 @@ public class BackgroundProblem extends ProblemExecutor {
 
         System.out.println(
                 "Load data time: "+ (System.currentTimeMillis() - start)+"\n"+
-                "Total features: "+allData.length+" selected: "+someData.length+"\n"+
+                "Total features: "+allData.length+" selected: "+someData.size()+"\n"+
                 "Feature length: "+trainingDataset.features[0].length+" targets length: "+trainingDataset.targets[0].length+"\n"+
                 "Training features: "+trainingDataset.SIZE+"\n"+
                 "Test features: "+testingDataset.SIZE+"\n"+
                 "Validation features: "+validationDataset.SIZE
         );
 
-        POPULATION_SIZE = 20;
+        POPULATION_SIZE = 30;
         THREADS = 10;
-        EPOCHS = 100;
+        EPOCHS = 500;
         MIGRATION_PERCENT = .1;
 
 //        PERCENT_OF_FITNESS = true;
@@ -90,7 +108,7 @@ public class BackgroundProblem extends ProblemExecutor {
         double[][] predictionValues = new double[dataset.SIZE][2];
 
         double error = datasetEvaluation(network, dataset, predictionValues);
-
+        System.out.println("Error percent: "+(100d * error / dataset.SIZE));
         return new EvaluationResult(predictionValues, error);
     }
 
@@ -100,7 +118,7 @@ public class BackgroundProblem extends ProblemExecutor {
 
         try {
             Files.write(
-                    Paths.get("/home/zachs/Develop/Java/artificialintelligence/networks/network1.json"),
+                    Paths.get("/home/zachs/Develop/Java/artificialintelligence/networks/network3.json"),
                     NetworkJsonSerializer.toJson((NeuralNetwork)executionResponse.getNetwork()).getBytes(StandardCharsets.UTF_8)
             );
         }
@@ -121,7 +139,7 @@ public class BackgroundProblem extends ProblemExecutor {
 
     @Override
     public Population selectionMethod(Population population) {
-        return Selection.tournament(population, 3, PERCENT_OF_FITNESS);
+        return Selection.tournament(population, 5, PERCENT_OF_FITNESS);
     }
 
     @Override
@@ -131,13 +149,13 @@ public class BackgroundProblem extends ProblemExecutor {
 
     @Override
     public Network buildNetwork(int maxStartValue) {
-        hiddenLayerFunction = ActivationFunction.GAUSS.getFunction();
+        hiddenLayerFunction = ActivationFunction.TANH.getFunction();
 //        Function middleFunction = ActivationFunctions.gauss();
         outputLayerFunction = ActivationFunction.SIGMOID.getFunction();
 
-        return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 9, hiddenLayerFunction)
-                .addLayer(5, hiddenLayerFunction)
-                .addLayer(36, outputLayerFunction)
+        return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 20, hiddenLayerFunction)
+                .addLayer(20, hiddenLayerFunction)
+                .addLayer(1, outputLayerFunction)
                 .build();
     }
 
@@ -156,28 +174,22 @@ public class BackgroundProblem extends ProblemExecutor {
     }
 
     private double datasetEvaluation(Network network, Dataset dataset, final double[][] predictionValues) {
-        double errorSum = 0;
-        int p = 0;
+        double errorCount = 0;
 
         for (int i=0; i<dataset.SIZE; i++) {
             double[] result = network.compute(dataset.features[i]);
-            int errorCount = 0;
 
-            for (int j=0; j < result.length; j++) {
-                if ((int) Math.round(result[j]) != dataset.targets[i][j]) {
-                    errorCount++;
-                }
-            }
-            double prediction = (double) errorCount / dataset.targets[i].length;
-            if (predictionValues != null && i < predictionValues.length) {
-                predictionValues[i][0] = prediction;
-                predictionValues[i][1] = prediction != 0 ? 1 : 0;
+            if ((int) Math.round(result[0]) != dataset.targets[i][0]) {
+                errorCount++;
             }
 
-            errorSum += prediction;
+            if (predictionValues != null) {
+                predictionValues[i][0] = Math.round(result[0]);
+                predictionValues[i][1] = dataset.targets[i][0];
+            }
         }
 
-        return errorSum;
+        return errorCount;
     }
 
 //    private double datasetEvaluation(Network network, Dataset dataset, final double[][] predictionValues) {
