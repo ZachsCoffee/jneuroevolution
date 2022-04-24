@@ -6,7 +6,7 @@
 package neuroevolution;
 
 import data_manipulation.Dataset;
-import evolution_builder.components.EvolutionComponents;
+import evolution_builder.components.EvolutionPhases;
 import evolution_builder.population.PersonManager;
 import maths.Function;
 import maths.LinearValues;
@@ -16,7 +16,7 @@ import maths.MinMax;
  *
  * @author Zachs
  */
-public abstract class Problem implements MLProblem, EvolutionComponents {
+public abstract class Problem implements MLProblem, EvolutionPhases {
     
     protected Function hiddenLayerFunction, outputLayerFunction;
     protected Dataset 

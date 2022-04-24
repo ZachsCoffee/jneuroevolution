@@ -1,11 +1,11 @@
 package basic_gui;
 
 public class ResultsData {
-    public double[] evolutionStatistics, validationStatistics;
-    public double[][] realData, predictedData;
-    public String resultsString;
+    public final double[] evolutionStatistics, validationStatistics;
+    public final double[][] realData, predictedData;
+    public final String resultsString;
 
-    public ResultsData(double[] evolutionStatistics, double[] validationStatistics, double[][] realData, double[][] predictedData, String resultsString) {
+    ResultsData(double[] evolutionStatistics, double[] validationStatistics, double[][] realData, double[][] predictedData, String resultsString) {
         this.evolutionStatistics = evolutionStatistics;
         this.validationStatistics = validationStatistics;
         this.realData = realData;

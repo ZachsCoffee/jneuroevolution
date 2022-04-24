@@ -3,15 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package networks.multilayer_perceptron;
+package networks.multilayer_perceptron.optimizer;
 
 import maths.Function;
+import networks.multilayer_perceptron.network.NetworkLayer;
+import networks.multilayer_perceptron.network.NeuralNetwork;
 
 /**
  *
  * @author arx-dev-3a-19
  */
-public class BackpropagationMLP extends NeuralNetwork{
+public class BackpropagationMLP extends NeuralNetwork {
     public final double LEARN_RATE;
 
     private final double[][] TRAINING_TARGETS, TRAINING_FEATURES;
@@ -52,8 +54,7 @@ public class BackpropagationMLP extends NeuralNetwork{
     public double[] compute(double[] features) {
         double[] results = features;
         for (int i=0; i<layers.length; i++){
-//            System.err.println(results.length+" "+i+" "+layers.length);
-            results = layers[i].computeLayer(results);
+            results = computeLayer(i, results);
             neurosOutput[i] = results;
         }
         

@@ -17,8 +17,11 @@ public class ConvolutionDataPresenter {
 
             for (int i=0; i<rows; i++) {
                 for (int j=0; j<columns; j++) {
-                    int value = (int) (255 * convolutionOutput.valueAt(i, j));
-
+                    double test = convolutionOutput.valueAt(i, j);
+                    int value = 255 * (int) convolutionOutput.valueAt(i, j);
+//                    if (test < 0 || test > 1) {
+//                        throw new RuntimeException("Failed "+test);
+//                    }
                     bufferedImage.setRGB(j, i, (value << 16) | (value << 8) | value);
                 }
             }

@@ -3,17 +3,15 @@ package basic_gui;
 import data_manipulation.CrossValidation;
 import data_manipulation.Dataset;
 import data_manipulation.DatasetSpecs;
-import data_manipulation.DatasetSplitter;
 import data_manipulation.ProblemDatasets;
 import evolution_builder.Evolution;
 import evolution_builder.population.PersonMigration;
 import evolution_builder.population.Population;
 import execution.EvaluationTarget;
-import files.CSVFileReader;
-import files.CSVFileWriter;
+import files.csv.CSVFileReader;
+import files.csv.CSVFileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,8 +28,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
     protected EvaluationTarget EVALUATION_TARGET;
     protected boolean
             PERCENT_OF_FITNESS = false,
-            PERSON_MIGRATION = true,
-            CROSS_VALIDATION_LEARNING = false;
+            PERSON_MIGRATION = true;
 
     protected double
             MIGRATION_PERCENT = 0.1;
@@ -41,14 +38,12 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
             EPOCHS = 2000,
             POPULATION_SIZE = 40;
 
-    private DataBinder dataBinder;
-    private DatasetSpecs crossValidationSpecs;
-    private AtomicInteger progressCounter = new AtomicInteger();
+    private final DataBinder dataBinder;
+    private final AtomicInteger progressCounter = new AtomicInteger();
     private ProblemDatasets[] problemDatasetses = null;
     private HashMap<Long, Integer> threadToDatasetMap = null;
     private double[] evolutionBest; // holds the (best person fitness) for each subpopulation
     private double meanFitness = 0; // the mean (best person fitness) from all the subpopulation
-    private double[][] data;
 
     private int totalEpochs;
 
@@ -61,50 +56,29 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
         this.dataBinder = dataBinder;
     }
 
-    public abstract EvaluationResult evaluation(Network network, Dataset testingDataset);
+    public abstract EvaluationResult evaluation(Network network, Dataset dataset);
+
+    public abstract void executionEnds(ExecutionResponse[] responses);
 
     public double getMeanFitness() {
         return meanFitness;
     }
     
-    
     @Override
     public Dataset getTrainingDataset() {
-        int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
-
-        return CROSS_VALIDATION_LEARNING 
-                ? problemDatasetses[datasetPos].getTrainingDataset()
-                : trainingDataset;
+        return trainingDataset;
     }
 
     @Override
     public Dataset getValidationDataset() {
-        int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
-        
-        return CROSS_VALIDATION_LEARNING 
-                ? problemDatasetses[datasetPos].getValidationDataset()
-                : validationDataset;
+        return validationDataset;
     }
 
     @Override
     public Dataset getTestingDataset() {
-        int datasetPos = threadToDatasetMap.get(Thread.currentThread().getId());
-        
-        return CROSS_VALIDATION_LEARNING 
-                ? problemDatasetses[datasetPos].getTestingDataset()
-                : testingDataset;
+        return testingDataset;
     }
-    
-    public void setCrossValidationLearning(double[][] data) {
-//        if (crossValidationSpecs == null) throw new IllegalArgumentException(
-//                "crossValidationSpecs not null"
-//        );
-        this.data = data;
-        
-//        this.crossValidationSpecs = crossValidationSpecs;
-        CROSS_VALIDATION_LEARNING = true;
-    }
-    Double test = 0D;
+
     public void execute() {
 
         progressCounter.set(0);
@@ -112,29 +86,15 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
         totalEpochs = THREADS * EPOCHS;
 
         evolutionBest = new double[THREADS];
-        
+
+        threadToDatasetMap = new HashMap<>();
+
         PersonMigration personMigration = new PersonMigration(MIGRATION_PERCENT, EPOCHS, THREADS);
 
-        final String resultsFolder = DateTimeFormatter.ofPattern("dd_MM_yyy__HH_mm_ss").format(LocalDateTime.now());
-        try {
-            Files.createDirectory(Paths.get("./src/gr/polar/titanic/data/"+resultsFolder));
-        } 
-        catch (IOException ex) {
-            System.err.println("Folder not created!");
-        }
-        
-        if (CROSS_VALIDATION_LEARNING) {
-            problemDatasetses = CrossValidation.kFolds(data, THREADS, 0.25);            
-//            problemDatasetses = CrossValidation.custom(DatasetSpecs.init(data)
-//                    .setTrainingSize(.5)
-//                    .setValidationSize(0.25)
-//                    .setTestingSize(0.25).setup(), THREADS);
+        final ExecutionResponse[] executionResponses = new ExecutionResponse[THREADS];
 
-            threadToDatasetMap = new HashMap<>();
-        }
-        
-        AtomicLong meanSum = new AtomicLong(0);
-        AtomicInteger threadCount = new AtomicInteger(1);
+        final AtomicInteger threadCount = new AtomicInteger(0);
+
         for (int i=0; i<THREADS; i++) {
             
 
@@ -144,7 +104,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
                 
                 long threadId = Thread.currentThread().getId();
                 
-                if (CROSS_VALIDATION_LEARNING) threadToDatasetMap.put(threadId, internalI);
+                threadToDatasetMap.put(threadId, internalI);
                 
                 Evolution evolution = new Evolution(Population.generate(getPersonManager(), POPULATION_SIZE), PERCENT_OF_FITNESS, this);
 
@@ -170,19 +130,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
                         break;
                 }
 
-                customCode(resultsFolder, threadId, network);
-                
                 EvaluationResult testResult = evaluation(network, getTestingDataset());
-                
-                synchronized(test) {
-                    test += testResult.evaluationError;
-                }
-                    
-                if (threadCount.get() == THREADS) {
-                    System.err.println("Cross validation error: "+(test / THREADS));
-                }
-                
-                threadCount.incrementAndGet();
                 
                 dataBinder.addResults(new ResultsData(
                         stage.getEvolutionStatistics(),
@@ -195,28 +143,30 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
                         )
                 ));
 
+                executionResponses[threadCount.getAndIncrement()] = new ExecutionResponse(network, testResult);
+
+                if (threadCount.get() == THREADS) {
+                    executionEnds(executionResponses);
+                }
             }).start();
         }
-    }
-
-    public void customCode(String resultsFolder, long thread, Network network) {
-        double[][] testingData = CSVFileReader.readNumbersFile("./src/gr/polar/titanic/data/normal_test6.csv", ",");
-        double[][] ids = CSVFileReader.readNumbersFile("./src/gr/polar/titanic/data/passenger_id.csv", ",");
-        
-        CSVFileWriter csvFileWriter = new CSVFileWriter("./src/gr/polar/titanic/data/"+resultsFolder+"/results_"+thread+".csv");
-        
-        for (int i=0; i<testingData.length; i++) {
-//            System.out.println(Math.round(network.compute(testingData[i])[0]) >= 0 ? 1 : 0);
-            
-            csvFileWriter.writeLine(ids[i][0], Math.round(network.compute(testingData[i])[0]) >= 0 ? 1 : 0);
-        }
-        
-        csvFileWriter.close();
     }
     
     @Override
     public void epochUpdate(int currentEpoch) {
         dataBinder.addProgress((int) Maths.percent(totalEpochs, progressCounter.incrementAndGet()));
+    }
+
+    protected ExecutionResponse findBest(ExecutionResponse[] executionResponses) {
+        ExecutionResponse bestExecutionResponse = executionResponses[0];
+
+        for (int i=1; i<executionResponses.length; i++) {
+            if (executionResponses[i].evaluationResult.evaluationError < bestExecutionResponse.evaluationResult.evaluationError) {
+                bestExecutionResponse = executionResponses[i];
+            }
+        }
+
+        return bestExecutionResponse;
     }
 
     @Override
@@ -230,14 +180,12 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
         }
         
         meanFitness = sum / evolutionBest.length;
-//        System.err.println(meanFitness);
-//        meanFitness = 0;
     }
     
     public static class EvaluationResult {
 
-        public double[][] predictionValues;
-        public double evaluationError;
+        public final double[][] predictionValues;
+        public final double evaluationError;
 
         public EvaluationResult(double[][] predictionValues, double evaluationError) {
             this.predictionValues = predictionValues;

@@ -29,6 +29,10 @@ public enum PoolFunction {
 
         @Override
         public double getResult() {
+            if (count == 0) {
+                return 0;
+            }
+
             double temp = sum / count;
             sum = count = 0;
             return temp;

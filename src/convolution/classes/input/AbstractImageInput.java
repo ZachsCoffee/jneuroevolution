@@ -17,30 +17,24 @@ public abstract class AbstractImageInput implements MatrixReader {
     protected final int realRowsCount, realColumnsCount;
     protected final int rowsCount, columnsCount;
 
-    public AbstractImageInput(File image) {
-        try {
-            Objects.requireNonNull(image);
-            bufferedImage = ImageIO.read(image);
+    public AbstractImageInput(BufferedImage bufferedImage) {
+        this.bufferedImage = Objects.requireNonNull(bufferedImage);
 
-            realRowsCount = bufferedImage.getHeight();
-            realColumnsCount = bufferedImage.getWidth();
+        realRowsCount = bufferedImage.getHeight();
+        realColumnsCount = bufferedImage.getWidth();
 
-            if (realRowsCount % 2 != 0) {
-                rowsCount = realRowsCount + 1;
-            }
-            else {
-                rowsCount = realRowsCount;
-            }
-
-            if (realColumnsCount % 2 != 0) {
-                columnsCount = realColumnsCount + 1;
-            }
-            else {
-                columnsCount = realColumnsCount;
-            }
+        if (realRowsCount % 2 != 0) {
+            rowsCount = realRowsCount + 1;
         }
-        catch (IOException e) {
-            throw new RuntimeException("Failed to read file: "+image, e);
+        else {
+            rowsCount = realRowsCount;
+        }
+
+        if (realColumnsCount % 2 != 0) {
+            columnsCount = realColumnsCount + 1;
+        }
+        else {
+            columnsCount = realColumnsCount;
         }
     }
 

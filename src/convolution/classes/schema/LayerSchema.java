@@ -4,7 +4,7 @@ import maths.matrix.MatrixSchema;
 
 public class LayerSchema implements MatrixSchema {
 
-    private final int rows, columns;
+    private int rows, columns;
 
     public LayerSchema(int rows, int columns) {
         if (rows < 1) throw new RuntimeException(
@@ -17,6 +17,10 @@ public class LayerSchema implements MatrixSchema {
 
         this.rows = rows;
         this.columns = columns;
+    }
+
+    private LayerSchema() {
+
     }
 
     @Override
