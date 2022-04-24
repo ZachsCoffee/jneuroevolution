@@ -40,7 +40,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
 
     private final DataBinder dataBinder;
     private final AtomicInteger progressCounter = new AtomicInteger();
-    private ProblemDatasets[] problemDatasetses = null;
+    private ProblemDatasets[] problemDatasets = null;
     private HashMap<Long, Integer> threadToDatasetMap = null;
     private double[] evolutionBest; // holds the (best person fitness) for each subpopulation
     private double meanFitness = 0; // the mean (best person fitness) from all the subpopulation
