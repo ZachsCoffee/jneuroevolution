@@ -9,6 +9,7 @@ module machine_learning {
     requires jocl;
     requires java.logging;
     requires com.google.gson;
+    requires aparapi;
 
     exports functions;
     exports networks.interfaces;
@@ -16,4 +17,6 @@ module machine_learning {
     exports networks.recurrent_neural_network;
     exports abstraction;
     exports data_manipulation;
+    exports networks.gpu;
+    opens networks.gpu to aparapi;
 }

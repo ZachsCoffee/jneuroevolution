@@ -115,7 +115,7 @@ public class BackgroundProblem extends ProblemExecutor {
 //        Function middleFunction = ActivationFunctions.gauss();
         outputLayerFunction = ActivationFunctions.sigmoid();
 
-        return new FastNetwork(GpuLayerProgram.gpuProgram, new NetworkLayer[] {
+        return new FastNetwork(new NetworkLayer[] {
                 new NetworkLayer(25, trainingDataset.features[0].length),
                 new NetworkLayer(25, 25),
                 new NetworkLayer(36, 25)
