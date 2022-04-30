@@ -101,17 +101,19 @@ public class Stage implements EvolutionStage {
     public boolean stopEvolution(Population population, evolution_builder.population.Person totalBestPerson, int epoch) {
         evolution_builder.population.Person epochBestPerson = population.getBestPerson();
 
-        double currentBestValidationFitness = Person.computeFitness(epochBestPerson, problem.getValidationDataset());
+        if (problem.getValidationDataset() != null) {
+            double currentBestValidationFitness = Person.computeFitness(epochBestPerson, problem.getValidationDataset());
+            if (currentBestValidationFitness > validationMaxFitness){
+                validationMaxFitness = currentBestValidationFitness;
+                validationBestPerson = population.getBestPerson();
+            }
 
-        if (currentBestValidationFitness > validationMaxFitness){
-            validationMaxFitness = currentBestValidationFitness;
-            validationBestPerson = population.getBestPerson();
+            validationStatistics[epoch] = currentBestValidationFitness;
         }
-        
+
         progressListener.evolutionBestUpdate(epochBestPerson.getFitness());
         
         evolutionStatistics[epoch] = epochBestPerson.getFitness();
-        validationStatistics[epoch] = currentBestValidationFitness;
 
         return false;
     }

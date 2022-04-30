@@ -54,8 +54,8 @@ public class PoolLayer implements Layer {
         int[] dimensions = null;
         for (int i = 0; i< channels.length; i++) {
             dimensions = ConvolutionUtils.outputDimensions(
-                    channels[i].getRowCount(),
-                    channels[i].getColumnCount(),
+                    channels[i].getRowsCount(),
+                    channels[i].getColumnsCount(),
                     sampleSize,
                     0,
                     stride
@@ -79,8 +79,8 @@ public class PoolLayer implements Layer {
 
     private MatrixReader computeMatrix(MatrixReader input) {
         int[] dimensions = ConvolutionUtils.outputDimensions(
-                input.getRowCount(),
-                input.getColumnCount(),
+                input.getRowsCount(),
+                input.getColumnsCount(),
                 sampleSize,
                 0,
                 stride
@@ -88,8 +88,8 @@ public class PoolLayer implements Layer {
 
         double[][] output = new double[dimensions[0]][dimensions[1]];
 
-        int rowsCount = input.getRowCount();
-        int columnsCount = input.getColumnCount();
+        int rowsCount = input.getRowsCount();
+        int columnsCount = input.getColumnsCount();
 
         for (int i=0, outI=0; i<rowsCount - sampleSize; i += stride, outI++) {
             for (int j=0, outJ=0; j<columnsCount - sampleSize; j += stride, outJ++) {

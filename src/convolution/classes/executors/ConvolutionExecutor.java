@@ -16,15 +16,11 @@ public class ConvolutionExecutor {
     }
 
     private final ArrayList<Layer>[] channelsLayers;
-    protected final MatrixReader[] channels;
+    protected MatrixReader[] channels;
     protected MatrixReader[][] output;
 
     protected ConvolutionExecutor(MatrixReader[] channels) {
-        this.channels = Objects.requireNonNull(channels);
-
-        if (channels.length == 0) {
-            throw new IllegalArgumentException("Need at least one channel!");
-        }
+        setChannels(channels);
 
         channelsLayers = (ArrayList<Layer>[]) new ArrayList[channels.length];
         for (int i = 0; i<channelsLayers.length; i++) {
@@ -32,6 +28,14 @@ public class ConvolutionExecutor {
         }
 
         output = new MatrixReader[channels.length][];
+    }
+
+    private void setChannels(MatrixReader[] channels) {
+        this.channels = Objects.requireNonNull(channels);
+
+        if (channels.length == 0) {
+            throw new IllegalArgumentException("Need at least one channel!");
+        }
     }
 
     public MatrixReader[][] getChannelsOutput() {
@@ -59,7 +63,7 @@ public class ConvolutionExecutor {
     }
 
     public void printSchema() {
-        System.out.println("Start with " + channels.length + " channels");
+        System.out.println("Total channels " + channels.length);
 
         int i = 0;
         for (MatrixReader channel : channels) {
@@ -68,10 +72,10 @@ public class ConvolutionExecutor {
                     "Layer type", "Channels", "Filters", "Sample size", "Stride", "Padding", "Output"
             });
 
-            convolutionSchemaPrinter.addRow("Channel", "-", "-", channel.getRowCount() + "x" + channel.getColumnCount(), "-", "-", "-");
+            convolutionSchemaPrinter.addRow("Channel", "-", "-", channel.getRowsCount() + "x" + channel.getColumnsCount(), "-", "-", "-");
 
             MatrixSchema[] tempLayerSchema = new MatrixSchema[] {
-                    new LayerSchema(channel.getRowCount(), channel.getColumnCount())
+                    new LayerSchema(channel.getRowsCount(), channel.getColumnsCount())
             };
 
             for (Layer channelLayer : channelsLayers[i]) {
@@ -85,6 +89,7 @@ public class ConvolutionExecutor {
     }
 
     public ConvolutionExecutor changeInput(ConvolutionInput convolutionInput) {
+        setChannels(convolutionInput.getChannels());
         output = new MatrixReader[channels.length][];
 
         return this;

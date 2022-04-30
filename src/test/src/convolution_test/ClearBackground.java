@@ -8,8 +8,6 @@ import functions.ActivationFunction;
 import input.*;
 import layers.convolution.ConvolutionLayer;
 import layers.flatten.FlatLayer;
-import layers.pool.PoolFunction;
-import layers.pool.PoolLayer;
 import maths.matrix.MatrixReader;
 import networks.multilayer_perceptron.network.NeuralNetwork;
 import networks.multilayer_perceptron.serializers.NetworkJsonSerializer;
@@ -21,8 +19,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Iterator;
 
 public class ClearBackground {
     public static void main(String[] args) throws IOException {
@@ -63,7 +59,7 @@ public class ClearBackground {
                     .execute();
 
             MatrixReader[][] channels = convolutionExecutor.getChannelsOutput();
-            double[] features = new double[channels.length * channels[0][0].getColumnCount()];
+            double[] features = new double[channels.length * channels[0][0].getColumnsCount()];
 
             int copyOffset = 0;
             for (int i=0; i< channels.length; i++) {

@@ -3,15 +3,12 @@ package convolution_test;
 import executors.ConvolutionExecutor;
 import executors.ConvolutionParallelExecutor;
 import files.binary.BinaryDatasetWriter;
-import files.csv.CSVDatasetUtils;
 import input.*;
 import layers.convolution.ConvolutionLayer;
 import filters.Filter;
 import filters.Kernel;
 import functions.ActivationFunction;
 import layers.flatten.FlatLayer;
-import layers.pool.PoolFunction;
-import layers.pool.PoolLayer;
 import maths.matrix.MatrixReader;
 import utils.ConvolutionDataPresenter;
 
@@ -22,10 +19,11 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class Main {
-    private static Integer featureLength = null;
+
     private static final int THRESHOLD = 128;
+    private static Integer featureLength = null;
     private static Plot plot;
-    
+
     public static void main(String[] args) throws IOException {
         plot = new Plot();
         plot.open();
@@ -35,11 +33,11 @@ public class Main {
 //                new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.EDGE_DETECTION_MEDIUM, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
-                new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GAUSS.getFunction()),
-                new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GAUSS.getFunction()),
-                new Filter(Kernel.IDENTITY, ActivationFunction.GAUSS.getFunction()),
-                new Filter(Kernel.SHARPEN, ActivationFunction.GAUSS.getFunction()),
-                new Filter(Kernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
+            new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GAUSS.getFunction()),
+            new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GAUSS.getFunction()),
+            new Filter(Kernel.IDENTITY, ActivationFunction.GAUSS.getFunction()),
+            new Filter(Kernel.SHARPEN, ActivationFunction.GAUSS.getFunction()),
+            new Filter(Kernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
 //                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
 
@@ -47,8 +45,8 @@ public class Main {
         };
 
         Filter[] filters2 = {
-                new Filter(Kernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
-                new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
+            new Filter(Kernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
+            new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.CUSTOM_1, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.CUSTOM_2, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.CUSTOM_3, ActivationFunctions.groundRelu()),
@@ -58,17 +56,18 @@ public class Main {
         String inputPath = "/home/zachs/Develop/Java/artificialintelligence/datasets/input_images/scaled";
 //        convolveImage(filters, filters2, new File(inputPath+"/")).printSchema();
 //        CSVFileWriter csvFileWriter = new CSVFileWriter("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset3.csv");
-        BinaryDatasetWriter binaryDatasetWriter = new BinaryDatasetWriter("/home/zachs/Develop/Java/artificialintelligence/datasets/dataset_border.b");
+        BinaryDatasetWriter binaryDatasetWriter = new BinaryDatasetWriter(
+            "/home/zachs/Develop/Java/artificialintelligence/datasets/dataset_border.b");
 
         ConvolutionParallelExecutor output = null;
         for (int i = 2; i <= 12; i++) {
             System.out.print("For image #" + i);
             convolveImage(
-                    filters,
-                    filters2,
-                    new File(inputPath + "/f" + i + ".jpg"),
-                    new File(inputPath+"/f"+i+"_final.jpg"),
-                    binaryDatasetWriter
+                filters,
+                filters2,
+                new File(inputPath + "/f" + i + ".jpg"),
+                new File(inputPath + "/f" + i + "_final.jpg"),
+                binaryDatasetWriter
             );
 //            output.printSchema();
 //            System.exit(0);
@@ -80,14 +79,21 @@ public class Main {
 
         try {
             binaryDatasetWriter.close();
-        } catch (Exception exception) {
+        }
+        catch (Exception exception) {
             exception.printStackTrace();
         }
 
 //        outputAsImages(output.getChannelsOutput(), "/home/zachs/Develop/Java/artificialintelligence/datasets/test_images");
     }
 
-    private static void convolveImage(Filter[] filters, Filter[] filters2, File image, File fileMaks, BinaryDatasetWriter binaryDatasetWriter) throws IOException {
+    private static void convolveImage(
+        Filter[] filters,
+        Filter[] filters2,
+        File image,
+        File fileMaks,
+        BinaryDatasetWriter binaryDatasetWriter
+    ) throws IOException {
 //        //        ConvolutionExecutor output = ConvolutionExecutor.initialize(new HsbInput(new File("/home/zachs/Downloads/ΟΔ 5396.jpg")))
         BufferedImage mask = ImageIO.read(fileMaks);
 
@@ -96,29 +102,40 @@ public class Main {
         ConvolutionInput convolutionInput = mainImageInput.next(), maskConvolutionInput = maskInput.next();
 
         ConvolutionExecutor convolutionExecutor = ConvolutionParallelExecutor.initialize(convolutionInput)
-                .addLayerForAllChannels(new ConvolutionLayer(filters, 1))
+            .addLayerForAllChannels(new ConvolutionLayer(filters, 1))
 //                .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
 //                .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 2, 1))
 //                    .addLayerForAllChannels(new ConvolutionLayer(filters, 10, 10))
-                .addLayerForAllChannels(new FlatLayer());
+            .addLayerForAllChannels(new FlatLayer());
+
         double[] features = null;
 
         for (; mainImageInput.hasNext() && maskInput.hasNext(); convolutionInput = mainImageInput.next(), maskConvolutionInput = maskInput.next()) {
             MatrixReader[][] channels = convolutionExecutor
-                    .changeInput(convolutionInput).execute().getChannelsOutput();
+                .changeInput(convolutionInput)
+                .execute()
+                .getChannelsOutput();
+
             if (features == null) {
-                features = new double[channels.length * channels[0][0].getColumnCount() + 1];
+                features = new double[channels.length * channels[0][0].getColumnsCount() + 1];
             }
-            createDataset(channels, features, (GridInputIterator.GridBlock) maskConvolutionInput.getChannels()[0], mask, binaryDatasetWriter);
+
+            createDataset(
+                channels,
+                features,
+                (GridInputIterator.GridBlock) maskConvolutionInput.getChannels()[0],
+                mask,
+                binaryDatasetWriter
+            );
         }
     }
 
     private static void createDataset(
-            MatrixReader[][] channels,
-            double[] dataForCsv,
-            GridInputIterator.GridBlock block,
-            BufferedImage mask,
-            BinaryDatasetWriter binaryDatasetWriter
+        MatrixReader[][] channels,
+        double[] dataForCsv,
+        GridInputIterator.GridBlock block,
+        BufferedImage mask,
+        BinaryDatasetWriter binaryDatasetWriter
     ) throws IOException {
 
 
@@ -128,13 +145,13 @@ public class Main {
             featureLength = dataForCsv.length;
         }
         else if (dataForCsv.length != featureLength) {
-            throw new RuntimeException("Not all the features have the same size first feature length: "+featureLength+" current: "+dataForCsv.length);
+            throw new RuntimeException("Not all the features have the same size first feature length: " + featureLength + " current: " + dataForCsv.length);
         }
 
         // load the channels
         int channelPosition = 0;
         for (MatrixReader[] channel : channels) {
-            int channelLength = channel[0].getColumnCount();
+            int channelLength = channel[0].getColumnsCount();
             System.arraycopy(channel[0].getRow(0), 0, dataForCsv, channelPosition, channelLength);
             channelPosition += channelLength;
         }
@@ -142,8 +159,8 @@ public class Main {
         int sum = 0;
         int blackCount = 0;
         int whiteCount = 0;
-        for (int i=0; i<block.getRowCount(); i++) {
-            for (int j=0; j<block.getColumnCount(); j++) {
+        for (int i = 0; i < block.getRowsCount(); i++) {
+            for (int j = 0; j < block.getColumnsCount(); j++) {
                 int normalize = (mask.getRGB(block.getRealColumn() + j, block.getRealRow() + i) & 0xFF) / 0xFF;
 
                 if (normalize == 1) {
@@ -159,7 +176,7 @@ public class Main {
         }
 
 
-        double colorAvg =( (double)sum / (block.getRowCount() * block.getColumnCount()));
+        double colorAvg = ((double) sum / (block.getRowsCount() * block.getColumnsCount()));
 //        System.out.println(colorAvg);
 //        dataForCsv[channelPosition] = (int) (colorAvg) != 1 && (int) (colorAvg) != 0 ? 1 : 0;
         dataForCsv[channelPosition] = (whiteCount != 0 && blackCount != 0) && Math.abs(whiteCount - blackCount) < 20 ? 1 : 0;
@@ -196,8 +213,8 @@ public class Main {
             int j = 0;
             for (MatrixReader filter : channel) {
                 ConvolutionDataPresenter.toBlackWhiteImage(
-                        filter,
-                        new File(folder + "/channel_" + i + "_filter_" + j + ".jpg")
+                    filter,
+                    new File(folder + "/channel_" + i + "_filter_" + j + ".jpg")
                 );
                 j++;
             }

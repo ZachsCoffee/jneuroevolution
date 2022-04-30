@@ -75,12 +75,12 @@ public class GridInputIterator implements Iterator<ConvolutionInput> {
         }
 
         @Override
-        public int getRowCount() {
+        public int getRowsCount() {
             return rowBound;
         }
 
         @Override
-        public int getColumnCount() {
+        public int getColumnsCount() {
             return columnBound;
         }
 

@@ -10,8 +10,8 @@ import java.io.IOException;
 public class ConvolutionDataPresenter {
     public static void toBlackWhiteImage(MatrixReader convolutionOutput, File outputImage) {
         try {
-            int rows = convolutionOutput.getRowCount();
-            int columns = convolutionOutput.getColumnCount();
+            int rows = convolutionOutput.getRowsCount();
+            int columns = convolutionOutput.getColumnsCount();
 
             BufferedImage bufferedImage = new BufferedImage(columns, rows, BufferedImage.TYPE_BYTE_GRAY);
 

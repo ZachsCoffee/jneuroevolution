@@ -135,21 +135,21 @@ public final class DatasetSpecs {
     }
     
     public DatasetSpecs setup() {
-        int diference = Maths.distance(trainingSize + testingSize + validationSize, data.length);
+        int difference = Maths.distance(trainingSize + testingSize + validationSize, data.length);
         
-        if (diference != 0) {
+        if (difference != 0) {
             if (haveTrainingSet()) {
-                trainingSize += diference;
+                trainingSize += difference;
             }
             else if (haveTestingSet()) {
-                testingSize += diference;
+                testingSize += difference;
             }
             else if (haveValidationSet()) {
-                validationSize += diference;
+                validationSize += difference;
             }
             else {
                 throw new RuntimeException(
-                        "Call of setup method withouth a set size specified. Please specified at least one set and then call this method."
+                        "Call of setup method without a dataset size specified. Please specified at least one dataset and then call this method."
                 );
             }
         }

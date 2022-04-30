@@ -16,8 +16,8 @@ public class FlatLayer implements Layer {
         int startCopyIndex = 0;
         int rows, columns;
         for (MatrixReader filter : channels) {
-            rows = filter.getRowCount();
-            columns = filter.getColumnCount();
+            rows = filter.getRowsCount();
+            columns = filter.getColumnsCount();
             for (int i=0; i<rows; i++) {
                 System.arraycopy(filter.getRow(i), 0, flat, startCopyIndex, columns);
                 startCopyIndex += columns;
@@ -52,7 +52,7 @@ public class FlatLayer implements Layer {
         int flatSize = 0;
 
         for (MatrixSchema filter : channel) {
-            flatSize += filter.getColumnCount() * filter.getRowCount();
+            flatSize += filter.getColumnsCount() * filter.getRowsCount();
         }
 
         return flatSize;

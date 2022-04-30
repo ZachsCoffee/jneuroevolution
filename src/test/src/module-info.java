@@ -9,4 +9,5 @@ module test {
     requires neuroevolution_gui;
 
     exports convolution_test;
+    exports convolution_test.stl10;
 }
