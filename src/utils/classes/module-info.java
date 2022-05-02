@@ -12,4 +12,5 @@ module utils {
     exports files.csv;
     exports maths;
     exports maths.matrix;
+    exports cli.stdout;
 }
