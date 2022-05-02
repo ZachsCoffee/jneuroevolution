@@ -19,6 +19,10 @@ public class ConvolutionSplitChannelExecutor extends ConvolutionExecutor {
         super(channels);
 
         channelsLayers = new List[channels.length];
+
+        for (int i=0; i<channelsLayers.length; i++) {
+            channelsLayers[i] = new LinkedList<>();
+        }
     }
 
     public void addLayer(Layer layer, int channelPosition) {
@@ -58,10 +62,11 @@ public class ConvolutionSplitChannelExecutor extends ConvolutionExecutor {
 
         int i = 0;
         for (MatrixReader channel : channels) {
-            ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channel, i);
+            System.out.println("Channel #" + (i + 1));
+            ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channel);
 
             MatrixSchema[] tempLayerSchema = new MatrixSchema[]{
-                new LayerSchema(channel.getRowCount(), channel.getColumnCount())
+                new LayerSchema(channel.getRowsCount(), channel.getColumnsCount())
             };
 
             for (Layer channelLayer : channelsLayers[i]) {
