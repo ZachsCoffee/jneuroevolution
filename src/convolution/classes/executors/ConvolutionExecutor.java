@@ -60,16 +60,14 @@ public class ConvolutionExecutor {
     public void printSchema() {
         System.out.println("Total channels " + channels.length);
 
-        ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channels[0], 0);
+        ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channels[0]);
 
-        MatrixSchema[] tempLayerSchema = new MatrixSchema[]{
-            new LayerSchema(channels[0].getRowsCount(), channels[0].getColumnsCount())
-        };
+        MatrixSchema[] tempLayerSchema = channels;
+        System.out.println("Channels #1..." + channels.length);
 
         for (Layer channelLayer : layers) {
             tempLayerSchema = channelLayer.getSchema(tempLayerSchema, convolutionSchemaPrinter);
         }
-
 
         convolutionSchemaPrinter.print();
     }
@@ -81,8 +79,7 @@ public class ConvolutionExecutor {
         return this;
     }
 
-    protected ConvolutionSchemaPrinter getConvolutionSchemaPrinter(MatrixReader channel, int i) {
-        System.out.println("Channel #" + (i + 1));
+    protected ConvolutionSchemaPrinter getConvolutionSchemaPrinter(MatrixReader channel) {
         ConvolutionSchemaPrinter convolutionSchemaPrinter = new ConvolutionSchemaPrinter(new String[]{
             "Layer type", "Channels", "Filters", "Sample size", "Stride", "Padding", "Output"
         });
