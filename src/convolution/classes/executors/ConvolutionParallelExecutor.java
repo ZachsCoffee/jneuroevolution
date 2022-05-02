@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ConvolutionParallelExecutor extends ConvolutionExecutor {
+public class ConvolutionParallelExecutor extends ConvolutionSplitChannelExecutor {
 
     public static ConvolutionParallelExecutor initialize(ConvolutionInput convolutionInput) {
         return new ConvolutionParallelExecutor(convolutionInput.getChannels());

@@ -102,12 +102,11 @@ public class Main {
         ConvolutionInput convolutionInput = mainImageInput.next(), maskConvolutionInput = maskInput.next();
 
         ConvolutionExecutor convolutionExecutor = ConvolutionParallelExecutor.initialize(convolutionInput)
-            .addLayer(new ConvolutionLayer(filters, 1))
+                .addLayer(new ConvolutionLayer(filters, 1))
 //                .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
 //                .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 2, 1))
 //                    .addLayerForAllChannels(new ConvolutionLayer(filters, 10, 10))
-            .addLayer(new FlatLayer());
-
+                .addLayer(new FlatLayer());
         double[] features = null;
 
         for (; mainImageInput.hasNext() && maskInput.hasNext(); convolutionInput = mainImageInput.next(), maskConvolutionInput = maskInput.next()) {
