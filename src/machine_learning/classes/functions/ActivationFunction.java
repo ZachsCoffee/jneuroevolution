@@ -58,6 +58,9 @@ public enum ActivationFunction {
     }
 
     public static ActivationFunction getByFunction(Function function) {
+        if (function == null) {
+            return null;
+        }
 
         for (ActivationFunction activationFunction : ActivationFunction.values()) {
             if (activationFunction.function.equals(function)) {

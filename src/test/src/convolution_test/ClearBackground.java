@@ -51,11 +51,11 @@ public class ClearBackground {
         ConvolutionExecutor convolutionExecutor = null;
         for (ConvolutionInput convolutionInput : gridInput) {
             convolutionExecutor = ConvolutionParallelExecutor.initialize(convolutionInput)
-                    .addLayerForAllChannels(new ConvolutionLayer(filters, 1))
+                    .addLayer(new ConvolutionLayer(filters, 1))
 //                .addLayerForAllChannels(new ConvolutionLayer(filters2, 1, true))
 //                    .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 2, 2))
 //                    .addLayerForAllChannels(new ConvolutionLayer(filters, 10, 10))
-                    .addLayerForAllChannels(new FlatLayer())
+                    .addLayer(new FlatLayer())
                     .execute();
 
             MatrixReader[][] channels = convolutionExecutor.getChannelsOutput();

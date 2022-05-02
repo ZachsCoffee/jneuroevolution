@@ -95,7 +95,7 @@ public final class DatasetSplitter {
         for (int i=0; i<totalSize; i++){
             total[i] = i;
         }
-//        randomizeTable(total);
+        randomizeTable(total);
         
         training = Arrays.copyOf(total, trainingSize);
 

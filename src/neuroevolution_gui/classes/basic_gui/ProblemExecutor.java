@@ -1,5 +1,6 @@
 package basic_gui;
 
+import cli.stdout.StdOut;
 import data_manipulation.CrossValidation;
 import data_manipulation.Dataset;
 import data_manipulation.DatasetSpecs;
@@ -94,7 +95,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
         final ExecutionResponse[] executionResponses = new ExecutionResponse[THREADS];
 
         final AtomicInteger threadCount = new AtomicInteger(0);
-
+        final long startTimestamp = System.currentTimeMillis();
         for (int i=0; i<THREADS; i++) {
             
 
@@ -147,6 +148,7 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
 
                 if (threadCount.get() == THREADS) {
                     executionEnds(executionResponses);
+                    System.out.printf("Total execution time: %.2fs", (System.currentTimeMillis() - startTimestamp) / 1000d);
                 }
             }).start();
         }

@@ -13,13 +13,20 @@ public class NeuralNetworkBuilder {
 
     public static NeuralNetwork buildFrom(NetworkModel networkModel) {
         NeuralNetworkBuilder builder = new NeuralNetworkBuilder(
-                networkModel.getFeatures(),
-                networkModel.getLayers()[0].neurons,
-                networkModel.getLayers()[0].activationFunction.getFunction()
+            networkModel.getFeatures(),
+            networkModel.getLayers()[0].neurons,
+            networkModel.getLayers()[0].activationFunction != null
+                ? networkModel.getLayers()[0].activationFunction.getFunction()
+                : null
         );
 
-        for (int i=1; i<networkModel.getLayers().length; i++) {
-            builder.addLayer(networkModel.getLayers()[i].neurons, networkModel.getLayers()[i].activationFunction.getFunction());
+        for (int i = 1; i < networkModel.getLayers().length; i++) {
+            builder.addLayer(
+                networkModel.getLayers()[i].neurons,
+                networkModel.getLayers()[i].activationFunction != null
+                    ? networkModel.getLayers()[i].activationFunction.getFunction()
+                    : null
+            );
         }
 
         return builder.build(networkModel.getWeights());
@@ -75,7 +82,13 @@ public class NeuralNetworkBuilder {
         int i = 0;
         int pastLayerNeurons = initialFeatureLength;
         for (LayerSchema layerSchema : layerSchemas) {
-            layers[i++] = new NetworkLayer(layerSchema.neurons, pastLayerNeurons, layerSchema.activationFunction.getFunction());
+            layers[i++] = new NetworkLayer(
+                layerSchema.neurons,
+                pastLayerNeurons,
+                layerSchema.activationFunction != null
+                    ? layerSchema.activationFunction.getFunction()
+                    : null
+            );
             pastLayerNeurons = layerSchema.neurons;
         }
 
@@ -83,6 +96,7 @@ public class NeuralNetworkBuilder {
     }
 
     public static class LayerSchema {
+
         int neurons;
         ActivationFunction activationFunction;
 
