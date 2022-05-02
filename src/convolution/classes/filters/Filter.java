@@ -37,7 +37,7 @@ public class Filter {
      */
     public double compute(int rowIndex, int columnIndex, MatrixReader matrixReader) {
         Objects.requireNonNull(matrixReader);
-        if (matrixReader.getRowCount() == 0) {
+        if (matrixReader.getRowsCount() == 0) {
             throw new IllegalArgumentException("Argument input don't have any rows!");
         }
 
@@ -49,7 +49,7 @@ public class Filter {
             for (int j = columnIndex, kj = 0; j < columnLength; j++, kj++) {
                 // if kernel value is zero then no need to compute
                 // if the input is outbounds no need to compute. (Is a valid case because the layers.convolution can have padding)
-                if (kernel[ki][kj] == 0 || i < 0 || i >= matrixReader.getRowCount() || j < 0 || j >= matrixReader.getColumnCount()) {
+                if (kernel[ki][kj] == 0 || i < 0 || i >= matrixReader.getRowsCount() || j < 0 || j >= matrixReader.getColumnsCount()) {
                     continue;
                 }
 

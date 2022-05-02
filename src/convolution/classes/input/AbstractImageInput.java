@@ -39,12 +39,12 @@ public abstract class AbstractImageInput implements MatrixReader {
     }
 
     @Override
-    public int getRowCount() {
+    public int getRowsCount() {
         return rowsCount;
     }
 
     @Override
-    public int getColumnCount() {
+    public int getColumnsCount() {
         return columnsCount;
     }
 

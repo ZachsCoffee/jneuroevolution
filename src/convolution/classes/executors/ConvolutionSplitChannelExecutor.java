@@ -6,7 +6,6 @@ import maths.matrix.MatrixSchema;
 import schema.ConvolutionSchemaPrinter;
 import schema.LayerSchema;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -61,7 +60,7 @@ public class ConvolutionSplitChannelExecutor extends ConvolutionExecutor {
             ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channel, i);
 
             MatrixSchema[] tempLayerSchema = new MatrixSchema[]{
-                new LayerSchema(channel.getRowCount(), channel.getColumnCount())
+                new LayerSchema(channel.getRowsCount(), channel.getColumnsCount())
             };
 
             for (Layer channelLayer : channelsLayers[i]) {

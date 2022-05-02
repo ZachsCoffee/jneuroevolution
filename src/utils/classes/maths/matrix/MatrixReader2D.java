@@ -12,12 +12,12 @@ public class MatrixReader2D implements MatrixReader {
         this.data = Objects.requireNonNull(data);
     }
     @Override
-    public int getRowCount() {
+    public int getRowsCount() {
         return data.length;
     }
 
     @Override
-    public int getColumnCount() {
+    public int getColumnsCount() {
         return data[0].length;
     }
 

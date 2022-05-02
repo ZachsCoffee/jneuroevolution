@@ -21,12 +21,12 @@ public class VectorReader implements MatrixReader {
     }
 
     @Override
-    public int getRowCount() {
+    public int getRowsCount() {
         return 1;
     }
 
     @Override
-    public int getColumnCount() {
+    public int getColumnsCount() {
         return data.length;
     }
 }

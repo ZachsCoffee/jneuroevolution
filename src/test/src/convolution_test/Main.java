@@ -3,15 +3,12 @@ package convolution_test;
 import executors.ConvolutionExecutor;
 import executors.ConvolutionParallelExecutor;
 import files.binary.BinaryDatasetWriter;
-import files.csv.CSVDatasetUtils;
 import input.*;
 import layers.convolution.ConvolutionLayer;
 import filters.Filter;
 import filters.Kernel;
 import functions.ActivationFunction;
 import layers.flatten.FlatLayer;
-import layers.pool.PoolFunction;
-import layers.pool.PoolLayer;
 import maths.matrix.MatrixReader;
 import utils.ConvolutionDataPresenter;
 
@@ -107,7 +104,7 @@ public class Main {
             MatrixReader[][] channels = convolutionExecutor
                     .changeInput(convolutionInput).execute().getChannelsOutput();
             if (features == null) {
-                features = new double[channels.length * channels[0][0].getColumnCount() + 1];
+                features = new double[channels.length * channels[0][0].getColumnsCount() + 1];
             }
             createDataset(channels, features, (GridInputIterator.GridBlock) maskConvolutionInput.getChannels()[0], mask, binaryDatasetWriter);
         }
@@ -134,7 +131,7 @@ public class Main {
         // load the channels
         int channelPosition = 0;
         for (MatrixReader[] channel : channels) {
-            int channelLength = channel[0].getColumnCount();
+            int channelLength = channel[0].getColumnsCount();
             System.arraycopy(channel[0].getRow(0), 0, dataForCsv, channelPosition, channelLength);
             channelPosition += channelLength;
         }
@@ -142,8 +139,8 @@ public class Main {
         int sum = 0;
         int blackCount = 0;
         int whiteCount = 0;
-        for (int i=0; i<block.getRowCount(); i++) {
-            for (int j=0; j<block.getColumnCount(); j++) {
+        for (int i = 0; i<block.getRowsCount(); i++) {
+            for (int j = 0; j<block.getColumnsCount(); j++) {
                 int normalize = (mask.getRGB(block.getRealColumn() + j, block.getRealRow() + i) & 0xFF) / 0xFF;
 
                 if (normalize == 1) {
@@ -159,7 +156,7 @@ public class Main {
         }
 
 
-        double colorAvg =( (double)sum / (block.getRowCount() * block.getColumnCount()));
+        double colorAvg =( (double)sum / (block.getRowsCount() * block.getColumnsCount()));
 //        System.out.println(colorAvg);
 //        dataForCsv[channelPosition] = (int) (colorAvg) != 1 && (int) (colorAvg) != 0 ? 1 : 0;
         dataForCsv[channelPosition] = (whiteCount != 0 && blackCount != 0) && Math.abs(whiteCount - blackCount) < 20 ? 1 : 0;

@@ -63,7 +63,7 @@ public class ConvolutionExecutor {
         ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channels[0], 0);
 
         MatrixSchema[] tempLayerSchema = new MatrixSchema[]{
-            new LayerSchema(channels[0].getRowCount(), channels[0].getColumnCount())
+            new LayerSchema(channels[0].getRowsCount(), channels[0].getColumnsCount())
         };
 
         for (Layer channelLayer : layers) {
@@ -91,7 +91,7 @@ public class ConvolutionExecutor {
             "Channel",
             "-",
             "-",
-            channel.getRowCount() + "x" + channel.getColumnCount(),
+            channel.getRowsCount() + "x" + channel.getColumnsCount(),
             "-",
             "-",
             "-"
@@ -104,12 +104,12 @@ public class ConvolutionExecutor {
             throw new IllegalArgumentException("Need at least one channel!");
         }
 
-        int firstChannelRows = channels[0].getRowCount();
-        int firstChannelColumns = channels[0].getColumnCount();
+        int firstChannelRows = channels[0].getRowsCount();
+        int firstChannelColumns = channels[0].getColumnsCount();
 
         for (int i = 1; i < channels.length; i++) {
-            int channelRowCount = channels[i].getRowCount();
-            int channelColumnCount = channels[i].getColumnCount();
+            int channelRowCount = channels[i].getRowsCount();
+            int channelColumnCount = channels[i].getColumnsCount();
 
             if (channelRowCount != firstChannelRows) {
                 throw new IllegalArgumentException(

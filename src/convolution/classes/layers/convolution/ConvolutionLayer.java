@@ -6,7 +6,6 @@ import schema.LayerSchema;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixReader2D;
 import maths.matrix.MatrixSchema;
-import maths.matrix.QubeSchema;
 import schema.ConvolutionSchemaPrinter;
 import schema.SchemaComputer;
 
@@ -77,7 +76,7 @@ public class ConvolutionLayer implements Layer {
         MatrixSchema[] matrixSchemas = new MatrixSchema[channels.length * filters.length];
         for (int i = 0; i< channels.length; i++) {
             for (int j=0; j<filters.length; j++) {
-                schemaComputer.compute(channels[i].getRowCount(), channels[i].getColumnCount(), filters[j].getKernelSize());
+                schemaComputer.compute(channels[i].getRowsCount(), channels[i].getColumnsCount(), filters[j].getKernelSize());
 
                 matrixSchemas[i * filters.length + j] = new LayerSchema(schemaComputer.getRowsCount(), schemaComputer.getColumnsCount());
             }
@@ -99,8 +98,8 @@ public class ConvolutionLayer implements Layer {
     private MatrixReader computeForFilter(MatrixReader matrixReader, Filter filter) {
         Objects.requireNonNull(matrixReader);
 
-        int inputRows = matrixReader.getRowCount();
-        int inputColumns = matrixReader.getColumnCount();
+        int inputRows = matrixReader.getRowsCount();
+        int inputColumns = matrixReader.getColumnsCount();
         int kernelSize = filter.getKernelSize();
 
         schemaComputer.compute(inputRows, inputColumns, kernelSize);

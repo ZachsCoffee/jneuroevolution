@@ -34,8 +34,8 @@ public class GridInput implements Iterable<ConvolutionInput> {
         even(this.blockRows);
         even(this.blockColumns);
 
-        int inputRows = input.getChannels()[0].getRowCount();
-        int inputColumns = input.getChannels()[0].getColumnCount();
+        int inputRows = input.getChannels()[0].getRowsCount();
+        int inputColumns = input.getChannels()[0].getColumnsCount();
         even(inputRows);
         even(inputColumns);
 
@@ -49,16 +49,16 @@ public class GridInput implements Iterable<ConvolutionInput> {
         if (channels.length == 0) throw new IllegalArgumentException(
                 "Need at least one channel."
         );
-        int firstChannelRows = channels[0].getRowCount();
-        int firstChannelColumns = channels[0].getColumnCount();
+        int firstChannelRows = channels[0].getRowsCount();
+        int firstChannelColumns = channels[0].getColumnsCount();
 
         for (int i=1; i<channels.length; i++) {
-            if (channels[i].getRowCount() != firstChannelRows) throw new IllegalArgumentException(
-                    "Not all channels have the same row count. First channel rows: "+firstChannelRows+" channel at "+i+" position, rows: "+channels[i].getRowCount()
+            if (channels[i].getRowsCount() != firstChannelRows) throw new IllegalArgumentException(
+                    "Not all channels have the same row count. First channel rows: "+firstChannelRows+" channel at "+i+" position, rows: "+channels[i].getRowsCount()
             );
 
-            if (channels[i].getColumnCount() != firstChannelColumns) throw new IllegalArgumentException(
-                    "Not all channels have the same column count. First channel columns: "+firstChannelColumns+" channel at "+i+" position, columns: "+channels[i].getColumnCount()
+            if (channels[i].getColumnsCount() != firstChannelColumns) throw new IllegalArgumentException(
+                    "Not all channels have the same column count. First channel columns: "+firstChannelColumns+" channel at "+i+" position, columns: "+channels[i].getColumnsCount()
             );
         }
     }

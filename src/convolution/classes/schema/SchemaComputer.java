@@ -48,22 +48,22 @@ public class SchemaComputer {
             );
         }
         else if (fixedSchema != null) {
-            if (inputRows > fixedSchema.getRowCount()) {
+            if (inputRows > fixedSchema.getRowsCount()) {
                 paddingRows = 0;
-                strideRows = ConvolutionUtils.stride(inputRows, kernelSize, 0, fixedSchema.getRowCount());
+                strideRows = ConvolutionUtils.stride(inputRows, kernelSize, 0, fixedSchema.getRowsCount());
             }
             else {
                 strideRows = DEFAULT_STRIDE;
-                paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, strideRows, fixedSchema.getRowCount());
+                paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, strideRows, fixedSchema.getRowsCount());
             }
 
-            if (inputColumns > fixedSchema.getColumnCount()) {
+            if (inputColumns > fixedSchema.getColumnsCount()) {
                 paddingColumns = 0;
-                strideColumns = ConvolutionUtils.stride(inputColumns, kernelSize, 0, fixedSchema.getColumnCount());
+                strideColumns = ConvolutionUtils.stride(inputColumns, kernelSize, 0, fixedSchema.getColumnsCount());
             }
             else {
                 strideColumns = DEFAULT_STRIDE;
-                paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, strideColumns, fixedSchema.getColumnCount());
+                paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, strideColumns, fixedSchema.getColumnsCount());
             }
 
             rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, strideRows);
@@ -73,12 +73,12 @@ public class SchemaComputer {
 //            if (rowsCount != fixedSchema.getRowCount() || columnsCount != fixedSchema.getColumnCount()) throw new RuntimeException(
 //                    "Failed to keep the fixed size "+fixedSchema+" computed rows: "+rowsCount+" columns: "+columnsCount
 //            );
-            if (rowsCount != fixedSchema.getRowCount() || columnsCount != fixedSchema.getColumnCount()) {
+            if (rowsCount != fixedSchema.getRowsCount() || columnsCount != fixedSchema.getColumnsCount()) {
 //                System.err.println(
 //                        "Failed to keep the fixed size "+fixedSchema+" computed rows: "+rowsCount+" columns: "+columnsCount
 //                );
-                rowsCount = fixedSchema.getRowCount();
-                columnsCount = fixedSchema.getColumnCount();
+                rowsCount = fixedSchema.getRowsCount();
+                columnsCount = fixedSchema.getColumnsCount();
             }
         }
         else {

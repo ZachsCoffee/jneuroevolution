@@ -24,12 +24,12 @@ public class LayerSchema implements MatrixSchema {
     }
 
     @Override
-    public int getRowCount() {
+    public int getRowsCount() {
         return rows;
     }
 
     @Override
-    public int getColumnCount() {
+    public int getColumnsCount() {
         return columns;
     }
 
