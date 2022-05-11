@@ -15,18 +15,35 @@ public class ConvolutionExecutor {
         return new ConvolutionExecutor(convolutionInput.getChannels());
     }
 
+    public static ConvolutionExecutor initialize(ConvolutionInput convolutionInput, boolean squashChannels) {
+        return new ConvolutionExecutor(convolutionInput.getChannels(), squashChannels);
+    }
+
+    private final boolean squashChannels;
     private final List<Layer> layers = new LinkedList<>();
     protected MatrixReader[] channels;
     protected MatrixReader[][] output;
 
     protected ConvolutionExecutor(MatrixReader[] channels) {
+        this(channels, false);
+    }
+
+    protected ConvolutionExecutor(MatrixReader[] channels, boolean squashChannels) {
         setChannels(channels);
 
-        output = new MatrixReader[channels.length][];
+        this.squashChannels = squashChannels;
     }
 
     public MatrixReader[][] getChannelsOutput() {
+        if (output == null) throw new IllegalStateException(
+            "Need to execute in order to have output."
+        );
+
         return output;
+    }
+
+    public boolean isSquashChannels() {
+        return squashChannels;
     }
 
     protected void setChannels(MatrixReader[] channels) {
@@ -42,16 +59,21 @@ public class ConvolutionExecutor {
     }
 
     public ConvolutionExecutor execute() {
-        MatrixReader[] previousMatrixReader = channels;
-        int i = 0;
-        try {
-            for (Layer layer : layers) {
-                previousMatrixReader = layer.computeLayer(previousMatrixReader);
+        if (layers.isEmpty()) throw new IllegalStateException(
+            "Can't execute without layers."
+        );
+
+        if (squashChannels) {
+            output = new MatrixReader[][] { computeChannels(channels) };
+        }
+        else {
+            output = new MatrixReader[channels.length][];
+
+            int i=0;
+            for (MatrixReader channel : channels) {
+                output[i] = computeChannels(new MatrixReader[] { channel });
                 i++;
             }
-        }
-        catch (Exception ex) {
-            throw new RuntimeException("Error at layer: " + i, ex);
         }
 
         return this;
@@ -94,6 +116,22 @@ public class ConvolutionExecutor {
             "-"
         );
         return convolutionSchemaPrinter;
+    }
+
+    private MatrixReader[] computeChannels(MatrixReader[] channels) {
+        MatrixReader[] previousMatrixReader = channels;
+        int i = 1;
+        try {
+            for (Layer layer : layers) {
+                previousMatrixReader = layer.computeLayer(previousMatrixReader);
+                i++;
+            }
+        }
+        catch (Exception ex) {
+            throw new RuntimeException("Error at channel: "+i+" and layer: "+i, ex);
+        }
+
+        return previousMatrixReader;
     }
 
     private void validateChannels(MatrixReader[] channels) {

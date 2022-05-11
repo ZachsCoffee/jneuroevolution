@@ -80,7 +80,7 @@ public class Benchmark {
 
         Arrays.sort(files, Comparator.comparingInt(o -> Integer.parseInt(o.getName())));
 
-        ConvolutionExecutor convolutionExecutor = getConvolutionExecutor(files[0], true);
+        ConvolutionExecutor convolutionExecutor = getConvolutionExecutor(files[0], false);
 
         try (
             DataOutputStream xOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(datasetOutput)));
@@ -115,11 +115,11 @@ public class Benchmark {
     }
 
     private static ConvolutionExecutor getConvolutionExecutor(File file, boolean printSchema) throws IOException {
-        ConvolutionExecutor convolutionExecutor = ConvolutionExecutor.initialize(new HsbInput(ImageIO.read(file)))
-            .addLayer(new ConvolutionLayer(filters1, 1))
-            .addLayer(new PoolLayer(PoolFunction.AVERAGE, 3, 3))
-            .addLayer(new ConvolutionLayer(filters1, 3))
-            .addLayer(new PoolLayer(PoolFunction.AVERAGE, 5, 5))
+        ConvolutionExecutor convolutionExecutor = ConvolutionExecutor.initialize(new HsbInput(ImageIO.read(file)), true)
+            .addLayer(new ConvolutionLayer(filters1, 1).setSquashChannels(true))
+            .addLayer(new PoolLayer(PoolFunction.AVERAGE, 5, 1))
+            .addLayer(new ConvolutionLayer(filters1, 3).setSquashChannels(true))
+            .addLayer(new PoolLayer(PoolFunction.AVERAGE, 5, 2))
 //            .addLayerForAllChannels(new ConvolutionLayer(filters, 3))
 //            .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 3, 4))
             .addLayer(new FlatLayer());

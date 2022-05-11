@@ -60,8 +60,8 @@ public class Stl10Problem extends ProblemExecutor {
 
         POPULATION_SIZE = 20;
         THREADS = 2;
-        EPOCHS = 10;
-        MIGRATION_PERCENT = .1;
+        EPOCHS = 100;
+        MIGRATION_PERCENT = .25;
 
         EVALUATION_TARGET = EvaluationTarget.EVOLUTION_BEST;
 
@@ -102,12 +102,12 @@ public class Stl10Problem extends ProblemExecutor {
 
     @Override
     public Network buildNetwork(int maxStartValue) {
-        hiddenLayerFunction = ActivationFunction.GAUSS.getFunction();
+        hiddenLayerFunction = ActivationFunction.TANSIG.getFunction();
         Function middleFunction = ActivationFunction.GAUSS.getFunction();
         outputLayerFunction = ActivationFunction.SIGMOID.getFunction();
 
-        return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 500, hiddenLayerFunction)
-            .addLayer(500, hiddenLayerFunction)
+        return NeuralNetworkBuilder.initialize(trainingDataset.features[0].length, 200, hiddenLayerFunction)
+            .addLayer(100, hiddenLayerFunction)
             .addLayer(1, outputLayerFunction)
             .build();
     }
