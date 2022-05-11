@@ -38,7 +38,7 @@ public class Filter {
     public double compute(int rowIndex, int columnIndex, MatrixReader matrixReader) {
         Objects.requireNonNull(matrixReader);
         if (matrixReader.getRowsCount() == 0) {
-            throw new IllegalArgumentException("Argument input don't have any rows!");
+            throw new IllegalArgumentException("Matrix reader don't have any rows!");
         }
 
         int rowLength = rowIndex + kernel.length;
