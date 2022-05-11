@@ -2,6 +2,7 @@ package maths.matrix;
 
 import maths.matrix.MatrixReader;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MatrixReader2D implements MatrixReader {
@@ -11,6 +12,7 @@ public class MatrixReader2D implements MatrixReader {
     public MatrixReader2D(double[][] data) {
         this.data = Objects.requireNonNull(data);
     }
+
     @Override
     public int getRowsCount() {
         return data.length;
@@ -29,5 +31,10 @@ public class MatrixReader2D implements MatrixReader {
     @Override
     public double[] getRow(int position) {
         return data[position];
+    }
+
+    @Override
+    public String toString() {
+        return "Matrix: " + getRowsCount() + "x" + getColumnsCount();
     }
 }
