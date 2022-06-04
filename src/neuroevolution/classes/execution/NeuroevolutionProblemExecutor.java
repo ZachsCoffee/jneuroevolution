@@ -1,31 +1,20 @@
-package basic_gui;
+package execution;
 
-import cli.stdout.StdOut;
-import data_manipulation.CrossValidation;
+import execution.common.DataBinder;
 import data_manipulation.Dataset;
-import data_manipulation.DatasetSpecs;
 import data_manipulation.ProblemDatasets;
 import evolution_builder.Evolution;
+import evolution_builder.population.PersonManager;
 import evolution_builder.population.PersonMigration;
 import evolution_builder.population.Population;
-import execution.EvaluationTarget;
-import files.csv.CSVFileReader;
-import files.csv.CSVFileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
 import java.util.HashMap;
 import maths.Maths;
 import networks.interfaces.Network;
-import neuroevolution.Problem;
-import neuroevolution.Stage;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
-public abstract class ProblemExecutor extends Problem implements Stage.ProgressListener {
+public abstract class NeuroevolutionProblemExecutor<P> extends Problem<P> implements Stage.ProgressListener {
     protected EvaluationTarget EVALUATION_TARGET;
     protected boolean
             PERCENT_OF_FITNESS = false,
@@ -48,7 +37,8 @@ public abstract class ProblemExecutor extends Problem implements Stage.ProgressL
 
     private int totalEpochs;
 
-    public ProblemExecutor(DataBinder dataBinder) {
+    public NeuroevolutionProblemExecutor(NeuroevolutionPersonManager<P> personManager, DataBinder dataBinder) {
+        super(personManager);
 
         if (dataBinder == null) throw new IllegalArgumentException(
                 "Argument dataBinder not null"

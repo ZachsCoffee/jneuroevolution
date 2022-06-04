@@ -1,4 +1,4 @@
-package basic_gui;
+package execution;
 
 public class ResultsData {
     public final double[] evolutionStatistics, validationStatistics;

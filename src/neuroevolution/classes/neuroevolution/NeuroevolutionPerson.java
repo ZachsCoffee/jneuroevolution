@@ -6,128 +6,143 @@
 package neuroevolution;
 
 import data_manipulation.Dataset;
+import data_manipulation.DatasetType;
 import evolution_builder.population.Person;
+import execution.NeuroevolutionPersonManager;
+import execution.NeuroevolutionProblem;
 import networks.interfaces.Network;
 import networks.interfaces.TimeNetwork;
-import evolution_builder.population.PersonManager;
 import maths.Function;
 import networks.multilayer_perceptron.optimizer.BackpropagationMLP;
 import networks.multilayer_perceptron.network.NetworkLayer;
 import networks.multilayer_perceptron.network.NeuralNetwork;
+
+import java.util.Objects;
+
 /**
- *
  * @author Zachs
  */
-class NeuroevolutionPerson implements PersonManager<Network> {
-    private static MLProblem mlProblem;
-    
-    protected NeuroevolutionPerson(MLProblem mlProblem){
-        if (mlProblem == null) throw new IllegalArgumentException("Argument mlProblem not null!");
-        
-        NeuroevolutionPerson.mlProblem = mlProblem;
+public class NeuroevolutionPerson<P> implements NeuroevolutionPersonManager<Network> {
+
+    private final NeuroevolutionProblem<P> neuroevolutionProblem;
+
+    public NeuroevolutionPerson(NeuroevolutionProblem<P> neuroevolutionProblem) {
+        if (neuroevolutionProblem == null) throw new IllegalArgumentException("Argument mlProblem not null!");
+
+        this.neuroevolutionProblem = Objects.requireNonNull(neuroevolutionProblem);
     }
-    
+
     @Override
     public Person<Network> newPerson() {
         return new Person<>(
-            mlProblem.buildNetwork(NeuroevolutionGenes.maxStartValue)
+            neuroevolutionProblem.buildNetwork(NeuroevolutionGenes.maxStartValue)
         );
     }
 
     @Override
     public Person<Network> newRandomPerson() {
         return new Person<>(
-            mlProblem.buildRandomNetwork(NeuroevolutionGenes.maxStartValue)
+            neuroevolutionProblem.buildRandomNetwork(NeuroevolutionGenes.maxStartValue)
         );
     }
-    
+
     @Override
     public Person<Network> newSameLengthAs(Person<Network> person) {
         NeuralNetwork givenNetwork = (NeuralNetwork) person.getGeneCode();
-        
+
         NetworkLayer[] networkLayers = new NetworkLayer[givenNetwork.getLayerCount()];
-        
+
         NetworkLayer firstLayer = givenNetwork.getLayerAt(0);
         Function firstLayerFunction = firstLayer.getFunction();
         int pastLayerNeurons = firstLayer.getNeuronsCount();
-        
-        if (firstLayerFunction != null){
+
+        if (firstLayerFunction != null) {
 //            if (givenNetwork.getLayerAt(0).getNeuronAt(0).getInputsCount()-1 == 6) throw new RuntimeException("AAAA");
-            networkLayers[0] = new NetworkLayer(pastLayerNeurons, givenNetwork.getLayerAt(0).getNeuronAt(0).getInputsCount(), firstLayerFunction);
+            networkLayers[0] = new NetworkLayer(
+                pastLayerNeurons,
+                givenNetwork.getLayerAt(0).getNeuronAt(0).getInputsCount(),
+                firstLayerFunction
+            );
         }
-        else{
-            networkLayers[0] = new NetworkLayer(pastLayerNeurons, givenNetwork.getLayerAt(0).getNeuronAt(0).getInputsCount());
+        else {
+            networkLayers[0] = new NetworkLayer(
+                pastLayerNeurons,
+                givenNetwork.getLayerAt(0).getNeuronAt(0).getInputsCount()
+            );
         }
-        
+
         NetworkLayer tempLayer;
         Function tempLayerFunction;
-        for (int i=1; i<networkLayers.length; i++){
+        for (int i = 1; i < networkLayers.length; i++) {
             tempLayer = givenNetwork.getLayerAt(i);
             tempLayerFunction = tempLayer.getFunction();
-            
-            if (tempLayerFunction != null){
-                networkLayers[i] = new NetworkLayer(tempLayer.getNeuronsCount(), pastLayerNeurons, tempLayer.getFunction());
+
+            if (tempLayerFunction != null) {
+                networkLayers[i] = new NetworkLayer(
+                    tempLayer.getNeuronsCount(),
+                    pastLayerNeurons,
+                    tempLayer.getFunction()
+                );
             }
-            else{
+            else {
                 networkLayers[i] = new NetworkLayer(tempLayer.getNeuronsCount(), pastLayerNeurons);
             }
-            
+
             pastLayerNeurons = tempLayer.getNeuronsCount();
         }
-        
+
         // TODO: make generic the network type e.g backpropagationmlp
         if (givenNetwork instanceof BackpropagationMLP) {
             return new Person<>(
-                    new BackpropagationMLP(
-                            networkLayers, 
-                            ((BackpropagationMLP) givenNetwork).LEARN_RATE, 
-                            mlProblem.getProblem().getTrainingDataset().features, 
-                            mlProblem.getProblem().getTrainingDataset().targets
-                    )
-            ); 
+                new BackpropagationMLP(
+                    networkLayers,
+                    ((BackpropagationMLP) givenNetwork).LEARN_RATE,
+                    neuroevolutionProblem.getProblem().getTrainingDataset().features,
+                    neuroevolutionProblem.getProblem().getTrainingDataset().targets
+                )
+            );
         }
         else {
             return new Person<>(new NeuralNetwork(networkLayers, 2));
         }
     }
-    
-    @Override
-    public double computeFitness(Person<Network> person) {
 
-        return computeFitness(person, mlProblem.getProblem().getTrainingDataset());
+    @Override
+    public double computeFitness(Person<Network> person, DatasetType datasetType) {
+        return computeFitness(person, getDataset(datasetType));
     }
 
-    static double computeFitness(Person<Network> person, Dataset dataset){
+    private Dataset getDataset(DatasetType datasetType) {
+        switch (datasetType) {
+            case TRAINING:
+                return neuroevolutionProblem.getProblem().getTrainingDataset();
+            case VALIDATION:
+                return neuroevolutionProblem.getProblem().getValidationDataset();
+            case TESTING:
+                return neuroevolutionProblem.getProblem().getTestingDataset();
+            default:
+                throw new UnsupportedOperationException("For dataset type: " + datasetType);
+        }
+    }
+
+    private double computeFitness(Person<Network> person, Dataset dataset) {
         double fitness;
-        
-        if (person.getGeneCode() instanceof TimeNetwork){
+
+        if (person.getGeneCode() instanceof TimeNetwork) {
             TimeNetwork timeNetwork = (TimeNetwork) person.getGeneCode();
             timeNetwork.startCompute();
-            
-            fitness = mlProblem.evaluateNetwork(timeNetwork, dataset);
-            
+
+            fitness = neuroevolutionProblem.evaluateNetwork(timeNetwork, dataset);
+
             timeNetwork.endCompute();
         }
-        else{
+        else {
             Network network = (Network) person.getGeneCode();
             //krataw thn 8esh tou target apo to training set
-            
-            fitness = mlProblem.evaluateNetwork(network, dataset);
+
+            fitness = neuroevolutionProblem.evaluateNetwork(network, dataset);
         }
-        
+
         return fitness;
     }
-    
-//    private static double compute(Network network, double[][] dataSet){
-//        //krataw thn 8esh tou target apo to training set
-//        int target = dataSet[0].length -1;
-//
-//        double sum = 0, predictedValue;
-//        for (int i=0; i<dataSet.length; i++) {
-//            predictedValue = network.compute(Arrays.copyOf(dataSet[i], dataSet[i].length-1))[0];
-//            sum += Math.pow(dataSet[i][target] - predictedValue, 2);
-//        }
-//
-//        return 1 - Math.sqrt(sum/dataSet.length);
-//    }
 }

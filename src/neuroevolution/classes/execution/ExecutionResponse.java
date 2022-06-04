@@ -1,13 +1,13 @@
-package basic_gui;
+package execution;
 
 import networks.interfaces.Network;
 
 public class ExecutionResponse {
     final Network network;
-    final ProblemExecutor.EvaluationResult evaluationResult;
+    final NeuroevolutionProblemExecutor.EvaluationResult evaluationResult;
 
 
-    public ExecutionResponse(Network network, ProblemExecutor.EvaluationResult evaluationResult) {
+    public ExecutionResponse(Network network, NeuroevolutionProblemExecutor.EvaluationResult evaluationResult) {
         this.network = network;
         this.evaluationResult = evaluationResult;
     }
@@ -16,7 +16,7 @@ public class ExecutionResponse {
         return network;
     }
 
-    public ProblemExecutor.EvaluationResult getEvaluationResult() {
+    public NeuroevolutionProblemExecutor.EvaluationResult getEvaluationResult() {
         return evaluationResult;
     }
 }
