@@ -4,7 +4,7 @@ import layers.convolution.ConvolutionUtils;
 import layers.Layer;
 import schema.LayerSchema;
 import maths.matrix.MatrixReader;
-import maths.matrix.MatrixReader2D;
+import maths.matrix.Matrix2D;
 import maths.matrix.MatrixSchema;
 import schema.ConvolutionSchemaPrinter;
 
@@ -97,7 +97,7 @@ public class PoolLayer implements Layer {
             }
         }
 
-        return new MatrixReader2D(output);
+        return new Matrix2D(output);
     }
 
     private double computeSample(MatrixReader input, int rowIndex, int columnIndex) {

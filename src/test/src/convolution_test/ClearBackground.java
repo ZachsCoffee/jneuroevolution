@@ -3,7 +3,7 @@ package convolution_test;
 import executors.ConvolutionExecutor;
 import executors.ConvolutionParallelExecutor;
 import filters.Filter;
-import filters.Kernel;
+import filters.StaticKernel;
 import functions.ActivationFunction;
 import input.*;
 import layers.convolution.ConvolutionLayer;
@@ -27,11 +27,11 @@ public class ClearBackground {
         NeuralNetwork neuralNetwork = NetworkJsonSerializer.fromJson(new String(bytes, StandardCharsets.UTF_8));
 
         Filter[] filters = {
-                new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GAUSS.getFunction()),
-                new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GAUSS.getFunction()),
-                new Filter(Kernel.IDENTITY, ActivationFunction.GAUSS.getFunction()),
-                new Filter(Kernel.SHARPEN, ActivationFunction.GAUSS.getFunction()),
-                new Filter(Kernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
+                new Filter(StaticKernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GAUSS.getFunction()),
+                new Filter(StaticKernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GAUSS.getFunction()),
+                new Filter(StaticKernel.IDENTITY, ActivationFunction.GAUSS.getFunction()),
+                new Filter(StaticKernel.SHARPEN, ActivationFunction.GAUSS.getFunction()),
+                new Filter(StaticKernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
 //                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
 

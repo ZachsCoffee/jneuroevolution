@@ -13,4 +13,5 @@ module utils {
     exports maths;
     exports maths.matrix;
     exports cli.stdout;
+    exports options;
 }

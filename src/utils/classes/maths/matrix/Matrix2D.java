@@ -1,15 +1,12 @@
 package maths.matrix;
 
-import maths.matrix.MatrixReader;
-
-import java.util.Arrays;
 import java.util.Objects;
 
-public class MatrixReader2D implements MatrixReader {
+public class Matrix2D implements MatrixRW {
 
     private final double[][] data;
 
-    public MatrixReader2D(double[][] data) {
+    public Matrix2D(double[][] data) {
         this.data = Objects.requireNonNull(data);
     }
 
@@ -36,5 +33,10 @@ public class MatrixReader2D implements MatrixReader {
     @Override
     public String toString() {
         return "Matrix: " + getRowsCount() + "x" + getColumnsCount();
+    }
+
+    @Override
+    public void setValueAt(int rowIndex, int columnIndex, double value) {
+        data[rowIndex][columnIndex] = value;
     }
 }

@@ -3,9 +3,9 @@ package convolution_test.stl10;
 import cli.stdout.StdOut;
 import executors.ConvolutionExecutor;
 import filters.Filter;
-import filters.Kernel;
+import filters.StaticKernel;
 import functions.ActivationFunction;
-import input.HsbInput;
+import input.ImageInput;
 import layers.convolution.ConvolutionLayer;
 import layers.flatten.FlatLayer;
 import layers.pool.PoolFunction;
@@ -24,13 +24,14 @@ import java.util.Objects;
 public class Benchmark {
 
     private static final Filter[] filters1 = {
-        new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
-        new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
-//                new Filter(Kernel.EDGE_DETECTION_MEDIUM, ActivationFunctions.groundRelu()),
-//                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
-        new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GROUND_RELU.getFunction()),
-        new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GROUND_RELU.getFunction()),
-        new Filter(Kernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
+//        new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
+//        new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
+        new Filter(StaticKernel.LAPLACIAN, ActivationFunction.GROUND_RELU.getFunction()),
+//        new Filter(Kernel.EDGE_DETECTION_MEDIUM, ActivationFunction.GROUND_RELU.getFunction()),
+//        new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
+//        new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GROUND_RELU.getFunction()),
+//        new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GROUND_RELU.getFunction()),
+//        new Filter(Kernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
 //        new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
 //        new Filter(Kernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
 //                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
@@ -40,13 +41,13 @@ public class Benchmark {
     };
 
     private static final Filter[] filters2 = {
-        new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
+        new Filter(StaticKernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
 //        new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.EDGE_DETECTION_MEDIUM, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
 //        new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GROUND_RELU.getFunction()),
 //        new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GROUND_RELU.getFunction()),
-        new Filter(Kernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
+        new Filter(StaticKernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
 //        new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
 //        new Filter(Kernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
 //                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
@@ -83,13 +84,14 @@ public class Benchmark {
         ConvolutionExecutor convolutionExecutor = getConvolutionExecutor(files[0], false);
 
         try (
-            DataOutputStream xOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(datasetOutput)));
+            DataOutputStream xOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(
+                datasetOutput)));
             BufferedInputStream yDatasetInputStream = new BufferedInputStream(new FileInputStream(labelData))
         ) {
             double[] featureData;
             boolean writeHeader = true;
             for (int i = 1; i < files.length; i++) {
-                StdOut.printPercent(i, files.length -1, "Completed");
+                StdOut.printPercent(i, files.length - 1, "Completed");
                 featureData = MatrixUtils.mergeChannels(convolutionExecutor.execute().getChannelsOutput());
 
                 int label = yDatasetInputStream.read() - 1;
@@ -109,17 +111,17 @@ public class Benchmark {
                 xOutputStream.writeDouble(label);
 
 
-                convolutionExecutor.changeInput(new HsbInput(ImageIO.read(files[i])));
+                convolutionExecutor.changeInput(new ImageInput(ImageIO.read(files[i])));
             }
         }
     }
 
     private static ConvolutionExecutor getConvolutionExecutor(File file, boolean printSchema) throws IOException {
-        ConvolutionExecutor convolutionExecutor = ConvolutionExecutor.initialize(new HsbInput(ImageIO.read(file)), true)
-            .addLayer(new ConvolutionLayer(filters1, 1).setSquashChannels(true))
-            .addLayer(new PoolLayer(PoolFunction.AVERAGE, 5, 1))
-            .addLayer(new ConvolutionLayer(filters1, 3).setSquashChannels(true))
-            .addLayer(new PoolLayer(PoolFunction.AVERAGE, 5, 2))
+        ConvolutionExecutor convolutionExecutor = ConvolutionExecutor.initialize(new ImageInput(ImageIO.read(file)))
+            .addLayer(new ConvolutionLayer(filters1, 1))
+            .addLayer(new PoolLayer(PoolFunction.MAX, 5, 1))
+            .addLayer(new ConvolutionLayer(filters1, 1))
+            .addLayer(new PoolLayer(PoolFunction.MAX, 5, 2))
 //            .addLayerForAllChannels(new ConvolutionLayer(filters, 3))
 //            .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 3, 4))
             .addLayer(new FlatLayer());

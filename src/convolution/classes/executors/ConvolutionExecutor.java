@@ -83,8 +83,14 @@ public class ConvolutionExecutor {
         System.out.println("Total channels " + channels.length);
 
         ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channels[0]);
+        MatrixSchema[] tempLayerSchema;
+        if (squashChannels) {
+            tempLayerSchema = new MatrixSchema[] { channels[0] };
+        }
+        else {
+            tempLayerSchema = channels;
+        }
 
-        MatrixSchema[] tempLayerSchema = channels;
         System.out.println("Channels #1..." + channels.length);
 
         for (Layer channelLayer : layers) {
@@ -96,7 +102,6 @@ public class ConvolutionExecutor {
 
     public ConvolutionExecutor changeInput(ConvolutionInput convolutionInput) {
         setChannels(convolutionInput.getChannels());
-        output = new MatrixReader[channels.length][];
 
         return this;
     }

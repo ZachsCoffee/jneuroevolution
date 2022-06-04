@@ -6,7 +6,7 @@ import files.binary.BinaryDatasetWriter;
 import input.*;
 import layers.convolution.ConvolutionLayer;
 import filters.Filter;
-import filters.Kernel;
+import filters.StaticKernel;
 import functions.ActivationFunction;
 import layers.flatten.FlatLayer;
 import maths.matrix.MatrixReader;
@@ -33,11 +33,11 @@ public class Main {
 //                new Filter(Kernel.EDGE_DETECTION_HIGH, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.EDGE_DETECTION_MEDIUM, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.EDGE_DETECTION_SOFT, ActivationFunction.GROUND_RELU.getFunction()),
-            new Filter(Kernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GAUSS.getFunction()),
-            new Filter(Kernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GAUSS.getFunction()),
-            new Filter(Kernel.IDENTITY, ActivationFunction.GAUSS.getFunction()),
-            new Filter(Kernel.SHARPEN, ActivationFunction.GAUSS.getFunction()),
-            new Filter(Kernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
+            new Filter(StaticKernel.SOBEL_EDGE_HORIZONTAL, ActivationFunction.GAUSS.getFunction()),
+            new Filter(StaticKernel.SOBEL_EDGE_VERTICAL, ActivationFunction.GAUSS.getFunction()),
+            new Filter(StaticKernel.IDENTITY, ActivationFunction.GAUSS.getFunction()),
+            new Filter(StaticKernel.SHARPEN, ActivationFunction.GAUSS.getFunction()),
+            new Filter(StaticKernel.SHARPEN2, ActivationFunction.GAUSS.getFunction()),
 //                new Filter(Kernel.IDENTITY, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.SHARPEN, ActivationFunctions.groundRelu()),
 
@@ -45,8 +45,8 @@ public class Main {
         };
 
         Filter[] filters2 = {
-            new Filter(Kernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
-            new Filter(Kernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
+            new Filter(StaticKernel.IDENTITY, ActivationFunction.GROUND_RELU.getFunction()),
+            new Filter(StaticKernel.SHARPEN, ActivationFunction.GROUND_RELU.getFunction()),
 //                new Filter(Kernel.CUSTOM_1, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.CUSTOM_2, ActivationFunctions.groundRelu()),
 //                new Filter(Kernel.CUSTOM_3, ActivationFunctions.groundRelu()),

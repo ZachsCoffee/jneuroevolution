@@ -1,7 +1,8 @@
 package utils;
 
+import maths.matrix.MatrixRW;
 import maths.matrix.MatrixReader;
-import maths.matrix.MatrixReader2D;
+import maths.matrix.Matrix2D;
 
 public class MatrixReaderUtils {
     private MatrixReaderUtils() {}
@@ -19,19 +20,26 @@ public class MatrixReaderUtils {
             }
         }
 
-        return new MatrixReader2D(result);
+        return new Matrix2D(result);
     }
 
-    public static void squashAndAdd(MatrixReader first, MatrixReader second) {
-        if (first.getRowsCount() != second.getRowsCount() || first.getColumnsCount() != second.getColumnsCount()) throw new IllegalArgumentException(
-            "The two given matrix must have the same schema. First matrix: " + first + " second matrix: " + second
+    public static void squashAndAdd(MatrixReader squashDestination, MatrixReader data) {
+        if (squashDestination.getRowsCount() != data.getRowsCount() || squashDestination.getColumnsCount() != data.getColumnsCount()) throw new IllegalArgumentException(
+            "The two given matrix must have the same schema. First matrix: " + squashDestination + " data matrix: " + data
         );
 
-        for (int i=0; i<first.getRowsCount(); i++) {
-            double[] row = first.getRow(i);
-            for (int j=0; j<first.getColumnsCount(); j++) {
-                row[j] += second.valueAt(i, j);
+        for (int i=0; i<squashDestination.getRowsCount(); i++) {
+            double[] row = squashDestination.getRow(i);
+            for (int j=0; j<squashDestination.getColumnsCount(); j++) {
+                row[j] += data.valueAt(i, j);
             }
+        }
+    }
+
+    public static void addConstant(MatrixRW squashDestination, double constant) {
+        int index = 0;
+        for (Double value : squashDestination) {
+            squashDestination.incrementBy(index++, value + constant);
         }
     }
 }

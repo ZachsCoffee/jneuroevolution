@@ -6,7 +6,7 @@ import maths.matrix.Matrix;
 
 import java.util.Objects;
 
-public class Filter {
+public class Filter implements Kernel {
 
     private final Function outputFunction;
     private final double[][] kernel;
@@ -35,7 +35,7 @@ public class Filter {
      * @param columnIndex The column index to start the filter.
      * @return The result.
      */
-    public double compute(int rowIndex, int columnIndex, MatrixReader matrixReader) {
+    public double compute(MatrixReader matrixReader, int rowIndex, int columnIndex) {
         Objects.requireNonNull(matrixReader);
         if (matrixReader.getRowsCount() == 0) {
             throw new IllegalArgumentException("Matrix reader don't have any rows!");

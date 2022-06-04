@@ -1,7 +1,16 @@
 package maths.matrix;
 
-public interface MatrixReader extends MatrixSchema {
+import java.util.Iterator;
+
+public interface MatrixReader extends MatrixSchema, Iterable<Double> {
     double valueAt(int rowIndex, int columnIndex);
 
-    double[] getRow(int position);
+    default double[] getRow(int position) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default Iterator<Double> iterator() {
+        return new MatrixReaderIterator(this);
+    }
 }
