@@ -5,18 +5,16 @@
  */
 package evolution_builder.population;
 
-import evolution_builder.population.Person;
-
 /**
- *
  * @author main
  */
-public interface Genes <T>{
-    public T getGenAt(Person person, int position);
-    
-    public void setGenAt(Person person, T gene, int position);
-    
-    public void mutationValue(Person person, int position, double mutationValue);
-    
-    public int genesCount(Person person);
+public interface Genes<T, P> {
+
+    T getGenAt(Person<P> person, int position);
+
+    void setGenAt(Person<P> person, T gene, int position);
+
+    void mutationValue(Person<P> person, int position, double mutationValue);
+
+    int genesCount(Person<P> person);
 }

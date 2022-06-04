@@ -12,12 +12,12 @@ import evolution_builder.population.Population;
  *
  * @author main
  */
-public interface EvolutionPhases {
-    void computePercentOfFitness(Population population);
+public interface EvolutionPhases<P> {
+    void computePercentOfFitness(Population<P> population);
     
-    Population recombinationOperator(Population population, int epoch);
+    Population<P> recombinationOperator(Population<P> population, int epoch);
     
-    Population selectionMethod(Population population);
+    Population<P> selectionMethod(Population<P> population);
     
-    void mutationMethod(Population population, int epoch, int maxEpoch);
+    void mutationMethod(Population<P> population, int epoch, int maxEpoch);
 }

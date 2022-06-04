@@ -101,7 +101,7 @@ public class Person<T> implements Comparable<Person<T>>, Cloneable {
         this.percentOfFitness = percentOfFitness;
     }
 
-    public Object getGeneCode() {
+    public T getGeneCode() {
         return person;
     }
 

@@ -12,18 +12,18 @@ import java.util.Collections;
  *
  * @author main
  */
-public class Population {
+public class Population<P> {
 
-    public synchronized static Population generate(PersonManager personManager) {
-        Population tempPopulation = new Population(personManager);
+    public synchronized static <P> Population<P> generate(PersonManager<P> personManager) {
+        Population<P> tempPopulation = new Population<>(personManager);
 
         tempPopulation.createPopulation();
 
         return tempPopulation;
     }
 
-    public synchronized static Population generate(PersonManager personManager, int size) {
-        Population tempPopulation = new Population(personManager, size);
+    public synchronized static <P> Population<P> generate(PersonManager<P> personManager, int size) {
+        Population<P> tempPopulation = new Population<>(personManager, size);
 
         tempPopulation.createPopulation();
 
@@ -31,12 +31,12 @@ public class Population {
     }
 
     private int size = 100;
-    private final ArrayList<Person> population = new ArrayList<>();
+    private final ArrayList<Person<P>> population = new ArrayList<>();
     
-    private final PersonManager personManager;
-    private Person bestPerson = null;
+    private final PersonManager<P> personManager;
+    private Person<P> bestPerson = null;
     
-    public Population(PersonManager personManager){
+    public Population(PersonManager<P> personManager){
         if (personManager == null){
             throw new IllegalArgumentException("Argument at pos 1: not null.");
         }
@@ -44,7 +44,7 @@ public class Population {
         this.personManager = personManager;
     }
     
-    public Population(PersonManager personManager, int size){
+    public Population(PersonManager<P> personManager, int size){
         this(personManager);
         if (size <= 0){
             throw new IllegalArgumentException("Argument at pos 1: must be greater than zero.");
@@ -54,14 +54,14 @@ public class Population {
     }
     
     //start get/set
-    public void addPerson(Person person){
+    public void addPerson(Person<P> person){
         population.add(person);
     }
     
-    public Person getPersonAt(int position){
+    public Person<P> getPersonAt(int position){
         return population.get(position);
     }
-    public void setPersonAt(Person person, int position){
+    public void setPersonAt(Person<P> person, int position){
         population.set(position, person);
     }
     
@@ -73,11 +73,11 @@ public class Population {
         return population.size();
     }
     
-    public PersonManager getPersonManager(){
+    public PersonManager<P> getPersonManager(){
         return personManager;
     }
 
-    public Person getBestPerson() {
+    public Person<P> getBestPerson() {
         if (bestPerson == null) throw new IllegalStateException(
                 "Can't give the best person if the fitness isn't computed"
         );
@@ -88,11 +88,11 @@ public class Population {
     //end get/set
     
     //start methods
-    public Person createPerson(){
+    public Person<P> createPerson(){
         return personManager.newPerson();
     }
     
-    public Person newSameLengthAs(Person person){
+    public Person<P> newSameLengthAs(Person<P> person){
         return personManager.newSameLengthAs(person);
     }
     
@@ -102,7 +102,7 @@ public class Population {
         }
     }
     
-    public Person findBestPerson(){
+    public Person<P> findBestPerson(){
         int bestPos = 0;
         double bestFitness = population.get(0).getFitness();
         for (int i=1; i<size; i++){
@@ -122,10 +122,10 @@ public class Population {
      * Computes the fitness for all the population persons. At the same time search's for the best population person.
      */
     public void computeFitnessForPopulation() {
-        Person populationBestPerson = population.get(0);
+        Person<P> populationBestPerson = population.get(0);
         populationBestPerson.setFitness(personManager.computeFitness(populationBestPerson));
 
-        Person tempPerson;
+        Person<P> tempPerson;
         for (int i=1; i<population.size(); i++) {
             tempPerson = population.get(i);
             tempPerson.setFitness(personManager.computeFitness(tempPerson));

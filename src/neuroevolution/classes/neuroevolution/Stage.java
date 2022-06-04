@@ -102,7 +102,7 @@ public class Stage implements EvolutionStage {
         evolution_builder.population.Person epochBestPerson = population.getBestPerson();
 
         if (problem.getValidationDataset() != null) {
-            double currentBestValidationFitness = Person.computeFitness(epochBestPerson, problem.getValidationDataset());
+            double currentBestValidationFitness = NeuroevolutionPerson.computeFitness(epochBestPerson, problem.getValidationDataset());
             if (currentBestValidationFitness > validationMaxFitness){
                 validationMaxFitness = currentBestValidationFitness;
                 validationBestPerson = population.getBestPerson();

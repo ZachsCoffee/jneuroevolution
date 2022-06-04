@@ -4,6 +4,7 @@ module convolution {
     requires machine_learning;
     requires org.apache.commons.lang3;
     requires j.text.utils;
+    requires evolution_algorithms;
 
     exports layers.convolution;
     exports schema;

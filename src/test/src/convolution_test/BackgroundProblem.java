@@ -128,7 +128,7 @@ public class BackgroundProblem extends ProblemExecutor {
     }
 
     @Override
-    public void computePercentOfFitness(Population population) {
+    public void computePercentOfFitness(Population<P> population) {
         PercentOfFitness.percentFromCurrentBestRanked(population);
     }
 

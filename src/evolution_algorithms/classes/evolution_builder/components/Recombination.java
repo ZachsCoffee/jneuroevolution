@@ -17,13 +17,13 @@ public class Recombination {
     
     private Recombination(){}
     
-    public static <T> Population fixed(Population population, int breakSize, Genes<T> genes){
+    public static <T, P> Population<P> fixed(Population<P> population, int breakSize, Genes<T, P> genes){
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
         
-        Person person1, person2, newPerson1, newPerson2;
+        Person<P> person1, person2, newPerson1, newPerson2;
         
-        Population newPopulation = new Population(population.getPersonManager(), populationSize);
+        Population<P> newPopulation = new Population<>(population.getPersonManager(), populationSize);
         
         if (genesCount <= breakSize){
             throw new IllegalArgumentException("Argument, at pos 2: must be less than genes count.");
@@ -69,14 +69,14 @@ public class Recombination {
         return newPopulation;
     }
     
-    public static <T> Population random(Population population, int breakSize, Genes<T> genes){
+    public static <T, P> Population<P> random(Population<P> population, int breakSize, Genes<T, P> genes){
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
         int randomBreakSize;
         
-        Person person1, person2, newPerson1, newPerson2;
+        Person<P> person1, person2, newPerson1, newPerson2;
         
-        Population newPopulation = new Population(population.getPersonManager(), populationSize);
+        Population<P> newPopulation = new Population<>(population.getPersonManager(), populationSize);
         
         if (genesCount <= breakSize){
             throw new IllegalArgumentException("Argument, at pos 2: must be less than genes count.");
@@ -123,14 +123,14 @@ public class Recombination {
         return newPopulation;
     }
     
-    public static <T> Population randomWithFilter(Population population, int breakSize, Genes<T> genes){
+    public static <T, P> Population<P> randomWithFilter(Population<P> population, int breakSize, Genes<T, P> genes){
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
         int randomBreakSize;
         
-        Person person1 = null, person2 = null, newPerson1, newPerson2;
-        Person[] persons;
-        Population newPopulation = new Population(population.getPersonManager(), populationSize);
+        Person<P> person1, person2, newPerson1, newPerson2;
+        Person<P>[] persons;
+        Population<P> newPopulation = new Population<>(population.getPersonManager(), populationSize);
         
         if (genesCount <= breakSize){
             throw new IllegalArgumentException("Argument, at pos 2: must be less than genes count.");
@@ -141,8 +141,6 @@ public class Recombination {
         
         boolean changeGenesSide;
         while (personCount < populationSize){
-            //person1 = population.getPersonAt(getRandom(populationSize));
-            //person2 = population.getPersonAt(getRandom(populationSize));
             persons = getFilteredPersons(population);
             person1 = persons[0];
             person2 = persons[1];
@@ -181,13 +179,13 @@ public class Recombination {
         return newPopulation;
     }
     
-    public static <T> Population fixedWithFilter(Population population, int breakSize, Genes<T> genes){
+    public static <T, P> Population<P> fixedWithFilter(Population<P> population, int breakSize, Genes<T, P> genes){
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
         
-        Person person1 = null, person2 = null, newPerson1, newPerson2;
-        Person[] persons;
-        Population newPopulation = new Population(population.getPersonManager(), populationSize);
+        Person<P> person1, person2, newPerson1, newPerson2;
+        Person<P>[] persons;
+        Population<P> newPopulation = new Population<>(population.getPersonManager(), populationSize);
         
         if (genesCount <= breakSize){
             throw new IllegalArgumentException("Argument, at pos 2: must be less than genes count.");
@@ -198,8 +196,6 @@ public class Recombination {
         
         boolean changeGenesSide;
         while (personCount < populationSize){
-            //person1 = population.getPersonAt(getRandom(populationSize));
-            //person2 = population.getPersonAt(getRandom(populationSize));
             persons = getFilteredPersons(population);
             person1 = persons[0];
             person2 = persons[1];
@@ -237,13 +233,13 @@ public class Recombination {
         return newPopulation;
     }
     
-    public static <T> Population variableLength(Population population, int breakSize, Genes<T> genes){
+    public static <T, P> Population<P> variableLength(Population<P> population, int breakSize, Genes<T, P> genes){
         int populationSize = population.getSize(), person1GenesCount;
         int personCount = 0;
         
-        Person person1, person2, newPerson1, newPerson2;
+        Person<P> person1, person2, newPerson1, newPerson2;
         
-        Population newPopulation = new Population(population.getPersonManager(), populationSize);
+        Population<P> newPopulation = new Population<>(population.getPersonManager(), populationSize);
         
 //        if (genesCount <= breakSize){
 //            throw new IllegalArgumentException("Argument, at pos 2: must be less than genes count.");
@@ -295,73 +291,17 @@ public class Recombination {
         return newPopulation;
     }
     
-//    public static Population basic(Population population, Genes genes){
-//        int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
-//        int personCount = 0;
-//        
-//        Person person1, person2, newPerson1, newPerson2;
-//        person1 = person2 = null;
-//
-//        
-//        Population newPopulation = new Population(population.getPersonManager(), populationSize);
-//        
-//        while (personCount < populationSize){
-//            newPerson1 = population.createPerson();
-//            newPerson2 = population.createPerson();
-//            
-//            for (int i=0; i<populationSize; i++){
-//                person1 = population.getPersonAt(getRandom(populationSize));
-//                person2 = population.getPersonAt(getRandom(populationSize));
-//
-//                recombination(genes, person1, person2, genesCount);
-//            }
-//            
-//            if (personCount + 2 <= populationSize){
-//                newPopulation.addPerson(person1);
-//                newPopulation.addPerson(person2);
-//                personCount += 2;
-//            }
-//            else if (personCount + 1 <= populationSize){
-//                newPopulation.addPerson(person1);
-//                personCount++;
-//            }
-//        }
-//        
-//        return newPopulation;
-//    }
-//    
-//    private static <T> void recombination(Genes genes, Person parent1, Person parent2, int genesLength){
-//        int cutPosition = getRandom(genesLength -2) +1;
-//        
-//        T swapTemp;
-//        for (int i=cutPosition; i<genesLength; i++){
-//            swapTemp = (T) genes.getGenAt(parent1, i);
-//            
-//            genes.setGenAt(
-//                    parent1, 
-//                    genes.getGenAt(parent2, i), 
-//                    i
-//            );
-//            genes.setGenAt(
-//                    parent2, 
-//                    swapTemp, 
-//                    i
-//            );
-//        }
-//    }
-    
-    private static <T> int getPositionOf(Genes<T> genes, Person a, Person b, long positionB){
+    private static <T, P> int getPositionOf(Genes<T, P> genes, Person<P> a, Person<P> b, long positionB){
         return (int)(positionB * genes.genesCount(a) / genes.genesCount(b));
-//                return (int)(positionB*(genes.genesCount(a) -1) / (genes.genesCount(b) -1));
-
     }
     
     private static int getRandom(int length){
         return (int)(Math.random()*length);
     }
     
-    private static Person[] getFilteredPersons(Population population){
-        Person[] persons = new Person[2];
+    @SuppressWarnings("unchecked")
+    private static <P> Person<P>[] getFilteredPersons(Population<P> population){
+        Person<P>[] persons = new Person[2];
         boolean firstPerson = false;
         int randomPosition, populationSize = population.getSize();
         while (true){

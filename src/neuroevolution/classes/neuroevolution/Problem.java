@@ -16,7 +16,7 @@ import maths.MinMax;
  *
  * @author Zachs
  */
-public abstract class Problem implements MLProblem, EvolutionPhases {
+public abstract class Problem<P> implements MLProblem, EvolutionPhases<P> {
     
     protected Function hiddenLayerFunction, outputLayerFunction;
     protected Dataset 
@@ -27,13 +27,13 @@ public abstract class Problem implements MLProblem, EvolutionPhases {
     private LinearValues dynamicMutation = null;
     private int fixedMutation;
     
-    protected final Person PERSON;
+    protected final NeuroevolutionPerson PERSON;
     
     protected Problem(){
-        PERSON = new Person(this);
+        PERSON = new NeuroevolutionPerson(this);
     }
 
-    public Person getPerson(){
+    public NeuroevolutionPerson getPerson(){
         return PERSON;
     }
     
@@ -55,7 +55,7 @@ public abstract class Problem implements MLProblem, EvolutionPhases {
         }
     }
     
-    public PersonManager getPersonManager(){
+    public PersonManager<P> getPersonManager(){
         System.out.println(Thread.currentThread().getId());
         return PERSON;
     }
