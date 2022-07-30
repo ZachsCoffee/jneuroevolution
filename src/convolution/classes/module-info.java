@@ -5,7 +5,9 @@ module convolution {
     requires org.apache.commons.lang3;
     requires j.text.utils;
     requires evolution_algorithms;
+    requires neuroevolution;
 
+    exports layers.trainable;
     exports layers.convolution;
     exports schema;
     exports filters;
@@ -15,4 +17,7 @@ module convolution {
     exports layers;
     exports layers.flatten;
     exports utils;
+    exports executors.common;
+    exports evolution;
+    exports dataset.common;
 }

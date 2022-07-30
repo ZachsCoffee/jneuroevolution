@@ -2,80 +2,120 @@ package layers.trainable;
 
 import filters.TrainableKernel;
 import functions.ActivationFunction;
+import layers.TrainableLayer;
 import layers.convolution.AbstractConvolutionLayer;
 import maths.Function;
 import maths.matrix.MatrixRW;
 import maths.matrix.MatrixReader;
 import maths.matrix.MatrixSchema;
-import options.Lockable;
 import schema.ConvolutionSchemaPrinter;
 import schema.LayerSchema;
 import schema.SchemaComputer;
 import utils.MatrixReaderUtils;
 
-public class TrainableConvolutionLayer extends AbstractConvolutionLayer {
+public class TrainableConvolutionLayer extends AbstractConvolutionLayer implements TrainableLayer {
 
     private static final int KERNEL_SIZE = 3;
     private static final Function FUNCTION = ActivationFunction.GROUND_RELU.getFunction();
-    private final Options options;
+    private final int kernelsPerChannel;
+    private final boolean sumKernels;
+    private final int stride;
+    private final boolean keepSize;
+    private final int channelsCount;
+    private final int outputChannelsCount;
+    private final MatrixReader[] output;
+    private final double[] kernelsWeights;
+    private final TrainableKernel[] kernels;
+    private final int[] biasWeightIndexes;
     private SchemaComputer schemaComputer;
-    private double[] kernelsWeights;
-    private TrainableKernel[] kernels;
-    private int channelsCount;
-    private boolean setupLayer = true;
-    private int[] biasWeightIndexes;
 
-    public TrainableConvolutionLayer() {
-        this(new Options());
+    public TrainableConvolutionLayer(
+        int channelsCount,
+        int kernelsPerChannel,
+        boolean sumKernels,
+        int stride,
+        boolean keepSize
+    ) {
+        this.channelsCount = channelsCount;
+
+        this.kernelsPerChannel = kernelsPerChannel;
+
+        this.sumKernels = sumKernels;
+
+        this.keepSize = keepSize;
+
+        if (stride < 1) throw new IllegalArgumentException(
+            "Stride can't be smaller than 1. Given: " + stride
+        );
+
+        this.stride = stride;
+
+        if (sumKernels) {
+            outputChannelsCount = kernelsPerChannel;
+        }
+        else {
+            outputChannelsCount = channelsCount * kernelsPerChannel;
+        }
+
+        output = new MatrixReader[outputChannelsCount];
+
+        kernels = createKernels();
+
+        int totalWeightsCount = findTotalWeightsCount();
+
+        kernelsWeights = new double[totalWeightsCount];
+        biasWeightIndexes = createBiasWeightIndexes(totalWeightsCount);
     }
 
-    public TrainableConvolutionLayer(Options options) {
-        this.options = options == null
-            ? new Options()
-            : options;
+    @Override
+    public int getWeightsCount() {
+        return kernelsWeights.length;
+    }
+
+    @Override
+    public int getOutputChannelsCount() {
+        return outputChannelsCount;
+    }
+
+    @Override
+    public void setWeightAt(int index, double weight) {
+        kernelsWeights[index] = weight;
+    }
+
+    @Override
+    public double getWeightAt(int index) {
+        return kernelsWeights[index];
     }
 
     @Override
     public MatrixReader[] computeLayer(MatrixReader[] channels) {
-        if (setupLayer) {
-            setupLayer(channels);
-            channelsCount = channels.length;
-            setupLayer = false;
-        }
-        else {
-            if (channels.length != channelsCount) throw new IllegalArgumentException(
-                "The initial channels count is: " + this.channelsCount + " now the given is: " + channels.length
-            );
-        }
+        if (channels.length != channelsCount) throw new IllegalArgumentException(
+            "The initial channels count is: " + this.channelsCount + " now the given is: " + channels.length
+        );
 
-        MatrixReader[] outcome;
-        if (options.sumKernels) {
-            outcome = new MatrixReader[options.kernelsPerChannel];
-            int kernelIndex = 0;
-            for (int i = 0; i < options.kernelsPerChannel; i++) {
+        int kernelIndex = 0;
+        if (sumKernels) {
+            for (int i = 0; i < kernelsPerChannel; i++) {
                 MatrixRW sumResult = computeForKernel(channels[0], schemaComputer, kernels[kernelIndex++]);
-                for (int j=1; j<channels.length; j++) {
+                for (int j = 1; j < channels.length; j++) {
                     MatrixReader kernelResult = computeForKernel(channels[j], schemaComputer, kernels[kernelIndex]);
                     MatrixReaderUtils.squashAndAdd(sumResult, kernelResult);
                     kernelIndex++;
                 }
                 MatrixReaderUtils.addConstant(sumResult, kernelsWeights[biasWeightIndexes[i]]);
-                outcome[i] = sumResult;
+                output[i] = sumResult;
             }
         }
         else {
-            outcome = new MatrixReader[channels.length * options.kernelsPerChannel];
-
-            int kernelIndex = 0;
-            for (int i = 0; i < options.kernelsPerChannel; i++) {
+            for (int i = 0; i < kernelsPerChannel; i++) {
                 for (MatrixReader channel : channels) {
-                    outcome[kernelIndex] = computeForKernel(channel, schemaComputer, kernels[kernelIndex]);
+                    output[kernelIndex] = computeForKernel(channel, schemaComputer, kernels[kernelIndex]);
                     kernelIndex++;
                 }
             }
         }
 
-        return outcome;
+        return output;
     }
 
     @Override
@@ -85,9 +125,9 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer {
         setupSchema();
 
         MatrixSchema[] matrixSchemas;
-        if (options.sumKernels) {
-            matrixSchemas = new MatrixSchema[options.kernelsPerChannel];
-            for (int i=0; i<options.kernelsPerChannel; i++) {
+        if (sumKernels) {
+            matrixSchemas = new MatrixSchema[kernelsPerChannel];
+            for (int i = 0; i < kernelsPerChannel; i++) {
                 schemaComputer.compute(
                     channels[i].getRowsCount(),
                     channels[i].getColumnsCount(),
@@ -100,15 +140,15 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer {
             }
         }
         else {
-            matrixSchemas = new MatrixSchema[channels.length * options.kernelsPerChannel];
-            for (int i=0; i<channels.length; i++) {
-                for (int j=0; j<options.kernelsPerChannel; j++) {
+            matrixSchemas = new MatrixSchema[channels.length * kernelsPerChannel];
+            for (int i = 0; i < channels.length; i++) {
+                for (int j = 0; j < kernelsPerChannel; j++) {
                     schemaComputer.compute(
                         channels[i].getRowsCount(),
                         channels[i].getColumnsCount(),
                         KERNEL_SIZE
                     );
-                    matrixSchemas[i * options.kernelsPerChannel + j] = new LayerSchema(
+                    matrixSchemas[i * kernelsPerChannel + j] = new LayerSchema(
                         schemaComputer.getRowsCount(),
                         schemaComputer.getColumnsCount()
                     );
@@ -119,30 +159,47 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer {
         return matrixSchemas;
     }
 
-    private void setupLayer(MatrixReader[] channels) {
-        options.lock();
-        setupKernels(channels);
-
-        setupSchema();
+    @Override
+    public TrainableLayer copy() {
+        return new TrainableConvolutionLayer(
+            channelsCount,
+            kernelsPerChannel,
+            sumKernels,
+            stride,
+            keepSize
+        );
     }
 
     private void setupSchema() {
-        options.lock();
-        schemaComputer = new SchemaComputer(options.stride, options.keepSize);
+        schemaComputer = new SchemaComputer(stride, keepSize);
     }
 
-    private void setupKernels(MatrixReader[] channels) {
-        kernels = new TrainableKernel[channels.length * options.kernelsPerChannel];
+    private int[] createBiasWeightIndexes(int totalWeightsCount) {
+        if (sumKernels) {
+            int[] biasWeightIndexes = new int[kernelsPerChannel];
+
+            for (int i = 0; i < kernelsPerChannel; i++) {
+                biasWeightIndexes[i] = i + totalWeightsCount;
+            }
+
+            return biasWeightIndexes;
+        }
+
+        return null;
+    }
+
+    private TrainableKernel[] createKernels() {
+        TrainableKernel[] kernels = new TrainableKernel[channelsCount * kernelsPerChannel];
 
         int totalWeights = 0;
         int kernelIndex = 0;
-        for (int i = 0; i < channels.length; i++) {
-            for (int j = 0; j < options.kernelsPerChannel; j++) {
+        for (int i = 0; i < channelsCount; i++) {
+            for (int j = 0; j < kernelsPerChannel; j++) {
                 TrainableKernel kernel = new TrainableKernel(
                     totalWeights,
                     KERNEL_SIZE,
                     FUNCTION,
-                    ! options.sumKernels
+                    ! sumKernels
                 );
                 kernels[kernelIndex++] = kernel;
 
@@ -150,72 +207,15 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer {
             }
         }
 
-        if (options.sumKernels) {
-            int startWeightsIndex = totalWeights;
-            totalWeights += options.kernelsPerChannel;
-            biasWeightIndexes = new int[options.kernelsPerChannel];
-
-            for (int i=0; i<options.kernelsPerChannel; i++) {
-                biasWeightIndexes[i] = i + startWeightsIndex;
-            }
-        }
-
-        kernelsWeights = new double[totalWeights];
+        return kernels;
     }
 
-    public static class Options extends Lockable {
-
-        private int kernelsPerChannel = 1;
-        private boolean sumKernels = false;
-        private int stride = 1;
-        private boolean keepSize = false;
-
-        public int getKernelsPerChannel() {
-            return kernelsPerChannel;
+    private int findTotalWeightsCount() {
+        int count = 0;
+        for (TrainableKernel kernel : kernels) {
+            count += kernel.getKernelTotalWeightsCount();
         }
 
-        public Options setKernelsPerChannel(int kernelsPerChannel) {
-            checkLock();
-            if (kernelsPerChannel < 1) throw new IllegalArgumentException(
-                "Kernels per channel can't be less than one."
-            );
-
-            this.kernelsPerChannel = kernelsPerChannel;
-            return this;
-        }
-
-        public boolean isSumKernels() {
-            return sumKernels;
-        }
-
-        public Options setSumKernels(boolean sumKernels) {
-            checkLock();
-            this.sumKernels = sumKernels;
-            return this;
-        }
-
-        public int getStride() {
-            return stride;
-        }
-
-        public Options setStride(int stride) {
-            checkLock();
-            if (stride < 1) throw new IllegalArgumentException(
-                "Stride can't be smaller than 1. Given: " + stride
-            );
-
-            this.stride = stride;
-            return this;
-        }
-
-        public boolean isKeepSize() {
-            return keepSize;
-        }
-
-        public Options setKeepSize(boolean keepSize) {
-            checkLock();
-            this.keepSize = keepSize;
-            return this;
-        }
+        return count;
     }
 }

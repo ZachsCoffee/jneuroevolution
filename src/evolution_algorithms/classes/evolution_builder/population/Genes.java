@@ -10,11 +10,11 @@ package evolution_builder.population;
  */
 public interface Genes<T, P> {
 
-    T getGenAt(Person<P> person, int position);
+    T getGenAt(PopulationPerson<P> populationPerson, int position);
 
-    void setGenAt(Person<P> person, T gene, int position);
+    void setGenAt(PopulationPerson<P> populationPerson, T gene, int position);
 
-    void mutationValue(Person<P> person, int position, double mutationValue);
+    void mutationValue(PopulationPerson<P> populationPerson, int position, double mutationValue);
 
-    int genesCount(Person<P> person);
+    int genesCount(PopulationPerson<P> populationPerson);
 }

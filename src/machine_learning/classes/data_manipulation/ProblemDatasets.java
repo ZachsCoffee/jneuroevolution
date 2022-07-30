@@ -1,29 +1,29 @@
 package data_manipulation;
 
 public class ProblemDatasets {
-    Dataset trainingDataset, testingDataset, validationDataset;
+    RawDataset trainingRawDataset, testingRawDataset, validationRawDataset;
     
-    public Dataset getTrainingDataset() {
+    public RawDataset getTrainingDataset() {
 //        if (datasetId == -1) throw new RuntimeException(
 //            "Can't use the dataset if not specified a unique id."
 //        );
         
-        return trainingDataset;
+        return trainingRawDataset;
     }
 
-    public Dataset getTestingDataset() {
+    public RawDataset getTestingDataset() {
 //        if (datasetId == -1) throw new RuntimeException(
 //            "Can't use the dataset if not specified a unique id."
 //        );
                 
-        return testingDataset;
+        return testingRawDataset;
     }
 
-    public Dataset getValidationDataset() {
+    public RawDataset getValidationDataset() {
 //        if (datasetId == -1) throw new RuntimeException(
 //            "Can't use the dataset if not specified a unique id."
 //        );
         
-        return validationDataset;
+        return validationRawDataset;
     }
 }

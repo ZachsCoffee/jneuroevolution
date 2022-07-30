@@ -11,22 +11,22 @@ package evolution_builder.population;
  */
 public interface PersonManager<P> {
     
-    Person<P> newRandomPerson();
+    PopulationPerson<P> newRandomPerson();
 
     /**
      * This method allow evolution to create a new person.
      * @return Must return a new instance of a person.
      */
-    Person<P> newPerson();
+    PopulationPerson<P> newPerson();
     
     /**
      * Creates a person same length as the given person. This is used when the person's length is variable
-     * @param person The given person to create a new with the same length
+     * @param populationPerson The given person to create a new with the same length
      * @return The new person
      */
     
-    Person<P> newSameLengthAs(Person<P> person);
+    PopulationPerson<P> newSameLengthAs(PopulationPerson<P> populationPerson);
     
     
-    double computeFitness(Person<P> person);
+    double computeFitness(PopulationPerson<P> populationPerson);
 }

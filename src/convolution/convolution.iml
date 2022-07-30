@@ -14,5 +14,7 @@
     <orderEntry type="module" module-name="machine_learning" />
     <orderEntry type="library" name="j-text-utils-0.3.4" level="project" />
     <orderEntry type="module" module-name="evolution_algorithms" />
+    <orderEntry type="module" module-name="neuroevolution" />
+    <orderEntry type="module" module-name="neuroevolution" />
   </component>
 </module>

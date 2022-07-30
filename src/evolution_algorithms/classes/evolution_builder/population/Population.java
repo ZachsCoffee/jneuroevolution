@@ -31,10 +31,10 @@ public class Population<P> {
     }
 
     private int size = 100;
-    private final ArrayList<Person<P>> population = new ArrayList<>();
+    private final ArrayList<PopulationPerson<P>> population = new ArrayList<>();
     
     private final PersonManager<P> personManager;
-    private Person<P> bestPerson = null;
+    private PopulationPerson<P> bestPopulationPerson = null;
     
     public Population(PersonManager<P> personManager){
         if (personManager == null){
@@ -54,15 +54,15 @@ public class Population<P> {
     }
     
     //start get/set
-    public void addPerson(Person<P> person){
-        population.add(person);
+    public void addPerson(PopulationPerson<P> populationPerson){
+        population.add(populationPerson);
     }
     
-    public Person<P> getPersonAt(int position){
+    public PopulationPerson<P> getPersonAt(int position){
         return population.get(position);
     }
-    public void setPersonAt(Person<P> person, int position){
-        population.set(position, person);
+    public void setPersonAt(PopulationPerson<P> populationPerson, int position){
+        population.set(position, populationPerson);
     }
     
     public int getSize(){
@@ -77,23 +77,23 @@ public class Population<P> {
         return personManager;
     }
 
-    public Person<P> getBestPerson() {
-        if (bestPerson == null) throw new IllegalStateException(
+    public PopulationPerson<P> getBestPerson() {
+        if (bestPopulationPerson == null) throw new IllegalStateException(
                 "Can't give the best person if the fitness isn't computed"
         );
 
-        return bestPerson;
+        return bestPopulationPerson;
     }
 
     //end get/set
     
     //start methods
-    public Person<P> createPerson(){
+    public PopulationPerson<P> createPerson(){
         return personManager.newPerson();
     }
     
-    public Person<P> newSameLengthAs(Person<P> person){
-        return personManager.newSameLengthAs(person);
+    public PopulationPerson<P> newSameLengthAs(PopulationPerson<P> populationPerson){
+        return personManager.newSameLengthAs(populationPerson);
     }
     
     public void createPopulation(){//ftiaxnei to population
@@ -102,7 +102,7 @@ public class Population<P> {
         }
     }
     
-    public Person<P> findBestPerson(){
+    public PopulationPerson<P> findBestPerson(){
         int bestPos = 0;
         double bestFitness = population.get(0).getFitness();
         for (int i=1; i<size; i++){
@@ -122,20 +122,20 @@ public class Population<P> {
      * Computes the fitness for all the population persons. At the same time search's for the best population person.
      */
     public void computeFitnessForPopulation() {
-        Person<P> populationBestPerson = population.get(0);
-        populationBestPerson.setFitness(personManager.computeFitness(populationBestPerson));
+        PopulationPerson<P> populationBestPopulationPerson = population.get(0);
+        populationBestPopulationPerson.setFitness(personManager.computeFitness(populationBestPopulationPerson));
 
-        Person<P> tempPerson;
+        PopulationPerson<P> tempPopulationPerson;
         for (int i=1; i<population.size(); i++) {
-            tempPerson = population.get(i);
-            tempPerson.setFitness(personManager.computeFitness(tempPerson));
+            tempPopulationPerson = population.get(i);
+            tempPopulationPerson.setFitness(personManager.computeFitness(tempPopulationPerson));
 
-            if (tempPerson.getFitness() > populationBestPerson.getFitness()) {
-                populationBestPerson = tempPerson;
+            if (tempPopulationPerson.getFitness() > populationBestPopulationPerson.getFitness()) {
+                populationBestPopulationPerson = tempPopulationPerson;
             }
         }
 
-        bestPerson = Person.copyPerson(populationBestPerson);
+        bestPopulationPerson = PopulationPerson.copyPerson(populationBestPopulationPerson);
     }
     
     public String toString(){

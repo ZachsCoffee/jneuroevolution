@@ -1,17 +1,52 @@
 package builder;
 
-import maths.matrix.MatrixReader;
+import executors.common.TrainableConvolution;
+import layers.TrainableLayer;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class ConvolutionBuilder {
 
-    public static ConvolutionBuilder initialize(MatrixReader[] channels) {
-        return new ConvolutionBuilder(channels);
+    public static ConvolutionBuilder getInstance(int inputChannelsCount) {
+        return new ConvolutionBuilder(inputChannelsCount);
     }
 
-    private final MatrixReader[] channels;
+    private final int inputChannelsCount;
+    private final List<TrainableLayer> layers = new LinkedList<>();
+    private TrainableConvolutionLayerBuilder lastLayerBuilder = null;
 
-    private ConvolutionBuilder(MatrixReader[] channels) {
+    private ConvolutionBuilder(int inputChannelsCount) {
 
-        this.channels = channels;
+        this.inputChannelsCount = inputChannelsCount;
+    }
+
+    public TrainableConvolutionLayerBuilder addLayer() {
+        int channelsCount;
+
+        if (lastLayerBuilder == null) {
+            channelsCount = inputChannelsCount;
+        }
+        else {
+            TrainableLayer layer = lastLayerBuilder.build();
+            layers.add(layer);
+            channelsCount = layer.getOutputChannelsCount();
+        }
+
+        lastLayerBuilder = new TrainableConvolutionLayerBuilder(this, channelsCount);
+
+        return lastLayerBuilder;
+    }
+
+    public TrainableConvolution build() {
+        if (lastLayerBuilder == null) throw new IllegalStateException(
+            "Need at least one layer in order to build"
+        );
+
+        layers.add(lastLayerBuilder.build());
+
+        return new executors.TrainableConvolution(
+            layers
+        );
     }
 }

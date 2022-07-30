@@ -5,7 +5,7 @@
  */
 package evolution_builder;
 
-import evolution_builder.population.Person;
+import evolution_builder.population.PopulationPerson;
 import evolution_builder.population.Population;
 
 /**
@@ -23,17 +23,17 @@ public interface EvolutionStage<P> {
     /**
      * Here you can keep an eye in the evolution
      * @param population The population of current evolution
-     * @param totalBestPerson The best person, from all epoch include this one
+     * @param totalBestPopulationPerson The best person, from all epoch include this one
      * @param epoch The current epoch, starts from 1
      */
-    void onEndEpoch(Population<P> population, Person<P> totalBestPerson, int epoch);
+    void onEndEpoch(Population<P> population, PopulationPerson<P> totalBestPopulationPerson, int epoch);
     
     /**
      * Use this method if you want to stop the evolution
      * @param population The population of current evolution
-     * @param totalBestPerson The best person, from all epoch include this one
+     * @param totalBestPopulationPerson The best person, from all epoch include this one
      * @param epoch The current epoch, starts from 1
      * @return If true the evolution will stop.
      */
-    boolean stopEvolution(Population<P> population, Person<P> totalBestPerson, int epoch);
+    boolean stopEvolution(Population<P> population, PopulationPerson<P> totalBestPopulationPerson, int epoch);
 }

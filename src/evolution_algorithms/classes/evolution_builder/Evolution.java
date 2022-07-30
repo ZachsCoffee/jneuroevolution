@@ -6,7 +6,7 @@
 package evolution_builder;
 
 import evolution_builder.components.EvolutionPhases;
-import evolution_builder.population.Person;
+import evolution_builder.population.PopulationPerson;
 import evolution_builder.population.Population;
 
 import java.util.Objects;
@@ -20,7 +20,7 @@ public class Evolution {
     private final boolean withPercentOfFitness;
 
     private Population population;
-    private Person totalBestPerson = null;
+    private PopulationPerson totalBestPopulationPerson = null;
     private boolean earlyStopped = false;
     
     public Evolution(Population population, boolean withPercentOfFitness, EvolutionPhases components) {
@@ -32,8 +32,8 @@ public class Evolution {
         this.withPercentOfFitness = withPercentOfFitness;
     }
     
-    public Person getTotalBestPerson(){
-        return totalBestPerson;
+    public PopulationPerson getTotalBestPerson(){
+        return totalBestPopulationPerson;
     }
 
     
@@ -98,9 +98,9 @@ public class Evolution {
                 computeFitnessForPopulation();
                 components.computePercentOfFitness(population);
                 
-                stage.onEndEpoch(population, totalBestPerson, i);
+                stage.onEndEpoch(population, totalBestPopulationPerson, i);
 
-                if (earlyStopped = stage.stopEvolution(population, totalBestPerson, i)){
+                if (earlyStopped = stage.stopEvolution(population, totalBestPopulationPerson, i)){
                     break;
                 }
             }
@@ -119,9 +119,9 @@ public class Evolution {
 
                 computeFitnessForPopulation();
                 
-                stage.onEndEpoch(population, totalBestPerson, i);
+                stage.onEndEpoch(population, totalBestPopulationPerson, i);
 
-                if (stage.stopEvolution(population, totalBestPerson, i)){
+                if (stage.stopEvolution(population, totalBestPopulationPerson, i)){
                     break;
                 }
             }
@@ -138,13 +138,13 @@ public class Evolution {
     private void computeFitnessForPopulation() {
         population.computeFitnessForPopulation();
 
-        Person populationBest = population.getBestPerson();
+        PopulationPerson populationBest = population.getBestPerson();
 
-        if (totalBestPerson == null) {
-            totalBestPerson = populationBest;
+        if (totalBestPopulationPerson == null) {
+            totalBestPopulationPerson = populationBest;
         }
-        else if (populationBest.getFitness() > totalBestPerson.getFitness()) {
-            totalBestPerson = populationBest;
+        else if (populationBest.getFitness() > totalBestPopulationPerson.getFitness()) {
+            totalBestPopulationPerson = populationBest;
         }
     }
 }

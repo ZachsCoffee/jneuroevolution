@@ -5,7 +5,7 @@
  */
 package evolution_builder.components;
 
-import evolution_builder.population.Person;
+import evolution_builder.population.PopulationPerson;
 import evolution_builder.population.Population;
 
 /**
@@ -22,15 +22,15 @@ public class PercentOfFitness {
         
         
         int size = population.getRunningSize();
-        Person tempPerson;
+        PopulationPerson tempPopulationPerson;
         for (int i=0; i<size; i++){
-            tempPerson = population.getPersonAt(i);
+            tempPopulationPerson = population.getPersonAt(i);
             
-            if (tempPerson.getFitness() <= 0){
-                tempPerson.setPercentOfFitness(0);
+            if (tempPopulationPerson.getFitness() <= 0){
+                tempPopulationPerson.setPercentOfFitness(0);
             }
             else{
-                tempPerson.setPercentOfFitness((int)(100*tempPerson.getFitness()/bestFitness));
+                tempPopulationPerson.setPercentOfFitness((int)(100* tempPopulationPerson.getFitness()/bestFitness));
             }
         }
     }
@@ -41,15 +41,15 @@ public class PercentOfFitness {
         
         if (currentMax < 0) return;
         
-        Person tempPerson;
+        PopulationPerson tempPopulationPerson;
         for (int i=0; i<size; i++){
-            tempPerson = population.getPersonAt(i);
+            tempPopulationPerson = population.getPersonAt(i);
             
-            if (tempPerson.getFitness() <= 0){
-                tempPerson.setPercentOfFitness(0);
+            if (tempPopulationPerson.getFitness() <= 0){
+                tempPopulationPerson.setPercentOfFitness(0);
             }
             else{
-                tempPerson.setPercentOfFitness((int)percentOf(0, currentMax, tempPerson.getFitness()));
+                tempPopulationPerson.setPercentOfFitness((int)percentOf(0, currentMax, tempPopulationPerson.getFitness()));
             }
             
 //            tempPerson.setPercentOfFitness((int)(100*tempPerson.getFitness()/currentMax));
@@ -62,10 +62,10 @@ public class PercentOfFitness {
                 currentMax = population.getPersonAt(findMax(population)).getFitness(),
                 currentMin = population.getPersonAt(findMin(population)).getFitness();
         double max = currentMax - currentMin;
-        Person tempPerson;
+        PopulationPerson tempPopulationPerson;
         for (int i=0; i<size; i++){
-            tempPerson = population.getPersonAt(i);
-            tempPerson.setPercentOfFitness((int)percentOf(currentMin, currentMax, tempPerson.getFitness()));
+            tempPopulationPerson = population.getPersonAt(i);
+            tempPopulationPerson.setPercentOfFitness((int)percentOf(currentMin, currentMax, tempPopulationPerson.getFitness()));
 //            tempPerson.setPercentOfFitness((int)(100*(tempPerson.getFitness() - currentMin)/max));
         }
     }

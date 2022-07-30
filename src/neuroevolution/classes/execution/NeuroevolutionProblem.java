@@ -5,7 +5,7 @@
  */
 package execution;
 
-import data_manipulation.Dataset;
+import data_manipulation.RawDataset;
 import networks.interfaces.Network;
 
 
@@ -33,22 +33,10 @@ public interface NeuroevolutionProblem<P> {
     /**
      * Evaluates the network for the specific dataset
      * @param network The network for evaluation
-     * @param dataset The dataset for evaluation
+     * @param rawDataset The dataset for evaluation
      * @return The score of network for the specific dataset
      */
-    double evaluateNetwork(Network network, Dataset dataset);
+    double evaluateNetwork(Network network, RawDataset rawDataset);
     
-    Problem<P> getProblem();
-    
-//    /**
-//     * The dataset for training, with the target value
-//     * @return A 2D array with the data. Each row is a feature, the last value for the feature MUST be the target value
-//     */
-//    double[][] getTrainingDataset();
-//
-//    /**
-//     * The dataset for training, WITHOUT the target value
-//     * @return A 2D array with the data. Each row is a feature.
-//     */
-//    double[][] getTrainingData();
+    Problem<P, RawDataset> getProblem();
 }

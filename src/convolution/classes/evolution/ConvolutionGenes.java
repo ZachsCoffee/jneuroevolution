@@ -1,28 +1,28 @@
 package evolution;
 
 import evolution_builder.population.Genes;
-import evolution_builder.population.Person;
-import networks.interfaces.Network;
+import evolution_builder.population.PopulationPerson;
+import executors.common.TrainableConvolution;
 
-public class ConvolutionGenes implements Genes<Double, Network> {
+public class ConvolutionGenes implements Genes<Double, TrainableConvolution> {
 
     @Override
-    public Double getGenAt(Person<Network> person, int position) {
-        return null;
+    public Double getGenAt(PopulationPerson<TrainableConvolution> populationPerson, int position) {
+        return populationPerson.getGeneCode().getWeightAt(position);
     }
 
     @Override
-    public void setGenAt(Person<Network> person, Double gene, int position) {
-
+    public void setGenAt(PopulationPerson<TrainableConvolution> populationPerson, Double gene, int position) {
+        populationPerson.getGeneCode().setWeightAt(position, gene);
     }
 
     @Override
-    public void mutationValue(Person<Network> person, int position, double mutationValue) {
-
+    public void mutationValue(PopulationPerson<TrainableConvolution> populationPerson, int position, double mutationValue) {
+        populationPerson.getGeneCode().setWeightAt(position, mutationValue);
     }
 
     @Override
-    public int genesCount(Person<Network> person) {
-        return 0;
+    public int genesCount(PopulationPerson<TrainableConvolution> populationPerson) {
+        return populationPerson.getGeneCode().getTotalWeights();
     }
 }

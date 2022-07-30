@@ -5,59 +5,49 @@
  */
 package execution;
 
+import data_manipulation.DatasetTarget;
 import data_manipulation.DatasetType;
-import evolution_builder.population.Person;
+import evolution_builder.population.PopulationPerson;
 import evolution_builder.population.Population;
 import evolution_builder.EvolutionStage;
 import evolution_builder.population.PersonMigration;
 
 /**
- *
  * @author Zachs
  */
-public class Stage<P> implements EvolutionStage<P> {
+public class Stage<P, D extends DatasetTarget> implements EvolutionStage<P> {
 
-    private Person<P> validationBestPerson;
-    
+    private final Problem<P, D> problem;
+    private final double[] evolutionStatistics, validationStatistics;
+    private PopulationPerson<P> validationBestPopulationPerson;
     private PersonMigration migration;
-    private Problem<P> problem;
     private ProgressListener progressListener;
-    
-    private double[] evolutionStatistics, validationStatistics;
-            
     private double validationMaxFitness = 0;
-    
-    public Stage(Problem<P> problem, int totalEpochs) {
-        
+
+    public Stage(Problem<P, D> problem, int totalEpochs) {
+
         if (problem == null) throw new IllegalArgumentException(
-                "problem not null!"
+            "problem not null!"
         );
         if (totalEpochs <= 0) throw new IllegalArgumentException(
-                "total epochs must be positive number"
+            "total epochs must be positive number"
         );
-        
+
 //        this.totalEpochs = totalEpochs;
         this.problem = problem;
 
         evolutionStatistics = new double[totalEpochs];
         validationStatistics = new double[totalEpochs];
     }
-    
-    public void setMigration(final PersonMigration personMigration) {
-        
-        if (personMigration == null) throw new IllegalArgumentException(
-            "Argument: personMigration not null"
-        );
-        
-        migration = personMigration;
+
+    public PopulationPerson<P> getValidationBestPerson() {
+        return validationBestPopulationPerson;
     }
 
-    public Person<P> getValidationBestPerson() {
-        return validationBestPerson;
-    }
-    public double getValidationBestFitness(){
+    public double getValidationBestFitness() {
         return validationMaxFitness;
     }
+
     public double[] getEvolutionStatistics() {
         return evolutionStatistics;
     }
@@ -65,64 +55,77 @@ public class Stage<P> implements EvolutionStage<P> {
     public double[] getValidationStatistics() {
         return validationStatistics;
     }
-    
+
+    public void setMigration(final PersonMigration personMigration) {
+
+        if (personMigration == null) throw new IllegalArgumentException(
+            "Argument: personMigration not null"
+        );
+
+        migration = personMigration;
+    }
+
     public void setProgressListener(ProgressListener progressListener) {
-        
+
         if (progressListener == null) throw new IllegalArgumentException(
             "Argument: progressListener not null"
         );
-        
+
         this.progressListener = progressListener;
     }
-    
-    
+
+
     @Override
     public void beforeEndEpoch(Population<P> population, int epoch) {
 
     }
-    
+
     @Override
-    public void onEndEpoch(Population<P> population, Person<P> totalBestPerson, int epoch) {
-        
+    public void onEndEpoch(Population<P> population, PopulationPerson<P> totalBestPopulationPerson, int epoch) {
+
         try {
-            if (migration != null){
+            if (migration != null) {
                 migration.migrate(population, epoch);
             }
-        } 
+        }
         catch (CloneNotSupportedException ex) {
             System.err.println(ex);
         }
-        
+
         if (progressListener != null) {
-            
+
             progressListener.epochUpdate(epoch);
         }
     }
 
     @Override
-    public boolean stopEvolution(Population<P> population, Person<P> totalBestPerson, int epoch) {
-        Person<P> epochBestPerson = population.getBestPerson();
+    public boolean stopEvolution(Population<P> population, PopulationPerson<P> totalBestPopulationPerson, int epoch) {
+        PopulationPerson<P> epochBestPopulationPerson = population.getBestPerson();
 
         if (problem.getValidationDataset() != null) {
-            double currentBestValidationFitness = problem.getPersonManager().computeFitness(epochBestPerson, DatasetType.VALIDATION);
-            if (currentBestValidationFitness > validationMaxFitness){
+            double currentBestValidationFitness = problem.getPersonManager().computeFitness(
+                epochBestPopulationPerson,
+                DatasetType.VALIDATION
+            );
+            if (currentBestValidationFitness > validationMaxFitness) {
                 validationMaxFitness = currentBestValidationFitness;
-                validationBestPerson = population.getBestPerson();
+                validationBestPopulationPerson = population.getBestPerson();
             }
 
             validationStatistics[epoch] = currentBestValidationFitness;
         }
 
-        progressListener.evolutionBestUpdate(epochBestPerson.getFitness());
-        
-        evolutionStatistics[epoch] = epochBestPerson.getFitness();
+        progressListener.evolutionBestUpdate(epochBestPopulationPerson.getFitness());
+
+        evolutionStatistics[epoch] = epochBestPopulationPerson.getFitness();
 
         return false;
     }
 
     public interface ProgressListener {
+
         void epochUpdate(int currentEpoch);
-        
+
         void evolutionBestUpdate(double bestPersonFitness);
     }
 }

@@ -22,7 +22,7 @@ public class PersonMigration {
     
     private LinearValues dynamicLinearValues;
     private SquareFunction squareFunction;
-    private Person[] migrationPersons;
+    private PopulationPerson[] migrationPopulationPeople;
     private int mlpEpoch = 0;
     
     /**
@@ -34,7 +34,7 @@ public class PersonMigration {
     public PersonMigration(double percent, int epochs, int populationsCount){
         if (percent <= 0 || percent >= 1) throw new IllegalArgumentException("Percent must be a float number between the (0,1) without the zero and one. percent="+percent);
 
-        migrationPersons = new Person[populationsCount];
+        migrationPopulationPeople = new PopulationPerson[populationsCount];
         SAMPLE_RATE = (int) Math.ceil(epochs * percent);
         dynamicLinearValues = new LinearValues(new MinMax(0.00001, 0.1), SAMPLE_RATE, LinearValues.Order.DESC);
 //        squareFunction = new SquareFunction(0.1, epochs);
@@ -50,21 +50,21 @@ public class PersonMigration {
         System.err.println("Migrate");
         population.sortPopulation();
 
-        Person tempPerson;
+        PopulationPerson tempPopulationPerson;
         int size = EVOLUTIONS.size();
         for (int i=0; i<size; i++){
             if (EVOLUTIONS.get(i) == null) continue;
 
-            tempPerson = EVOLUTIONS.get(i).getTotalBestPerson();
+            tempPopulationPerson = EVOLUTIONS.get(i).getTotalBestPerson();
 
-            if (tempPerson != null) {
-                tempPerson = (Person)tempPerson.clone();
+            if (tempPopulationPerson != null) {
+                tempPopulationPerson = (PopulationPerson) tempPopulationPerson.clone();
 
-                if (tempPerson.getGeneCode() instanceof BackpropagationMLP) {
-                    propagate((BackpropagationMLP) tempPerson.getGeneCode(), currentEpoch);
+                if (tempPopulationPerson.getGeneCode() instanceof BackpropagationMLP) {
+                    propagate((BackpropagationMLP) tempPopulationPerson.getGeneCode(), currentEpoch);
                 }
 
-                population.setPersonAt(tempPerson, i);
+                population.setPersonAt(tempPopulationPerson, i);
             }
         }
     }

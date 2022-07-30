@@ -5,11 +5,8 @@
  */
 package data_manipulation;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import maths.ArrayUtils;
 
 /**
  *
@@ -62,7 +59,7 @@ public class CrossValidation {
             
             for (int j=0; j<folds.length; j++) {
                 if (i == j) {
-                    problemDatasets[i].testingDataset = Dataset.create(folds[i], folds[i][0].length -1);
+                    problemDatasets[i].testingRawDataset = RawDataset.create(folds[i], folds[i][0].length -1);
                 }
                 else {
                     tempDataset.addAll(Arrays.asList(folds[j]));
@@ -76,8 +73,8 @@ public class CrossValidation {
                         .setup()
             );
             
-            problemDatasets[i].trainingDataset = tempProblemDatasets.trainingDataset;
-            problemDatasets[i].validationDataset = tempProblemDatasets.validationDataset;
+            problemDatasets[i].trainingRawDataset = tempProblemDatasets.trainingRawDataset;
+            problemDatasets[i].validationRawDataset = tempProblemDatasets.validationRawDataset;
                     
             tempDataset.clear();
         }

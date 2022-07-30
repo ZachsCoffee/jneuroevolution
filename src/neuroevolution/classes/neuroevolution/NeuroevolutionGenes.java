@@ -7,7 +7,7 @@ package neuroevolution;
 
 import evolution_builder.population.Genes;
 import networks.interfaces.Network;
-import evolution_builder.population.Person;
+import evolution_builder.population.PopulationPerson;
 
 /**
  *
@@ -17,18 +17,18 @@ class NeuroevolutionGenes implements Genes<Double, Network> {
     static int maxStartValue = 1;
     
     @Override
-    public Double getGenAt(Person<Network> person, int position) {
-        return person.getGeneCode().getWeightAt(position);
+    public Double getGenAt(PopulationPerson<Network> populationPerson, int position) {
+        return populationPerson.getGeneCode().getWeightAt(position);
     }
 
     @Override
-    public void setGenAt(Person<Network> person, Double gene, int position) {
-        person.getGeneCode().setWeightAt(position, gene);
+    public void setGenAt(PopulationPerson<Network> populationPerson, Double gene, int position) {
+        populationPerson.getGeneCode().setWeightAt(position, gene);
     }
 
     @Override
-    public void mutationValue(Person<Network> person, int position, double mutationValue) {
-        Network network = person.getGeneCode();
+    public void mutationValue(PopulationPerson<Network> populationPerson, int position, double mutationValue) {
+        Network network = populationPerson.getGeneCode();
         double weight = network.getWeightAt(position);
         if (weight + mutationValue > maxStartValue){
             maxStartValue = (int)(weight + mutationValue);
@@ -37,8 +37,8 @@ class NeuroevolutionGenes implements Genes<Double, Network> {
     }
 
     @Override
-    public int genesCount(Person<Network> person) {
-        return person.getGeneCode().getWeightsCount();
+    public int genesCount(PopulationPerson<Network> populationPerson) {
+        return populationPerson.getGeneCode().getWeightsCount();
     }
     
 }

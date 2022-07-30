@@ -21,28 +21,28 @@ public final class DatasetSplitter {
         if (datasetSpecs.haveTrainingSet()) {
             datasets = split(datasetSpecs.getData(), datasetSpecs.getTrainingSize());
             
-            problemDatasets.trainingDataset = Dataset.create(datasets[0], features);
+            problemDatasets.trainingRawDataset = RawDataset.create(datasets[0], features);
         }
         
         if (datasetSpecs.haveValidationSet()) {
             if (datasets == null) {
                 datasets = split(datasetSpecs.getData(), datasetSpecs.getValidationSize());
-                problemDatasets.validationDataset = Dataset.create(datasets[0], features);
+                problemDatasets.validationRawDataset = RawDataset.create(datasets[0], features);
 
             }
             else {
                 datasets = split(datasets[1], datasetSpecs.getValidationSize());
-                problemDatasets.validationDataset = Dataset.create(datasets[0], features);;
+                problemDatasets.validationRawDataset = RawDataset.create(datasets[0], features);;
             }
         }
         
         if (datasetSpecs.haveTestingSet()) {
             if (datasets == null) {
                 datasets = split(datasetSpecs.getData(), datasetSpecs.getTestingSize());
-                problemDatasets.testingDataset = Dataset.create(datasets[0], features);
+                problemDatasets.testingRawDataset = RawDataset.create(datasets[0], features);
             }
             else {
-                problemDatasets.testingDataset = Dataset.create(split(datasets[1], datasetSpecs.getTestingSize())[0], features);
+                problemDatasets.testingRawDataset = RawDataset.create(split(datasets[1], datasetSpecs.getTestingSize())[0], features);
             }
         }
 
