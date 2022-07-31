@@ -1,12 +1,12 @@
 package layers.pool;
 
+import layer.ConvolutionSchemaPrinter;
+import layer.Layer;
+import layer.MatrixReader;
+import layer.MatrixSchema;
 import layers.convolution.ConvolutionUtils;
-import layers.Layer;
 import schema.LayerSchema;
-import maths.matrix.MatrixReader;
 import maths.matrix.Matrix2D;
-import maths.matrix.MatrixSchema;
-import schema.ConvolutionSchemaPrinter;
 
 import java.util.Objects;
 

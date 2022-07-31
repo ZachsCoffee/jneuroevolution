@@ -1,15 +1,12 @@
 package evolution;
 
-import dataset.common.DatasetMatrixReader;
-import evolution_builder.population.PopulationPerson;
-import execution.Problem;
+import dataset.MatrixReaderDataset;
+import execution.common.CommonProblem;
 import executors.common.TrainableConvolution;
 
-public interface Convolution2DProblem<P extends PopulationPerson<?>> {
-
-    Problem<P, DatasetMatrixReader> getProblem();
+public interface Convolution2DProblem<P> extends CommonProblem<P, MatrixReaderDataset> {
 
     TrainableConvolution buildConvolution();
 
-    double evaluateFitness(TrainableConvolution convolution, DatasetMatrixReader channels);
+    double evaluateFitness(TrainableConvolution convolution, MatrixReaderDataset dataset);
 }

@@ -2,13 +2,13 @@ package layers.trainable;
 
 import filters.TrainableKernel;
 import functions.ActivationFunction;
-import layers.TrainableLayer;
+import layer.ConvolutionSchemaPrinter;
+import layer.MatrixReader;
+import layer.MatrixSchema;
+import layer.TrainableLayer;
 import layers.convolution.AbstractConvolutionLayer;
 import maths.Function;
 import maths.matrix.MatrixRW;
-import maths.matrix.MatrixReader;
-import maths.matrix.MatrixSchema;
-import schema.ConvolutionSchemaPrinter;
 import schema.LayerSchema;
 import schema.SchemaComputer;
 import utils.MatrixReaderUtils;

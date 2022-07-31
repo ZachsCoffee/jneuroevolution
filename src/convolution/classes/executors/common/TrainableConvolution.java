@@ -1,7 +1,7 @@
 package executors.common;
 
-import layers.TrainableLayer;
-import utils.common.Imitable;
+import layer.Imitable;
+import layer.TrainableLayer;
 
 public interface TrainableConvolution extends Convolution, Iterable<TrainableLayer>, Imitable<TrainableConvolution> {
     double getWeightAt(int index);

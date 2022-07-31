@@ -1,7 +1,7 @@
 package builder;
 
 import executors.common.TrainableConvolution;
-import layers.TrainableLayer;
+import layer.TrainableLayer;
 
 import java.util.LinkedList;
 import java.util.List;

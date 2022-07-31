@@ -16,5 +16,6 @@
     <orderEntry type="module" module-name="evolution_algorithms" />
     <orderEntry type="module" module-name="neuroevolution" />
     <orderEntry type="module" module-name="neuroevolution" />
+    <orderEntry type="module" module-name="core" />
   </component>
 </module>

@@ -1,8 +1,4 @@
-package layers;
-
-import maths.matrix.MatrixReader;
-import maths.matrix.MatrixSchema;
-import schema.ConvolutionSchemaPrinter;
+package layer;
 
 public interface Layer {
     MatrixReader[] computeLayer(MatrixReader[] channels);

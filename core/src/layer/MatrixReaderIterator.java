@@ -1,4 +1,4 @@
-package maths.matrix;
+package layer;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

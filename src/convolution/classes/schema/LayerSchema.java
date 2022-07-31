@@ -1,6 +1,6 @@
 package schema;
 
-import maths.matrix.MatrixSchema;
+import layer.MatrixSchema;
 
 public class LayerSchema implements MatrixSchema {
 

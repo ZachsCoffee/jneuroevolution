@@ -1,11 +1,10 @@
 package executors;
 
-import layers.Layer;
-import schema.LayerSchema;
+import layer.ConvolutionSchemaPrinter;
+import layer.Layer;
+import layer.MatrixReader;
+import layer.MatrixSchema;
 import input.ConvolutionInput;
-import maths.matrix.MatrixReader;
-import maths.matrix.MatrixSchema;
-import schema.ConvolutionSchemaPrinter;
 
 import java.util.*;
 

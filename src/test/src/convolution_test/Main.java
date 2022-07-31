@@ -4,12 +4,12 @@ import executors.ConvolutionExecutor;
 import executors.ConvolutionParallelExecutor;
 import files.binary.BinaryDatasetWriter;
 import input.*;
+import layer.MatrixReader;
 import layers.convolution.ConvolutionLayer;
 import filters.Filter;
 import filters.StaticKernel;
 import functions.ActivationFunction;
 import layers.flatten.FlatLayer;
-import maths.matrix.MatrixReader;
 import utils.ConvolutionDataPresenter;
 
 import javax.imageio.ImageIO;

@@ -1,5 +1,7 @@
 package maths.matrix;
 
+import layer.MatrixReader;
+
 import java.util.Objects;
 
 public class VectorReader implements MatrixReader {

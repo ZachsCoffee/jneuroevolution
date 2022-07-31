@@ -1,9 +1,8 @@
 package input;
 
-import maths.matrix.MatrixReader;
+import layer.MatrixReader;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.Objects;
 
 

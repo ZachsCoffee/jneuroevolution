@@ -1,6 +1,6 @@
 package input;
 
-import maths.matrix.MatrixReader;
+import layer.MatrixReader;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

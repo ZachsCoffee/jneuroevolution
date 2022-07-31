@@ -1,9 +1,9 @@
 package layers.convolution;
 
 import filters.Kernel;
-import layers.Layer;
+import layer.Layer;
+import layer.MatrixReader;
 import maths.matrix.MatrixRW;
-import maths.matrix.MatrixReader;
 import maths.matrix.Matrix2D;
 import schema.SchemaComputer;
 

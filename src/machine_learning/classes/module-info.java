@@ -9,6 +9,7 @@ module machine_learning {
 //    requires jocl;
     requires java.logging;
     requires com.google.gson;
+    requires core;
 
     exports functions;
     exports networks.interfaces;

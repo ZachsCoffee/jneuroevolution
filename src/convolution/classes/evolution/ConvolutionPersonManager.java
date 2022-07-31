@@ -9,9 +9,9 @@ import java.util.Objects;
 
 public class ConvolutionPersonManager implements NeuroevolutionPersonManager<TrainableConvolution> {
 
-    private final Convolution2DProblem<PopulationPerson<TrainableConvolution>> neuroevolutionProblem;
+    private final Convolution2DProblem<TrainableConvolution> neuroevolutionProblem;
 
-    public ConvolutionPersonManager(Convolution2DProblem<PopulationPerson<TrainableConvolution>> neuroevolutionProblem) {
+    public ConvolutionPersonManager(Convolution2DProblem<TrainableConvolution> neuroevolutionProblem) {
         this.neuroevolutionProblem = Objects.requireNonNull(neuroevolutionProblem);
     }
 
@@ -33,7 +33,12 @@ public class ConvolutionPersonManager implements NeuroevolutionPersonManager<Tra
     }
 
     @Override
+    public TrainableConvolution getGenes() {
+        return null;
+    }
+
+    @Override
     public double computeFitness(PopulationPerson<TrainableConvolution> populationPerson, DatasetType datasetType) {
-        return neuroevolutionProblem.evaluateFitness(populationPerson.getGeneCode(), neuroevolutionProblem.getProblem().getDataset(datasetType));
+        return neuroevolutionProblem.evaluateFitness(populationPerson.getGeneCode(), neuroevolutionProblem.getDataset(datasetType));
     }
 }

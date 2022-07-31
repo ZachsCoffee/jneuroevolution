@@ -1,4 +1,4 @@
-package maths.matrix;
+package layer;
 
 public interface MatrixSchema {
     int getRowsCount();

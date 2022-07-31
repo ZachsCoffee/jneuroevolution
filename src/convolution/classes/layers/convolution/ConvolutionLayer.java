@@ -1,14 +1,13 @@
 package layers.convolution;
 
 import filters.Filter;
+import layer.ConvolutionSchemaPrinter;
+import layer.MatrixReader;
+import layer.MatrixSchema;
 import schema.LayerSchema;
-import maths.matrix.MatrixReader;
-import maths.matrix.MatrixSchema;
-import schema.ConvolutionSchemaPrinter;
 import schema.SchemaComputer;
 import utils.MatrixReaderUtils;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class ConvolutionLayer extends AbstractConvolutionLayer {

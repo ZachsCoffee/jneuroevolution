@@ -1,6 +1,6 @@
 package executors.common;
 
-import maths.matrix.MatrixReader;
+import layer.MatrixReader;
 
 public interface Convolution {
     MatrixReader[] execute(MatrixReader[] channels);

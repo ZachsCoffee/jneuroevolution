@@ -1,10 +1,6 @@
 package executors;
 
-import layers.Layer;
-import layers.TrainableLayer;
-import maths.matrix.MatrixReader;
-import maths.matrix.MatrixSchema;
-import schema.ConvolutionSchemaPrinter;
+import layer.*;
 
 import java.util.Iterator;
 import java.util.LinkedList;

@@ -9,6 +9,10 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import functions.ActivationFunction;
+import layer.ConvolutionSchemaPrinter;
+import layer.MatrixReader;
+import layer.MatrixSchema;
+import layer.TrainableLayer;
 import maths.Function;
 import networks.interfaces.Network;
 import maths.MinMax;
@@ -18,7 +22,7 @@ import networks.representations.NetworkImage;
 /**
  * @author main
  */
-public class NeuralNetwork implements Network {
+public class NeuralNetwork implements Network, TrainableLayer {
 
     public final int MAX_START_VALUE;
 
@@ -78,6 +82,11 @@ public class NeuralNetwork implements Network {
     }
 
     @Override
+    public int getOutputChannelsCount() {
+        return 0;
+    }
+
+    @Override
     public void setWeightAt(int position, double value) {
         weights[position] = value;
     }
@@ -98,6 +107,23 @@ public class NeuralNetwork implements Network {
         }
 
         return results;
+    }
+
+    @Override
+    public TrainableLayer copy() {
+        return null;
+    }
+
+    @Override
+    public MatrixReader[] computeLayer(MatrixReader[] channels) {
+        return new MatrixReader[0];
+    }
+
+    @Override
+    public MatrixSchema[] getSchema(
+        MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter
+    ) {
+        return new MatrixSchema[0];
     }
 
     protected double[] computeLayer(int layerIndex, double[] features) {

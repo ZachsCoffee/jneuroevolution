@@ -1,7 +1,7 @@
 package utils;
 
+import layer.MatrixReader;
 import maths.matrix.MatrixRW;
-import maths.matrix.MatrixReader;
 import maths.matrix.Matrix2D;
 
 public class MatrixReaderUtils {

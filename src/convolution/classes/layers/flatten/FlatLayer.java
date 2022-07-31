@@ -1,10 +1,10 @@
 package layers.flatten;
 
-import layers.Layer;
-import maths.matrix.MatrixReader;
-import maths.matrix.MatrixSchema;
+import layer.ConvolutionSchemaPrinter;
+import layer.Layer;
+import layer.MatrixReader;
+import layer.MatrixSchema;
 import maths.matrix.VectorReader;
-import schema.ConvolutionSchemaPrinter;
 import schema.LayerSchema;
 
 public class FlatLayer implements Layer {

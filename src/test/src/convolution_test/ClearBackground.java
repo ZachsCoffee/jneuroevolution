@@ -6,9 +6,9 @@ import filters.Filter;
 import filters.StaticKernel;
 import functions.ActivationFunction;
 import input.*;
+import layer.MatrixReader;
 import layers.convolution.ConvolutionLayer;
 import layers.flatten.FlatLayer;
-import maths.matrix.MatrixReader;
 import networks.multilayer_perceptron.network.NeuralNetwork;
 import networks.multilayer_perceptron.serializers.NetworkJsonSerializer;
 

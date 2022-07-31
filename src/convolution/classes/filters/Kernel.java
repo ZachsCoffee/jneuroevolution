@@ -1,6 +1,6 @@
 package filters;
 
-import maths.matrix.MatrixReader;
+import layer.MatrixReader;
 
 public interface Kernel {
     double compute(MatrixReader matrixReader, int startRowIndex, int startColumnIndex);

@@ -1,6 +1,4 @@
-package layers;
-
-import utils.common.Imitable;
+package layer;
 
 public interface TrainableLayer extends Layer, Cloneable, Imitable<TrainableLayer> {
     int getWeightsCount();

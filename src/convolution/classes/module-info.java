@@ -6,6 +6,7 @@ module convolution {
     requires j.text.utils;
     requires evolution_algorithms;
     requires neuroevolution;
+    requires core;
 
     exports layers.trainable;
     exports layers.convolution;
@@ -20,4 +21,6 @@ module convolution {
     exports executors.common;
     exports evolution;
     exports dataset.common;
+    exports dataset;
+    exports builder;
 }

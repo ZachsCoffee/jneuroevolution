@@ -8,6 +8,7 @@ package execution;
 import data_manipulation.DatasetTarget;
 import data_manipulation.DatasetType;
 import evolution_builder.components.EvolutionPhases;
+import execution.common.CommonProblem;
 import maths.LinearValues;
 import maths.MinMax;
 
@@ -16,24 +17,14 @@ import java.util.Objects;
 /**
  * @author Zachs
  */
-public abstract class Problem<P, D extends DatasetTarget> implements EvolutionPhases<P> {
+public abstract class Problem<P, D extends DatasetTarget> implements CommonProblem<P, D> {
 
-    protected final NeuroevolutionPersonManager<P> personManager;
     protected D
         trainingDataset,
         validationDataset,
         testingDataset;
     private LinearValues dynamicMutation = null;
     private int fixedMutation;
-
-    protected Problem(NeuroevolutionPersonManager<P> personManager) {
-        this.personManager = Objects.requireNonNull(personManager);
-    }
-
-    public NeuroevolutionPersonManager<P> getPersonManager() {
-        System.out.println(Thread.currentThread().getId());
-        return personManager;
-    }
 
     public D getTrainingDataset() {
         System.out.println(Thread.currentThread().getId());

@@ -1,5 +1,7 @@
 package maths.matrix;
 
+import layer.MatrixReader;
+
 public interface MatrixRW extends MatrixReader, MatrixWriter{
     default void incrementBy(int rowIndex, int columnIndex, double value) {
         setValueAt(rowIndex, columnIndex, valueAt(rowIndex, columnIndex) + value);
