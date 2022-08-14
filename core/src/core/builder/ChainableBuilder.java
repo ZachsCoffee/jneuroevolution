@@ -1,7 +1,7 @@
 package core.builder;
 
-public interface ChainableBuilder {
-    ChainableBuilder setParentBuilder(TrainableBuilder builder);
+public interface ChainableBuilder<T> {
+    ChainableBuilder<T> setParentBuilder(T builder);
 
-    TrainableBuilder and();
+    T and();
 }

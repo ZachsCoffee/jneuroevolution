@@ -9,7 +9,7 @@ import networks.multilayer_perceptron.network.NeuralNetwork;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NeuralNetworkBuilder extends AbstractChainableBuilder {
+public class NeuralNetworkBuilder<T> extends AbstractChainableBuilder<T> {
 
     public static NeuralNetwork buildFrom(NetworkModel networkModel) {
         NeuralNetworkBuilder builder = new NeuralNetworkBuilder(
@@ -32,8 +32,8 @@ public class NeuralNetworkBuilder extends AbstractChainableBuilder {
         return builder.build(networkModel.getWeights());
     }
 
-    public static NeuralNetworkBuilder initialize(int featureLength) {
-        return new NeuralNetworkBuilder(featureLength);
+    public static <T> NeuralNetworkBuilder<T> initialize(int featureLength) {
+        return new NeuralNetworkBuilder<>(featureLength);
     }
 
     public static NeuralNetworkBuilder initialize(int featureLength, int firstLayerNeurons) {

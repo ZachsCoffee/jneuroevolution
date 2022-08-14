@@ -2,6 +2,6 @@ package core.builder;
 
 import core.layer.TrainableLayer;
 
-public interface TrainableBuilder extends ChainableBuilder {
+public interface TrainableBuilder<T> extends ChainableBuilder<T> {
     TrainableLayer build();
 }

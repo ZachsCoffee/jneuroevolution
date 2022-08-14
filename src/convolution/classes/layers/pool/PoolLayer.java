@@ -19,7 +19,6 @@ public class PoolLayer implements Layer {
     private final int stride;
 
     public PoolLayer(PoolFunction poolFunction, int sampleSize, int stride) {
-
         if (sampleSize < MIN_SAMPLE_SIZE) throw new IllegalArgumentException(
                 "Sample size must be at least: "+MIN_SAMPLE_SIZE+" and not: "+sampleSize
         );
@@ -49,6 +48,9 @@ public class PoolLayer implements Layer {
 
     @Override
     public MatrixSchema[] getSchema(MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+        if (inputChannels.length == 0) throw new IllegalArgumentException(
+            "Need at least one input channel."
+        );
 
         MatrixSchema[] matrixSchemas = new MatrixSchema[inputChannels.length];
         int[] dimensions = null;
@@ -75,6 +77,11 @@ public class PoolLayer implements Layer {
         );
 
         return matrixSchemas;
+    }
+
+    @Override
+    public Layer copy() {
+        return new PoolLayer(poolFunction, sampleSize, stride);
     }
 
     private MatrixReader computeMatrix(MatrixReader input) {

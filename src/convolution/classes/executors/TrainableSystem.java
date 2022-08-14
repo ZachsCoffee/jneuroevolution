@@ -1,17 +1,17 @@
 package executors;
 
 import core.layer.*;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
 
-public class TrainableSystem implements TrainableLayer, Iterable<TrainableLayer> {
+import java.util.*;
 
-    private final List<TrainableLayer> layers;
+public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
+
+    private final List<Layer> layers;
+    private final List<TrainableLayer> trainableLayers = new ArrayList<>();
     private final int totalWeights;
+    private final int[] layerPosition = new int[2];
 
-    public TrainableSystem(List<TrainableLayer> layers) {
+    public TrainableSystem(List<Layer> layers) {
         this.layers = Objects.requireNonNull(layers);
 
         if (layers.isEmpty()) throw new IllegalArgumentException(
@@ -19,9 +19,19 @@ public class TrainableSystem implements TrainableLayer, Iterable<TrainableLayer>
         );
 
         int countWeights = 0;
-        for (TrainableLayer layer : layers) {
-            countWeights += layer.getTotalWeights();
+        boolean hasTrainableLayer = false;
+        for (Layer layer : layers) {
+            if (layer instanceof TrainableLayer) {
+                TrainableLayer tempTrainableLayer = (TrainableLayer) layer;
+                trainableLayers.add(tempTrainableLayer);
+                countWeights += tempTrainableLayer.getTotalWeights();
+                hasTrainableLayer = true;
+            }
         }
+
+        if (!hasTrainableLayer) throw new IllegalArgumentException(
+            "Need at least one trainable layer."
+        );
 
         totalWeights = countWeights;
     }
@@ -34,18 +44,24 @@ public class TrainableSystem implements TrainableLayer, Iterable<TrainableLayer>
     public double getWeightAt(int index) {
         int[] position = getLayer(index);
 
-        return layers.get(position[0]).getWeightAt(position[1]);
+        return trainableLayers.get(position[0]).getWeightAt(position[1]);
     }
 
     @Override
     public int getOutputChannelsCount() {
-        return layers.get(layers.size() - 1).getOutputChannelsCount();
+        Layer layer = layers.get(trainableLayers.size() - 1);
+
+        if (!(layer instanceof TrainableLayer)) throw new IllegalStateException(
+            "The last layer isn't trainable."
+        );
+
+        return ((TrainableLayer)layer).getOutputChannelsCount();
     }
 
     public void setWeightAt(int index, double weight) {
         int[] position = getLayer(index);
 
-        layers.get(position[0]).setWeightAt(position[1], weight);
+        trainableLayers.get(position[0]).setWeightAt(position[1], weight);
     }
 
     public MatrixReader[] execute(MatrixReader[] channels) {
@@ -91,15 +107,15 @@ public class TrainableSystem implements TrainableLayer, Iterable<TrainableLayer>
     }
 
     @Override
-    public Iterator<TrainableLayer> iterator() {
+    public Iterator<Layer> iterator() {
         return layers.iterator();
     }
 
     @Override
     public TrainableLayer copy() {
-        List<TrainableLayer> copiedLayers = new LinkedList<>();
+        List<Layer> copiedLayers = new LinkedList<>();
 
-        for (TrainableLayer layer : layers) {
+        for (Layer layer : layers) {
             copiedLayers.add(layer.copy());
         }
 
@@ -132,12 +148,14 @@ public class TrainableSystem implements TrainableLayer, Iterable<TrainableLayer>
 
     private int[] getLayer(int index) {
         int layerIndex = 0;
-        for (TrainableLayer layer : layers) {
-            if (index >= layer.getTotalWeights()) {
-                index -= layer.getTotalWeights();
+        for (TrainableLayer trainableLayer : trainableLayers) {
+            if (index >= trainableLayer.getTotalWeights()) {
+                index -= trainableLayer.getTotalWeights();
             }
             else {
-                return new int[]{layerIndex, index};
+                layerPosition[0] = layerIndex;
+                layerPosition[1] = index;
+                return layerPosition;
             }
             layerIndex++;
         }

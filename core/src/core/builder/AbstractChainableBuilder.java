@@ -1,18 +1,16 @@
 package core.builder;
 
-public abstract class AbstractChainableBuilder implements ChainableBuilder, TrainableBuilder {
+public abstract class AbstractChainableBuilder<T> implements TrainableBuilder<T> {
 
-    private TrainableBuilder builder;
+    private T builder;
 
     @Override
-    public ChainableBuilder setParentBuilder(TrainableBuilder builder) {
-        this.builder = builder;
-
+    public ChainableBuilder<T> setParentBuilder(T builder) {
         return this;
     }
 
     @Override
-    public TrainableBuilder and() {
+    public T and() {
         if (builder == null) throw new IllegalStateException(
             "Need to pass a builder before using it."
         );

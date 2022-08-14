@@ -29,7 +29,7 @@ public class ConvolutionPersonManager implements NeuroevolutionPersonManager<Tra
 
     @Override
     public PopulationPerson<TrainableLayer> newSameLengthAs(PopulationPerson<TrainableLayer> populationPerson) {
-        return new PopulationPerson<>(populationPerson.getGeneCode().copy());
+        return new PopulationPerson(populationPerson.getGeneCode().copy());
     }
 
     @Override

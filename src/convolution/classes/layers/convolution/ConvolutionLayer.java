@@ -1,5 +1,6 @@
 package layers.convolution;
 
+import core.layer.Layer;
 import filters.Filter;
 import core.layer.ConvolutionSchemaPrinter;
 import core.layer.MatrixReader;
@@ -50,6 +51,12 @@ public class ConvolutionLayer extends AbstractConvolutionLayer {
         schemaComputer = new SchemaComputer(stride, keepSize);
     }
 
+    private ConvolutionLayer(Filter[] filters, SchemaComputer schemaComputer, Boolean squashChannels) {
+        this.filters = filters;
+        this.schemaComputer = schemaComputer;
+        this.squashChannels = squashChannels;
+    }
+
     public boolean isSquashChannels() {
         return squashChannels != null && squashChannels;
     }
@@ -77,6 +84,11 @@ public class ConvolutionLayer extends AbstractConvolutionLayer {
         }
 
         return output;
+    }
+
+    @Override
+    public Layer copy() {
+        return new ConvolutionLayer(filters, schemaComputer, squashChannels);
     }
 
     private MatrixReader[] computeAsSeparateChannels(MatrixReader[] channels) {

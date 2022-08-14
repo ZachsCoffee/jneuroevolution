@@ -1,9 +1,6 @@
 package layers.flatten;
 
-import core.layer.ConvolutionSchemaPrinter;
-import core.layer.Layer;
-import core.layer.MatrixReader;
-import core.layer.MatrixSchema;
+import core.layer.*;
 import maths.matrix.VectorReader;
 import core.schema.LayerSchema;
 
@@ -46,6 +43,11 @@ public class FlatLayer implements Layer {
         return new MatrixSchema[] {
                 new LayerSchema(1, outputSize)
         };
+    }
+
+    @Override
+    public Layer copy() {
+        return new FlatLayer();
     }
 
     private <T extends MatrixSchema> int computeOutputSize(T[] channel) {

@@ -1,12 +1,13 @@
 package builder;
 
 import core.builder.AbstractChainableBuilder;
+import core.builder.TrainableBuilder;
 import layers.trainable.TrainableConvolutionLayer;
 
-public class TrainableConvolutionLayerBuilder extends AbstractChainableBuilder {
+public class TrainableConvolutionLayerBuilder<T> extends AbstractChainableBuilder<T> {
 
-    public static TrainableConvolutionLayerBuilder initialize(int inputChannelsCount) {
-        return new TrainableConvolutionLayerBuilder(inputChannelsCount);
+    public static <T> TrainableConvolutionLayerBuilder<T> initialize(int inputChannelsCount) {
+        return new TrainableConvolutionLayerBuilder<>(inputChannelsCount);
     }
 
     private final int inputChannelsCount;
@@ -27,7 +28,7 @@ public class TrainableConvolutionLayerBuilder extends AbstractChainableBuilder {
         return kernelsPerChannel;
     }
 
-    public TrainableConvolutionLayerBuilder setKernelsPerChannel(int kernelsPerChannel) {
+    public TrainableConvolutionLayerBuilder<T> setKernelsPerChannel(int kernelsPerChannel) {
         if (kernelsPerChannel < 1) throw new IllegalArgumentException(
             "Kernels per channel can't be less than one."
         );
@@ -40,7 +41,7 @@ public class TrainableConvolutionLayerBuilder extends AbstractChainableBuilder {
         return sumKernels;
     }
 
-    public TrainableConvolutionLayerBuilder setSumKernels(boolean sumKernels) {
+    public TrainableConvolutionLayerBuilder<T> setSumKernels(boolean sumKernels) {
         this.sumKernels = sumKernels;
         return this;
     }
@@ -49,7 +50,7 @@ public class TrainableConvolutionLayerBuilder extends AbstractChainableBuilder {
         return stride;
     }
 
-    public TrainableConvolutionLayerBuilder setStride(int stride) {
+    public TrainableConvolutionLayerBuilder<T> setStride(int stride) {
         if (stride < 1) throw new IllegalArgumentException(
             "Stride can't be smaller than 1. Given: " + stride
         );
@@ -62,7 +63,7 @@ public class TrainableConvolutionLayerBuilder extends AbstractChainableBuilder {
         return keepSize;
     }
 
-    public TrainableConvolutionLayerBuilder setKeepSize(boolean keepSize) {
+    public TrainableConvolutionLayerBuilder<T> setKeepSize(boolean keepSize) {
         this.keepSize = keepSize;
         return this;
     }

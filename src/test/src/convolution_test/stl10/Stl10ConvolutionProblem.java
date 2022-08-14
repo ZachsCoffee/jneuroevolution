@@ -6,21 +6,28 @@ import dataset.MatrixReaderDataset;
 import evolution.Convolution2DProblem;
 import evolution.ConvolutionGenes;
 import evolution.ConvolutionPersonManager;
+import evolution_builder.components.Mutation;
 import evolution_builder.components.Recombination;
 import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
 import execution.NeuroevolutionPersonManager;
 import execution.Problem;
 import core.layer.MatrixReader;
+import functions.ActivationFunction;
+import maths.MinMax;
 
 public class Stl10ConvolutionProblem extends Problem<TrainableLayer, MatrixReaderDataset> implements Convolution2DProblem<TrainableLayer> {
 
-    private ConvolutionPersonManager personManager;
-    private ConvolutionGenes convolutionGenes;
+    private static final int EPOCHS = 100;
+
+    private final ConvolutionPersonManager personManager;
+    private final ConvolutionGenes convolutionGenes;
 
     protected Stl10ConvolutionProblem() {
         personManager = new ConvolutionPersonManager(this);
         convolutionGenes = new ConvolutionGenes();
+
+        setDynamicMutation(new MinMax(1000, 2000), EPOCHS);
     }
 
     @Override
@@ -35,17 +42,25 @@ public class Stl10ConvolutionProblem extends Problem<TrainableLayer, MatrixReade
             .setStride(2)
             .setKernelsPerChannel(2)
             .and()
+            .addNeuralNetworkLayer()
+            .addLayer(10, ActivationFunction.SIGMOID.getFunction())
+            .addLayer(1, ActivationFunction.SIGMOID.getFunction())
             .build();
     }
 
     @Override
     public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
+        int total = dataset.getData().length;
+        int errors = 0;
 
-        for (MatrixReader[] channels : dataset.getData()) {
-            convolution.execute(channels);
+        for (int i=0; i<total; i++) {
+            MatrixReader[] result = convolution.execute(dataset.getData()[i]);
+            if (Math.round(result[0].valueAt(0, 0) * 10) != (int)dataset.getTargets()[i][0]) {
+                errors++;
+            }
         }
 
-        return 0;
+        return total - errors;
     }
 
 
@@ -69,6 +84,6 @@ public class Stl10ConvolutionProblem extends Problem<TrainableLayer, MatrixReade
 
     @Override
     public void mutationMethod(Population<TrainableLayer> population, int epoch, int maxEpoch) {
-
+        Mutation.mutation(population, getMutationChange(epoch), 2, true, convolutionGenes);
     }
 }
