@@ -33,11 +33,6 @@ public class ConvolutionPersonManager implements NeuroevolutionPersonManager<Tra
     }
 
     @Override
-    public TrainableLayer getGenes() {
-        return null;
-    }
-
-    @Override
     public double computeFitness(PopulationPerson<TrainableLayer> populationPerson, DatasetType datasetType) {
         return neuroevolutionProblem.evaluateFitness(populationPerson.getGeneCode(), neuroevolutionProblem.getDataset(datasetType));
     }

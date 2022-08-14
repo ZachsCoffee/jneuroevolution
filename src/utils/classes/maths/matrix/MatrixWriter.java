@@ -1,5 +1,7 @@
 package maths.matrix;
 
+import core.layer.MatrixSchema;
+
 public interface MatrixWriter extends MatrixSchema {
     void setValueAt(int rowIndex, int columnIndex, double value);
 

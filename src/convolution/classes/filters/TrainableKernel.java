@@ -1,7 +1,7 @@
 package filters;
 
+import core.layer.MatrixReader;
 import maths.Function;
-import maths.matrix.MatrixReader;
 
 import java.util.Objects;
 

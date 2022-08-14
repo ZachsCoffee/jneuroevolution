@@ -29,6 +29,4 @@ public interface PersonManager<P> {
     
     
     double computeFitness(PopulationPerson<P> populationPerson);
-
-    P getGenes();
 }

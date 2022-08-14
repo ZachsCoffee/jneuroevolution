@@ -1,7 +1,7 @@
 package executors;
 
+import core.layer.MatrixReader;
 import input.ConvolutionInput;
-import maths.matrix.MatrixReader;
 
 import java.util.LinkedList;
 import java.util.List;

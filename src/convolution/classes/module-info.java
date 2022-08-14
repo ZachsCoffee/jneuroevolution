@@ -17,7 +17,6 @@ module convolution {
     exports layers.flatten;
     exports utils;
     exports evolution;
-    exports dataset.common;
     exports dataset;
     exports builder;
     exports schema;
