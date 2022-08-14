@@ -38,7 +38,7 @@ class NeuroevolutionGenes implements Genes<Double, Network> {
 
     @Override
     public int genesCount(PopulationPerson<Network> populationPerson) {
-        return populationPerson.getGeneCode().getWeightsCount();
+        return populationPerson.getGeneCode().getTotalWeights();
     }
     
 }

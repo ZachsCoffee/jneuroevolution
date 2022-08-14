@@ -29,7 +29,7 @@ public class MultilayerRNN implements TimeNetwork{
         }
         rnnLayers[rnnLayers.length-1] = new RNN(numberOfFeatures, hiddenFunction, outputFunction);
         
-        return new MultilayerRNN(rnnLayers, rnnLayers.length * rnnLayers[0].getWeightsCount());
+        return new MultilayerRNN(rnnLayers, rnnLayers.length * rnnLayers[0].getTotalWeights());
     }
     
     public static MultilayerRNN buildRandom(int layers, int numberOfFeatures, Function hiddenFunction, Function outputFunction){
@@ -44,7 +44,7 @@ public class MultilayerRNN implements TimeNetwork{
         }
         rnnLayers[rnnLayers.length -1] = new RNN(numberOfFeatures, hiddenFunction, outputFunction, true);
         
-        return new MultilayerRNN(rnnLayers, rnnLayers.length * rnnLayers[0].getWeightsCount());
+        return new MultilayerRNN(rnnLayers, rnnLayers.length * rnnLayers[0].getTotalWeights());
     }
     
     protected MultilayerRNN(RNN[] layers, int weightsCount){
@@ -75,16 +75,16 @@ public class MultilayerRNN implements TimeNetwork{
 
     @Override
     public double getWeightAt(int position) {
-        return RNN_LAYERS[position / RNN_LAYERS[0].getWeightsCount()].getWeightAt(position % RNN_LAYERS[0].getWeightsCount());
+        return RNN_LAYERS[position / RNN_LAYERS[0].getTotalWeights()].getWeightAt(position % RNN_LAYERS[0].getTotalWeights());
     }
 
     @Override
     public void setWeightAt(int position, double weight) {
-        RNN_LAYERS[position / RNN_LAYERS[0].getWeightsCount()].setWeightAt(position % RNN_LAYERS[0].getWeightsCount(), weight);
+        RNN_LAYERS[position / RNN_LAYERS[0].getTotalWeights()].setWeightAt(position % RNN_LAYERS[0].getTotalWeights(), weight);
     }
 
     @Override
-    public int getWeightsCount() {
+    public int getTotalWeights() {
         return weightsCount;
     }
 }

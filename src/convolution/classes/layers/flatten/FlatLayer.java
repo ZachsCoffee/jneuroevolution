@@ -1,21 +1,21 @@
 package layers.flatten;
 
-import layer.ConvolutionSchemaPrinter;
-import layer.Layer;
-import layer.MatrixReader;
-import layer.MatrixSchema;
+import core.layer.ConvolutionSchemaPrinter;
+import core.layer.Layer;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
 import maths.matrix.VectorReader;
-import schema.LayerSchema;
+import core.schema.LayerSchema;
 
 public class FlatLayer implements Layer {
 
     @Override
-    public MatrixReader[] computeLayer(MatrixReader[] channels) {
-        double[] flat = new double[computeOutputSize(channels)];
+    public MatrixReader[] execute(MatrixReader[] inputChannels) {
+        double[] flat = new double[computeOutputSize(inputChannels)];
 
         int startCopyIndex = 0;
         int rows, columns;
-        for (MatrixReader filter : channels) {
+        for (MatrixReader filter : inputChannels) {
             rows = filter.getRowsCount();
             columns = filter.getColumnsCount();
             for (int i=0; i<rows; i++) {
@@ -30,17 +30,17 @@ public class FlatLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
-        int outputSize = computeOutputSize(channels);
+    public MatrixSchema[] getSchema(MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+        int outputSize = computeOutputSize(inputChannels);
 
         convolutionSchemaPrinter.addRow(
-                "Flatten",
-                channels.length,
-                '-',
-                '-',
-                '-',
-                '-',
-                "1x"+outputSize
+            "Flatten",
+            inputChannels.length,
+            '-',
+            '-',
+            '-',
+            '-',
+            "1x"+outputSize
         );
 
         return new MatrixSchema[] {

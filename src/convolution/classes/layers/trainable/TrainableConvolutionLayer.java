@@ -2,14 +2,14 @@ package layers.trainable;
 
 import filters.TrainableKernel;
 import functions.ActivationFunction;
-import layer.ConvolutionSchemaPrinter;
-import layer.MatrixReader;
-import layer.MatrixSchema;
-import layer.TrainableLayer;
+import core.layer.ConvolutionSchemaPrinter;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
+import core.layer.TrainableLayer;
 import layers.convolution.AbstractConvolutionLayer;
 import maths.Function;
 import maths.matrix.MatrixRW;
-import schema.LayerSchema;
+import core.schema.LayerSchema;
 import schema.SchemaComputer;
 import utils.MatrixReaderUtils;
 
@@ -68,7 +68,7 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
     }
 
     @Override
-    public int getWeightsCount() {
+    public int getTotalWeights() {
         return kernelsWeights.length;
     }
 
@@ -88,17 +88,17 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
     }
 
     @Override
-    public MatrixReader[] computeLayer(MatrixReader[] channels) {
-        if (channels.length != channelsCount) throw new IllegalArgumentException(
-            "The initial channels count is: " + this.channelsCount + " now the given is: " + channels.length
+    public MatrixReader[] execute(MatrixReader[] inputChannels) {
+        if (inputChannels.length != channelsCount) throw new IllegalArgumentException(
+            "The initial channels count is: " + this.channelsCount + " now the given is: " + inputChannels.length
         );
 
         int kernelIndex = 0;
         if (sumKernels) {
             for (int i = 0; i < kernelsPerChannel; i++) {
-                MatrixRW sumResult = computeForKernel(channels[0], schemaComputer, kernels[kernelIndex++]);
-                for (int j = 1; j < channels.length; j++) {
-                    MatrixReader kernelResult = computeForKernel(channels[j], schemaComputer, kernels[kernelIndex]);
+                MatrixRW sumResult = computeForKernel(inputChannels[0], schemaComputer, kernels[kernelIndex++]);
+                for (int j = 1; j < inputChannels.length; j++) {
+                    MatrixReader kernelResult = computeForKernel(inputChannels[j], schemaComputer, kernels[kernelIndex]);
                     MatrixReaderUtils.squashAndAdd(sumResult, kernelResult);
                     kernelIndex++;
                 }
@@ -108,7 +108,7 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
         }
         else {
             for (int i = 0; i < kernelsPerChannel; i++) {
-                for (MatrixReader channel : channels) {
+                for (MatrixReader channel : inputChannels) {
                     output[kernelIndex] = computeForKernel(channel, schemaComputer, kernels[kernelIndex]);
                     kernelIndex++;
                 }
@@ -120,7 +120,7 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
 
     @Override
     public MatrixSchema[] getSchema(
-        MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter
+        MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter
     ) {
         setupSchema();
 
@@ -129,8 +129,8 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
             matrixSchemas = new MatrixSchema[kernelsPerChannel];
             for (int i = 0; i < kernelsPerChannel; i++) {
                 schemaComputer.compute(
-                    channels[i].getRowsCount(),
-                    channels[i].getColumnsCount(),
+                    inputChannels[i].getRowsCount(),
+                    inputChannels[i].getColumnsCount(),
                     KERNEL_SIZE
                 );
                 matrixSchemas[i] = new LayerSchema(
@@ -140,12 +140,12 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
             }
         }
         else {
-            matrixSchemas = new MatrixSchema[channels.length * kernelsPerChannel];
-            for (int i = 0; i < channels.length; i++) {
+            matrixSchemas = new MatrixSchema[inputChannels.length * kernelsPerChannel];
+            for (int i = 0; i < inputChannels.length; i++) {
                 for (int j = 0; j < kernelsPerChannel; j++) {
                     schemaComputer.compute(
-                        channels[i].getRowsCount(),
-                        channels[i].getColumnsCount(),
+                        inputChannels[i].getRowsCount(),
+                        inputChannels[i].getColumnsCount(),
                         KERNEL_SIZE
                     );
                     matrixSchemas[i * kernelsPerChannel + j] = new LayerSchema(

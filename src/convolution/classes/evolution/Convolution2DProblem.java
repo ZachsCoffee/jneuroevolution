@@ -1,12 +1,12 @@
 package evolution;
 
+import core.layer.TrainableLayer;
 import dataset.MatrixReaderDataset;
 import execution.common.CommonProblem;
-import executors.common.TrainableConvolution;
 
 public interface Convolution2DProblem<P> extends CommonProblem<P, MatrixReaderDataset> {
 
-    TrainableConvolution buildConvolution();
+    TrainableLayer buildConvolution();
 
-    double evaluateFitness(TrainableConvolution convolution, MatrixReaderDataset dataset);
+    double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset);
 }

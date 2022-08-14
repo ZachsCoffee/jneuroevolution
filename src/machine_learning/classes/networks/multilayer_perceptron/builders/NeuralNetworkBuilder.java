@@ -1,15 +1,15 @@
 package networks.multilayer_perceptron.builders;
 
+import core.builder.AbstractChainableBuilder;
 import functions.ActivationFunction;
 import maths.Function;
 import networks.multilayer_perceptron.network.NetworkLayer;
 import networks.multilayer_perceptron.network.NeuralNetwork;
-import networks.multilayer_perceptron.serializers.NetworkJsonSerializer;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class NeuralNetworkBuilder {
+public class NeuralNetworkBuilder extends AbstractChainableBuilder {
 
     public static NeuralNetwork buildFrom(NetworkModel networkModel) {
         NeuralNetworkBuilder builder = new NeuralNetworkBuilder(
@@ -32,6 +32,10 @@ public class NeuralNetworkBuilder {
         return builder.build(networkModel.getWeights());
     }
 
+    public static NeuralNetworkBuilder initialize(int featureLength) {
+        return new NeuralNetworkBuilder(featureLength);
+    }
+
     public static NeuralNetworkBuilder initialize(int featureLength, int firstLayerNeurons) {
         return new NeuralNetworkBuilder(featureLength, firstLayerNeurons, null);
     }
@@ -41,15 +45,15 @@ public class NeuralNetworkBuilder {
     }
 
     private final List<LayerSchema> layerSchemas = new LinkedList<>();
-    private int initialFeatureLength;
+    private final int initialFeatureLength;
+
+    private NeuralNetworkBuilder(int featureLength) {
+        initialFeatureLength = featureLength;
+    }
 
     private NeuralNetworkBuilder(int featureLength, int firstLayerNeurons, Function function) {
         initialFeatureLength = featureLength;
         layerSchemas.add(new LayerSchema(firstLayerNeurons, function));
-    }
-
-    private NeuralNetworkBuilder() {
-
     }
 
     public NeuralNetworkBuilder addLayer(int neurons) {
@@ -77,6 +81,10 @@ public class NeuralNetworkBuilder {
     }
 
     private NetworkLayer[] buildLayers() {
+        if (layerSchemas.isEmpty()) throw new IllegalStateException(
+            "Need at least one layer in order to build the network."
+        );
+
         NetworkLayer[] layers = new NetworkLayer[layerSchemas.size()];
 
         int i = 0;

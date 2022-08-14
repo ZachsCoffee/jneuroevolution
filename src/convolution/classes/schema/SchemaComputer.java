@@ -1,5 +1,6 @@
 package schema;
 
+import core.schema.LayerSchema;
 import layers.convolution.ConvolutionUtils;
 
 import java.util.Objects;

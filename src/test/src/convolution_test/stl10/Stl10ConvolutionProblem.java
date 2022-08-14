@@ -1,6 +1,7 @@
 package convolution_test.stl10;
 
-import builder.ConvolutionBuilder;
+import common.TrainableSystemBuilder;
+import core.layer.TrainableLayer;
 import dataset.MatrixReaderDataset;
 import evolution.Convolution2DProblem;
 import evolution.ConvolutionGenes;
@@ -10,10 +11,9 @@ import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
 import execution.NeuroevolutionPersonManager;
 import execution.Problem;
-import executors.common.TrainableConvolution;
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 
-public class Stl10ConvolutionProblem extends Problem<TrainableConvolution, MatrixReaderDataset> implements Convolution2DProblem<TrainableConvolution> {
+public class Stl10ConvolutionProblem extends Problem<TrainableLayer, MatrixReaderDataset> implements Convolution2DProblem<TrainableLayer> {
 
     private ConvolutionPersonManager personManager;
     private ConvolutionGenes convolutionGenes;
@@ -24,14 +24,14 @@ public class Stl10ConvolutionProblem extends Problem<TrainableConvolution, Matri
     }
 
     @Override
-    public NeuroevolutionPersonManager<TrainableConvolution> getPersonManager() {
+    public NeuroevolutionPersonManager<TrainableLayer> getPersonManager() {
         return personManager;
     }
 
     @Override
-    public TrainableConvolution buildConvolution() {
-        return ConvolutionBuilder.getInstance(3)
-            .addLayer()
+    public TrainableLayer buildConvolution() {
+        return TrainableSystemBuilder.getInstance(3)
+            .addConvolutionLayer()
             .setStride(2)
             .setKernelsPerChannel(2)
             .and()
@@ -39,35 +39,36 @@ public class Stl10ConvolutionProblem extends Problem<TrainableConvolution, Matri
     }
 
     @Override
-    public double evaluateFitness(TrainableConvolution convolution, MatrixReaderDataset dataset) {
+    public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
 
         for (MatrixReader[] channels : dataset.getData()) {
-
+            convolution.execute(channels);
         }
-        return convolution.execute(channels.getData());
+
+        return 0;
     }
 
 
     @Override
-    public void computePercentOfFitness(Population<TrainableConvolution> population) {
+    public void computePercentOfFitness(Population<TrainableLayer> population) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Population<TrainableConvolution> recombinationOperator(
-        Population<TrainableConvolution> population,
+    public Population<TrainableLayer> recombinationOperator(
+        Population<TrainableLayer> population,
         int epoch
     ) {
         return Recombination.random(population, 5, convolutionGenes);
     }
 
     @Override
-    public Population<TrainableConvolution> selectionMethod(Population<TrainableConvolution> population) {
+    public Population<TrainableLayer> selectionMethod(Population<TrainableLayer> population) {
         return Selection.tournament(population, 5, false);
     }
 
     @Override
-    public void mutationMethod(Population<TrainableConvolution> population, int epoch, int maxEpoch) {
+    public void mutationMethod(Population<TrainableLayer> population, int epoch, int maxEpoch) {
 
     }
 }

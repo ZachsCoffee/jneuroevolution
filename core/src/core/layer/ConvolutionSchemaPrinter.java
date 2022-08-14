@@ -1,6 +1,7 @@
-package layer;
+package core.layer;
 
 import dnl.utils.text.table.TextTable;
+import core.schema.SchemaRow;
 
 import java.util.LinkedList;
 import java.util.Objects;
@@ -19,6 +20,12 @@ public class ConvolutionSchemaPrinter {
         }
 
         data.add(row);
+    }
+
+    public ConvolutionSchemaPrinter addRow(SchemaRow schemaRow) {
+        data.add(schemaRow.toRow());
+
+        return this;
     }
 
     public void print() {

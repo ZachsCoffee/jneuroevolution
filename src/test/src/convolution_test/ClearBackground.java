@@ -6,7 +6,7 @@ import filters.Filter;
 import filters.StaticKernel;
 import functions.ActivationFunction;
 import input.*;
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 import layers.convolution.ConvolutionLayer;
 import layers.flatten.FlatLayer;
 import networks.multilayer_perceptron.network.NeuralNetwork;

@@ -1,11 +1,11 @@
 package layers.pool;
 
-import layer.ConvolutionSchemaPrinter;
-import layer.Layer;
-import layer.MatrixReader;
-import layer.MatrixSchema;
+import core.layer.ConvolutionSchemaPrinter;
+import core.layer.Layer;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
 import layers.convolution.ConvolutionUtils;
-import schema.LayerSchema;
+import core.schema.LayerSchema;
 import maths.matrix.Matrix2D;
 
 import java.util.Objects;
@@ -32,46 +32,46 @@ public class PoolLayer implements Layer {
         this.stride = stride;
     }
 
-    public MatrixReader[] computeLayer(MatrixReader[] channels) {
-        Objects.requireNonNull(channels);
-        if (channels.length == 0) {
-            throw new IllegalArgumentException("Need at least one matrix reader!");
+    public MatrixReader[] execute(MatrixReader[] inputChannels) {
+        Objects.requireNonNull(inputChannels);
+        if (inputChannels.length == 0) {
+            throw new IllegalArgumentException("Need at least one core.matrix reader!");
         }
 
-        MatrixReader[] output = new MatrixReader[channels.length];
+        MatrixReader[] output = new MatrixReader[inputChannels.length];
 
         for (int i=0; i<output.length; i++) {
-            output[i] = computeMatrix(channels[i]);
+            output[i] = computeMatrix(inputChannels[i]);
         }
 
         return output;
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+    public MatrixSchema[] getSchema(MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
 
-        MatrixSchema[] matrixSchemas = new MatrixSchema[channels.length];
+        MatrixSchema[] matrixSchemas = new MatrixSchema[inputChannels.length];
         int[] dimensions = null;
-        for (int i = 0; i< channels.length; i++) {
+        for (int i = 0; i< inputChannels.length; i++) {
             dimensions = ConvolutionUtils.outputDimensions(
-                    channels[i].getRowsCount(),
-                    channels[i].getColumnsCount(),
-                    sampleSize,
-                    0,
-                    stride
+                inputChannels[i].getRowsCount(),
+                inputChannels[i].getColumnsCount(),
+                sampleSize,
+                0,
+                stride
             );
 
             matrixSchemas[i] = new LayerSchema(dimensions[0], dimensions[1]);
         }
 
         convolutionSchemaPrinter.addRow(
-                "Pool",
-                channels.length,
-                "-",
-                sampleSize + "x" + sampleSize,
-                stride,
-                0,
-                channels.length + "x" + dimensions[0] + "x" + dimensions[1]
+            "Pool",
+            inputChannels.length,
+            "-",
+            sampleSize + "x" + sampleSize,
+            stride,
+            0,
+            inputChannels.length + "x" + dimensions[0] + "x" + dimensions[1]
         );
 
         return matrixSchemas;

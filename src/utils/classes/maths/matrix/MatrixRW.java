@@ -1,6 +1,6 @@
 package maths.matrix;
 
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 
 public interface MatrixRW extends MatrixReader, MatrixWriter{
     default void incrementBy(int rowIndex, int columnIndex, double value) {

@@ -1,6 +1,6 @@
 package input;
 
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 
 public interface ConvolutionInput {
     MatrixReader[] getChannels();

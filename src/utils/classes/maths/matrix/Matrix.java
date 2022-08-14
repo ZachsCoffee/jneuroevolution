@@ -85,7 +85,7 @@ public class Matrix {
             throw new IllegalArgumentException("Matrix can't be null!");
         }
         if (matrix.length == 0) {
-            throw new IllegalArgumentException("The matrix don't have any rows!");
+            throw new IllegalArgumentException("The core.matrix don't have any rows!");
         }
 
         int rowsCount = matrix.length;

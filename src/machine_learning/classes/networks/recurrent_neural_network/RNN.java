@@ -80,7 +80,7 @@ public class RNN implements TimeNetwork{
         return allArrays[position / numberOfFeatures][position % numberOfFeatures];
     }
     @Override
-    public int getWeightsCount() {
+    public int getTotalWeights() {
         return weightsCount;
     }
     @Override
@@ -145,7 +145,7 @@ public class RNN implements TimeNetwork{
 //import machine_learning.Function;
 //import machine_learning.Functions;
 //import machine_learning.Network;
-//import matrix.Matrix;
+//import core.matrix.Matrix;
 //
 ///**
 // *

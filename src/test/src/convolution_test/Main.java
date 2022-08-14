@@ -4,7 +4,7 @@ import executors.ConvolutionExecutor;
 import executors.ConvolutionParallelExecutor;
 import files.binary.BinaryDatasetWriter;
 import input.*;
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 import layers.convolution.ConvolutionLayer;
 import filters.Filter;
 import filters.StaticKernel;

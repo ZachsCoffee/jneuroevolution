@@ -1,21 +1,21 @@
 package builder;
 
+import core.builder.AbstractChainableBuilder;
 import layers.trainable.TrainableConvolutionLayer;
 
-import java.util.Objects;
+public class TrainableConvolutionLayerBuilder extends AbstractChainableBuilder {
 
-public class TrainableConvolutionLayerBuilder {
+    public static TrainableConvolutionLayerBuilder initialize(int inputChannelsCount) {
+        return new TrainableConvolutionLayerBuilder(inputChannelsCount);
+    }
 
     private final int inputChannelsCount;
-    private final ConvolutionBuilder builder;
     private int kernelsPerChannel = 1;
     private boolean sumKernels = false;
     private int stride = 1;
     private boolean keepSize = false;
 
-    TrainableConvolutionLayerBuilder(ConvolutionBuilder builder, int inputChannelsCount) {
-        this.builder = Objects.requireNonNull(builder);
-
+    private TrainableConvolutionLayerBuilder(int inputChannelsCount) {
         if (inputChannelsCount < 1) throw new IllegalArgumentException(
             "Need at least one channel. Given: " + inputChannelsCount
         );
@@ -67,11 +67,7 @@ public class TrainableConvolutionLayerBuilder {
         return this;
     }
 
-    public ConvolutionBuilder and() {
-        return builder;
-    }
-
-    TrainableConvolutionLayer build() {
+    public TrainableConvolutionLayer build() {
         return new TrainableConvolutionLayer(
             inputChannelsCount,
             kernelsPerChannel,

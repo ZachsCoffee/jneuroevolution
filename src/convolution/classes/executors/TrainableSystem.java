@@ -1,27 +1,26 @@
 package executors;
 
-import layer.*;
-
+import core.layer.*;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class TrainableConvolution implements executors.common.TrainableConvolution {
+public class TrainableSystem implements TrainableLayer, Iterable<TrainableLayer> {
 
     private final List<TrainableLayer> layers;
     private final int totalWeights;
 
-    public TrainableConvolution(List<TrainableLayer> layers) {
+    public TrainableSystem(List<TrainableLayer> layers) {
         this.layers = Objects.requireNonNull(layers);
 
         if (layers.isEmpty()) throw new IllegalArgumentException(
-            "Need at least one layer."
+            "Need at least one core.layer."
         );
 
         int countWeights = 0;
         for (TrainableLayer layer : layers) {
-            countWeights += layer.getWeightsCount();
+            countWeights += layer.getTotalWeights();
         }
 
         totalWeights = countWeights;
@@ -38,6 +37,11 @@ public class TrainableConvolution implements executors.common.TrainableConvoluti
         return layers.get(position[0]).getWeightAt(position[1]);
     }
 
+    @Override
+    public int getOutputChannelsCount() {
+        return layers.get(layers.size() - 1).getOutputChannelsCount();
+    }
+
     public void setWeightAt(int index, double weight) {
         int[] position = getLayer(index);
 
@@ -51,15 +55,22 @@ public class TrainableConvolution implements executors.common.TrainableConvoluti
         int i = 1;
         try {
             for (Layer layer : layers) {
-                previousMatrixReader = layer.computeLayer(previousMatrixReader);
+                previousMatrixReader = layer.execute(previousMatrixReader);
                 i++;
             }
         }
         catch (Exception ex) {
-            throw new RuntimeException("Error at channel: " + i + " and layer: " + i, ex);
+            throw new RuntimeException("Error at channel: " + i + " and core.layer: " + i, ex);
         }
 
         return previousMatrixReader;
+    }
+
+    @Override
+    public MatrixSchema[] getSchema(
+        MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter
+    ) {
+        return new MatrixSchema[0];
     }
 
     public void printSchema(MatrixReader[] channels) {
@@ -85,14 +96,14 @@ public class TrainableConvolution implements executors.common.TrainableConvoluti
     }
 
     @Override
-    public executors.common.TrainableConvolution copy() {
+    public TrainableLayer copy() {
         List<TrainableLayer> copiedLayers = new LinkedList<>();
 
         for (TrainableLayer layer : layers) {
             copiedLayers.add(layer.copy());
         }
 
-        return new TrainableConvolution(
+        return new TrainableSystem(
             copiedLayers
         );
     }
@@ -122,8 +133,8 @@ public class TrainableConvolution implements executors.common.TrainableConvoluti
     private int[] getLayer(int index) {
         int layerIndex = 0;
         for (TrainableLayer layer : layers) {
-            if (index >= layer.getWeightsCount()) {
-                index -= layer.getWeightsCount();
+            if (index >= layer.getTotalWeights()) {
+                index -= layer.getTotalWeights();
             }
             else {
                 return new int[]{layerIndex, index};
@@ -131,7 +142,7 @@ public class TrainableConvolution implements executors.common.TrainableConvoluti
             layerIndex++;
         }
 
-        throw new RuntimeException("Failed to find layer with index: " + index);
+        throw new RuntimeException("Failed to find core.layer with index: " + index);
     }
 
     private void validateChannels(MatrixReader[] channels) {
@@ -148,13 +159,13 @@ public class TrainableConvolution implements executors.common.TrainableConvoluti
 
             if (channelRowCount != firstChannelRows) {
                 throw new IllegalArgumentException(
-                    "All channels must have the same schema. First channel rows: " + firstChannelRows + " " + (i + 1) + "th channel rows: " + channelRowCount
+                    "All channels must have the same core.schema. First channel rows: " + firstChannelRows + " " + (i + 1) + "th channel rows: " + channelRowCount
                 );
             }
 
             if (channelColumnCount != firstChannelColumns) {
                 throw new IllegalArgumentException(
-                    "All channels must have the same schema. First channel rows: " + firstChannelRows + " " + (i + 1) + "th channel rows: " + channelColumnCount
+                    "All channels must have the same core.schema. First channel rows: " + firstChannelRows + " " + (i + 1) + "th channel rows: " + channelColumnCount
                 );
             }
         }

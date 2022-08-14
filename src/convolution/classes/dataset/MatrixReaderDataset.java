@@ -1,7 +1,7 @@
 package dataset;
 
 import data_manipulation.DatasetTarget;
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 
 public class MatrixReaderDataset implements DatasetTarget {
 

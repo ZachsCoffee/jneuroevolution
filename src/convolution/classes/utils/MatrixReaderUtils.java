@@ -1,6 +1,6 @@
 package utils;
 
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 import maths.matrix.MatrixRW;
 import maths.matrix.Matrix2D;
 
@@ -9,7 +9,7 @@ public class MatrixReaderUtils {
 
     public static MatrixReader add(MatrixReader first, MatrixReader second) {
         if (first.getRowsCount() != second.getRowsCount() || first.getColumnsCount() != second.getColumnsCount()) throw new IllegalArgumentException(
-            "The two given matrix must have the same schema. First matrix: " + first + " second matrix: " + second
+            "The two given core.matrix must have the same core.schema. First core.matrix: " + first + " second core.matrix: " + second
         );
 
         double[][] result = new double[first.getRowsCount()][first.getColumnsCount()];
@@ -25,7 +25,7 @@ public class MatrixReaderUtils {
 
     public static void squashAndAdd(MatrixReader squashDestination, MatrixReader data) {
         if (squashDestination.getRowsCount() != data.getRowsCount() || squashDestination.getColumnsCount() != data.getColumnsCount()) throw new IllegalArgumentException(
-            "The two given matrix must have the same schema. First matrix: " + squashDestination + " data matrix: " + data
+            "The two given core.matrix must have the same core.schema. First core.matrix: " + squashDestination + " data core.matrix: " + data
         );
 
         for (int i=0; i<squashDestination.getRowsCount(); i++) {

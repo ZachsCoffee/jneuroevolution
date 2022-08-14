@@ -10,17 +10,15 @@ module convolution {
 
     exports layers.trainable;
     exports layers.convolution;
-    exports schema;
     exports filters;
     exports executors;
     exports input;
     exports layers.pool;
-    exports layers;
     exports layers.flatten;
     exports utils;
-    exports executors.common;
     exports evolution;
     exports dataset.common;
     exports dataset;
     exports builder;
+    exports schema;
 }

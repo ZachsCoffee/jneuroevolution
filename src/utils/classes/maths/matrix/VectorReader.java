@@ -1,6 +1,6 @@
 package maths.matrix;
 
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 
 import java.util.Objects;
 

@@ -1,13 +1,13 @@
 package utils;
 
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 
 import java.util.Objects;
 
 public class MatrixUtils {
 
     /**
-     * Merge all the given channels into one vector. The channels MUST be previously passed from a flatted convolution layer.
+     * Merge all the given channels into one vector. The channels MUST be previously passed from a flatted convolution core.layer.
      *
      * @param channels
      * @return

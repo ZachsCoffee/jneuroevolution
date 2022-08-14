@@ -1,6 +1,6 @@
 package utils;
 
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

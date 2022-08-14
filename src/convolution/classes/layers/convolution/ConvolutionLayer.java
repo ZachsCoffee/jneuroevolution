@@ -1,10 +1,10 @@
 package layers.convolution;
 
 import filters.Filter;
-import layer.ConvolutionSchemaPrinter;
-import layer.MatrixReader;
-import layer.MatrixSchema;
-import schema.LayerSchema;
+import core.layer.ConvolutionSchemaPrinter;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
+import core.schema.LayerSchema;
 import schema.SchemaComputer;
 import utils.MatrixReaderUtils;
 
@@ -60,20 +60,20 @@ public class ConvolutionLayer extends AbstractConvolutionLayer {
         return this;
     }
 
-    public MatrixReader[] computeLayer(MatrixReader[] channels) {
-        Objects.requireNonNull(channels);
+    public MatrixReader[] execute(MatrixReader[] inputChannels) {
+        Objects.requireNonNull(inputChannels);
 
-        if (channels.length == 0) throw new IllegalArgumentException(
-            "Need at least one matrix reader!"
+        if (inputChannels.length == 0) throw new IllegalArgumentException(
+            "Need at least one core.matrix reader!"
         );
 
         MatrixReader[] output;
 
         if (isSquashChannels()) {
-            output = computeAsSquashedChannels(channels);
+            output = computeAsSquashedChannels(inputChannels);
         }
         else {
-            output = computeAsSeparateChannels(channels);
+            output = computeAsSeparateChannels(inputChannels);
         }
 
         return output;
@@ -109,13 +109,13 @@ public class ConvolutionLayer extends AbstractConvolutionLayer {
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
-        MatrixSchema[] matrixSchemas = new MatrixSchema[channels.length * filters.length];
-        for (int i = 0; i < channels.length; i++) {
+    public MatrixSchema[] getSchema(MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+        MatrixSchema[] matrixSchemas = new MatrixSchema[inputChannels.length * filters.length];
+        for (int i = 0; i < inputChannels.length; i++) {
             for (int j = 0; j < filters.length; j++) {
                 schemaComputer.compute(
-                    channels[i].getRowsCount(),
-                    channels[i].getColumnsCount(),
+                    inputChannels[i].getRowsCount(),
+                    inputChannels[i].getColumnsCount(),
                     filters[j].getKernelSize()
                 );
 
@@ -128,12 +128,12 @@ public class ConvolutionLayer extends AbstractConvolutionLayer {
 
         convolutionSchemaPrinter.addRow(
             "Convolution",
-            channels.length,
+            inputChannels.length,
             filters.length,
             "-",
             schemaComputer.getStrideRows() + "x" + schemaComputer.getStrideColumns(),
             schemaComputer.getPaddingRows() + "x" + schemaComputer.getPaddingColumns(),
-            channels.length + "x" + filters.length + "x" + schemaComputer.getRowsCount() + "x" + schemaComputer.getColumnsCount()
+            inputChannels.length + "x" + filters.length + "x" + schemaComputer.getRowsCount() + "x" + schemaComputer.getColumnsCount()
         );
 
         return matrixSchemas;

@@ -1,7 +1,7 @@
-package layer;
+package core.layer;
 
 public interface TrainableLayer extends Layer, Cloneable, Imitable<TrainableLayer> {
-    int getWeightsCount();
+    int getTotalWeights();
 
     void setWeightAt(int index, double weight);
 

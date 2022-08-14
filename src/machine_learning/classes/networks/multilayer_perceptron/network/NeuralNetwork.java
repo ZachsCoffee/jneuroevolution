@@ -5,145 +5,44 @@
  */
 package networks.multilayer_perceptron.network;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import functions.ActivationFunction;
-import layer.ConvolutionSchemaPrinter;
-import layer.MatrixReader;
-import layer.MatrixSchema;
-import layer.TrainableLayer;
+import core.layer.ConvolutionSchemaPrinter;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
+import core.layer.TrainableLayer;
+import core.schema.LayerSchema;
 import maths.Function;
+import maths.matrix.Matrix2D;
 import networks.interfaces.Network;
 import maths.MinMax;
-import networks.representations.LayerImage;
-import networks.representations.NetworkImage;
+import core.schema.SchemaRow;
+
+import java.util.Arrays;
 
 /**
  * @author main
  */
 public class NeuralNetwork implements Network, TrainableLayer {
 
-    public final int MAX_START_VALUE;
-
-    protected final NetworkLayer[] layers;
-    protected final double[] weights;
-
-    public NeuralNetwork(double[] weights, NetworkLayer[] layers) {
-        this(layers);
-
-        if (weights.length != this.weights.length) throw new IllegalArgumentException(
-                "Given weights length is different from the actual needed to build the network. Given: "+weights.length+" needed: "+this.weights.length
-        );
-
-        System.arraycopy(weights, 0, this.weights, 0, this.weights.length);
-    }
-
-    public NeuralNetwork(NetworkLayer[] layers) {
-        this(layers, 1);
-    }
-
-    public NeuralNetwork(NetworkLayer[] layers, int maxStartValue) {
-        if (layers == null) {
-            throw new IllegalArgumentException("Layers not null.");
-        }
-
-        if (layers.length <= 0) {
-            throw new IllegalArgumentException("Layers length, must be greater than zero");
-        }
-
-        this.layers = layers;
-
-        int sumOfWeights = 0;
-        for (int i = 0; i < layers.length; i++) {
-            sumOfWeights += layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS;
-        }
-
-        weights = new double[sumOfWeights];
-
-        MAX_START_VALUE = maxStartValue;
-
-        int startPoint = 0;
-        for (int i = 0; i < layers.length; i++) {
-            layers[i].maxStartValue = MAX_START_VALUE;
-            layers[i].buildNeurons(weights, startPoint);
-            startPoint += layers[i].getNeuronsCount() * layers[i].NUMBER_OR_WEIGHTS;
-        }
-    }
-
-    @Override
-    public int getWeightsCount() {
-        return weights.length;
-    }
-
-    @Override
-    public double getWeightAt(int position) {
-        return weights[position];
-    }
-
-    @Override
-    public int getOutputChannelsCount() {
-        return 0;
-    }
-
-    @Override
-    public void setWeightAt(int position, double value) {
-        weights[position] = value;
-    }
-
-    public NetworkLayer getLayerAt(int position) {
-        return layers[position];
-    }
-
-    public int getLayerCount() {
-        return layers.length;
-    }
-
-    @Override
-    public double[] compute(double[] features) {
-        double[] results = features;
-        for (NetworkLayer layer : layers) {
-            results = layer.computeLayer(results);
-        }
-
-        return results;
-    }
-
-    @Override
-    public TrainableLayer copy() {
-        return null;
-    }
-
-    @Override
-    public MatrixReader[] computeLayer(MatrixReader[] channels) {
-        return new MatrixReader[0];
-    }
-
-    @Override
-    public MatrixSchema[] getSchema(
-        MatrixSchema[] channels, ConvolutionSchemaPrinter convolutionSchemaPrinter
-    ) {
-        return new MatrixSchema[0];
-    }
-
-    protected double[] computeLayer(int layerIndex, double[] features) {
-        return layers[layerIndex].computeLayer(features);
-    }
-
     public static Network buildRandomSizeNetwork(
-            int inputFeatures, int output, MinMax neuronPerLayer, MinMax networkLength, Function hiddenLayerF, Function outputLayerF) {
+        int inputFeatures,
+        int output,
+        MinMax neuronPerLayer,
+        MinMax networkLength,
+        Function hiddenLayerF,
+        Function outputLayerF
+    ) {
 
         if (neuronPerLayer.min < 2) throw new IllegalArgumentException(
-                "A network layer must have at least two neurons! (min=" + neuronPerLayer.min + ")"
+            "A network layer must have at least two neurons! (min=" + neuronPerLayer.min + ")"
         );
         if (networkLength.min < 2) throw new IllegalArgumentException(
-                "A neural network must have at least two layers! min=(" + networkLength.min + ")"
+            "A neural network must have at least two layers! min=(" + networkLength.min + ")"
         );
         if (inputFeatures < 1) throw new IllegalArgumentException(
-                "Input features must be at least one inputFeatures=" + inputFeatures
+            "Input features must be at least one inputFeatures=" + inputFeatures
         );
         if (output < 1) throw new IllegalArgumentException(
-                "Output must be at least one output=" + output
+            "Output must be at least one output=" + output
         );
 
         int tempNeuronsPerlLayer = neuronPerLayer.randomBetween();
@@ -179,6 +78,145 @@ public class NeuralNetwork implements Network, TrainableLayer {
         return returnedNetwork;
     }
 
+    public final int MAX_START_VALUE;
+    protected final NetworkLayer[] layers;
+    protected final double[] weights;
+
+    public NeuralNetwork(double[] weights, NetworkLayer[] layers) {
+        this(layers);
+
+        if (weights.length != this.weights.length) throw new IllegalArgumentException(
+            "Given weights length is different from the actual needed to build the network. Given: " + weights.length + " needed: " + this.weights.length
+        );
+
+        System.arraycopy(weights, 0, this.weights, 0, this.weights.length);
+    }
+
+    public NeuralNetwork(NetworkLayer[] layers) {
+        this(layers, 1);
+    }
+
+    public NeuralNetwork(NetworkLayer[] layers, int maxStartValue) {
+        if (layers == null) {
+            throw new IllegalArgumentException("Layers not null.");
+        }
+
+        if (layers.length <= 0) {
+            throw new IllegalArgumentException("Layers length, must be greater than zero");
+        }
+
+        this.layers = layers;
+
+        int sumOfWeights = 0;
+        for (int i = 0; i < layers.length; i++) {
+            sumOfWeights += layers[i].getNeuronsCount() * layers[i].totalWeightsCount;
+        }
+
+        weights = new double[sumOfWeights];
+
+        MAX_START_VALUE = maxStartValue;
+
+        int startPoint = 0;
+        for (int i = 0; i < layers.length; i++) {
+            layers[i].maxStartValue = MAX_START_VALUE;
+            layers[i].buildNeurons(weights, startPoint);
+            startPoint += layers[i].getNeuronsCount() * layers[i].totalWeightsCount;
+        }
+    }
+
+    @Override
+    public int getTotalWeights() {
+        return weights.length;
+    }
+
+    @Override
+    public int getOutputChannelsCount() {
+        return 1;
+    }
+
+    public int getLayerCount() {
+        return layers.length;
+    }
+
+    @Override
+    public double getWeightAt(int position) {
+        return weights[position];
+    }
+
+    @Override
+    public void setWeightAt(int position, double value) {
+        weights[position] = value;
+    }
+
+    public NetworkLayer getLayerAt(int position) {
+        return layers[position];
+    }
+
+    @Override
+    public double[] compute(double[] features) {
+        double[] results = features;
+        for (NetworkLayer layer : layers) {
+            results = layer.computeLayer(results);
+        }
+
+        return results;
+    }
+
+    @Override
+    public TrainableLayer copy() {
+        double[] weights = Arrays.copyOf(this.weights, this.weights.length);
+
+        NetworkLayer[] layers = new NetworkLayer[this.layers.length];
+
+        for (int i = 0; i < layers.length; i++) {
+            layers[i] = this.layers[i].copy();
+        }
+
+        return new NeuralNetwork(weights, layers);
+    }
+
+    @Override
+    public MatrixReader[] execute(MatrixReader[] inputChannels) {
+        if (inputChannels.length != 1) throw new IllegalArgumentException(
+            "Need exactly one channel as input. Found: " + inputChannels.length
+        );
+
+        if (inputChannels[0].getRowsCount() != 1) throw new IllegalArgumentException(
+            "The input core.matrix must be flat, exactly one row needed as input. Found: " + inputChannels[0].getRowsCount()
+        );
+
+        if (inputChannels[0].getColumnsCount() > 0) throw new IllegalArgumentException(
+            "Need at least one column as input. Found: " + inputChannels[0].getColumnsCount()
+        );
+
+        // TODO optimize with a simpler structure for a MatrixReader[]
+
+        return new Matrix2D[]{
+            new Matrix2D(
+                new double[][]{
+                    compute(inputChannels[0].getRow(0))
+                }
+            )
+        };
+    }
+
+    @Override
+    public MatrixSchema[] getSchema(
+        MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter
+    ) {
+        int output = layers[layers.length - 1].getNeuronsCount();
+        convolutionSchemaPrinter.addRow(
+            new SchemaRow()
+                .setLayerType("Dense")
+                .setChannelsCount(inputChannels.length)
+                .setOutput(output)
+        );
+
+        return new MatrixSchema[]{
+            new LayerSchema(1, output)
+        };
+    }
+
     public String toString() {
         StringBuilder output = new StringBuilder();
 
@@ -188,5 +226,9 @@ public class NeuralNetwork implements Network, TrainableLayer {
         }
 
         return output + "\n";
+    }
+
+    protected double[] computeLayer(int layerIndex, double[] features) {
+        return layers[layerIndex].computeLayer(features);
     }
 }

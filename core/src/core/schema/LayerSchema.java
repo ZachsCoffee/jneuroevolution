@@ -1,6 +1,6 @@
-package schema;
+package core.schema;
 
-import layer.MatrixSchema;
+import core.layer.MatrixSchema;
 
 public class LayerSchema implements MatrixSchema {
 

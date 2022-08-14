@@ -1,6 +1,6 @@
 package input;
 
-import layer.MatrixReader;
+import core.layer.MatrixReader;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

@@ -1,9 +1,9 @@
 package executors;
 
-import layer.ConvolutionSchemaPrinter;
-import layer.Layer;
-import layer.MatrixReader;
-import layer.MatrixSchema;
+import core.layer.ConvolutionSchemaPrinter;
+import core.layer.Layer;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
 import input.ConvolutionInput;
 
 import java.util.*;
@@ -127,12 +127,12 @@ public class ConvolutionExecutor {
         int i = 1;
         try {
             for (Layer layer : layers) {
-                previousMatrixReader = layer.computeLayer(previousMatrixReader);
+                previousMatrixReader = layer.execute(previousMatrixReader);
                 i++;
             }
         }
         catch (Exception ex) {
-            throw new RuntimeException("Error at channel: "+i+" and layer: "+i, ex);
+            throw new RuntimeException("Error at channel: "+i+" and core.layer: "+i, ex);
         }
 
         return previousMatrixReader;
@@ -152,13 +152,13 @@ public class ConvolutionExecutor {
 
             if (channelRowCount != firstChannelRows) {
                 throw new IllegalArgumentException(
-                    "All channels must have the same schema. First channel rows: " + firstChannelRows + " " + (i + 1) + "th channel rows: " + channelRowCount
+                    "All channels must have the same core.schema. First channel rows: " + firstChannelRows + " " + (i + 1) + "th channel rows: " + channelRowCount
                 );
             }
 
             if (channelColumnCount != firstChannelColumns) {
                 throw new IllegalArgumentException(
-                    "All channels must have the same schema. First channel rows: " + firstChannelRows + " " + (i + 1) + "th channel rows: " + channelColumnCount
+                    "All channels must have the same core.schema. First channel rows: " + firstChannelRows + " " + (i + 1) + "th channel rows: " + channelColumnCount
                 );
             }
         }

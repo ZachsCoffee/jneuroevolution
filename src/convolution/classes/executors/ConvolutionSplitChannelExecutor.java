@@ -1,10 +1,10 @@
 package executors;
 
-import layer.ConvolutionSchemaPrinter;
-import layer.Layer;
-import layer.MatrixReader;
-import layer.MatrixSchema;
-import schema.LayerSchema;
+import core.layer.ConvolutionSchemaPrinter;
+import core.layer.Layer;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
+import core.schema.LayerSchema;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -84,12 +84,12 @@ public class ConvolutionSplitChannelExecutor extends ConvolutionExecutor {
         int i = 0;
         try {
             for (Layer layer : channelsLayers[channelIndex]) {
-                previousMatrixReader = layer.computeLayer(previousMatrixReader);
+                previousMatrixReader = layer.execute(previousMatrixReader);
                 i++;
             }
         }
         catch (Exception ex) {
-            throw new RuntimeException("Error at channel: " + channelIndex + " and layer: " + i, ex);
+            throw new RuntimeException("Error at channel: " + channelIndex + " and core.layer: " + i, ex);
         }
 
         return previousMatrixReader;

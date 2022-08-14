@@ -1,6 +1,5 @@
 package networks.multilayer_perceptron.builders;
 
-import functions.ActivationFunction;
 import networks.multilayer_perceptron.network.NeuralNetwork;
 
 import java.util.Objects;
@@ -9,7 +8,7 @@ public class NetworkModel {
     public static final int VERSION = 1;
 
     public static NetworkModel from(NeuralNetwork neuralNetwork) {
-        int weightsLength = neuralNetwork.getWeightsCount();
+        int weightsLength = neuralNetwork.getTotalWeights();
         double[] weights = new double[weightsLength];
 
         for (int i=0; i<weightsLength; i++) {

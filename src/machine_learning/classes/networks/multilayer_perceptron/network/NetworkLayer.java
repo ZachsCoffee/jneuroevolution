@@ -1,21 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package networks.multilayer_perceptron.network;
 
+import core.layer.Imitable;
 import maths.Function;
 
 /**
  * @author main
  */
-public class NetworkLayer {
-    int maxStartValue = 1;
+public class NetworkLayer implements Imitable<NetworkLayer> {
 
-    protected final int NUMBER_OR_WEIGHTS;
+    protected final int totalWeightsCount;
+    protected final int inputWeightsCount;
     protected final Function function;
     protected final Neuron[] neurons;
+    int maxStartValue = 1;
 
     public NetworkLayer(int numberOfNeurons, int numberOfWeights) {
         this(numberOfNeurons, numberOfWeights, null);
@@ -26,14 +23,12 @@ public class NetworkLayer {
             throw new IllegalArgumentException("Number of nodes and number of weights must be greater than zero.");
         }
 
-        NUMBER_OR_WEIGHTS = numberOfWeights + Neuron.EXTRA_WEIGHTS;// the weights for one neuron
+        inputWeightsCount = numberOfWeights;
+
+        this.totalWeightsCount = numberOfWeights + Neuron.EXTRA_WEIGHTS;// the weights for one neuron
         neurons = new Neuron[numberOfNeurons];
 
         this.function = function;
-    }
-
-    public Neuron getNeuronAt(int position) {
-        return neurons[position];
     }
 
     public int getNeuronsCount() {
@@ -41,11 +36,20 @@ public class NetworkLayer {
     }
 
     public int getLayerInputCount() {
-        return NUMBER_OR_WEIGHTS - Neuron.EXTRA_WEIGHTS;
+        return inputWeightsCount;
     }
 
     public Function getFunction() {
         return function;
+    }
+
+    public Neuron getNeuronAt(int position) {
+        return neurons[position];
+    }
+
+    @Override
+    public NetworkLayer copy() {
+        return new NetworkLayer(neurons.length, inputWeightsCount, function);
     }
 
     protected void setNeuronAt(int position, Neuron neuron) {
@@ -53,16 +57,17 @@ public class NetworkLayer {
     }
 
     protected void buildNeurons(double[] weights, int startPoint) {
-        int endPoint = startPoint + NUMBER_OR_WEIGHTS;
+        int endPoint = startPoint + totalWeightsCount;
         for (int i = 0; i < neurons.length; i++) {
             if (function == null) {
                 neurons[i] = new Neuron(weights, startPoint, endPoint, maxStartValue);
-            } else {
+            }
+            else {
                 neurons[i] = new Neuron(weights, startPoint, endPoint, maxStartValue, function);
             }
 
-            startPoint += NUMBER_OR_WEIGHTS;
-            endPoint += NUMBER_OR_WEIGHTS;
+            startPoint += totalWeightsCount;
+            endPoint += totalWeightsCount;
         }
     }
 

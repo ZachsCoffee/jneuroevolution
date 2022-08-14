@@ -1,6 +1,6 @@
 package filters;
 
-import maths.matrix.MatrixReader;
+import core.layer.MatrixReader;
 import maths.Function;
 import maths.matrix.Matrix;
 
@@ -19,7 +19,7 @@ public class Filter implements Kernel {
         this.kernel = Objects.requireNonNull(kernel);
 
         if (! Matrix.isSquare(kernel)) {
-            throw new IllegalArgumentException("Kernel must be a square matrix!");
+            throw new IllegalArgumentException("Kernel must be a square core.matrix!");
         }
 
         this.outputFunction = outputFunction;
