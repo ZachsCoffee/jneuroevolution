@@ -9,9 +9,9 @@ import java.util.Objects;
 
 public class ConvolutionPersonManager implements NeuroevolutionPersonManager<TrainableLayer> {
 
-    private final Convolution2DProblem<TrainableLayer> neuroevolutionProblem;
+    private final Convolution2DProblem neuroevolutionProblem;
 
-    public ConvolutionPersonManager(Convolution2DProblem<TrainableLayer> neuroevolutionProblem) {
+    public ConvolutionPersonManager(Convolution2DProblem neuroevolutionProblem) {
         this.neuroevolutionProblem = Objects.requireNonNull(neuroevolutionProblem);
     }
 

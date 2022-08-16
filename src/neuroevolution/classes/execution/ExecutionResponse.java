@@ -1,18 +1,18 @@
 package execution;
 
-import networks.interfaces.Network;
+import core.layer.TrainableLayer;
 
 public class ExecutionResponse {
-    final Network network;
+    final TrainableLayer network;
     final NeuroevolutionProblemExecutor.EvaluationResult evaluationResult;
 
 
-    public ExecutionResponse(Network network, NeuroevolutionProblemExecutor.EvaluationResult evaluationResult) {
+    public ExecutionResponse(TrainableLayer network, NeuroevolutionProblemExecutor.EvaluationResult evaluationResult) {
         this.network = network;
         this.evaluationResult = evaluationResult;
     }
 
-    public Network getNetwork() {
+    public TrainableLayer getNetwork() {
         return network;
     }
 

@@ -1,40 +1,39 @@
 package execution;
 
+import core.layer.TrainableLayer;
 import data_manipulation.DatasetTarget;
 import evolution_builder.Evolution;
 import evolution_builder.population.PersonMigration;
 import evolution_builder.population.Population;
 import execution.common.DataBinder;
 import maths.Maths;
-import networks.interfaces.Network;
 
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class ProblemExecutor<P, D extends DatasetTarget> implements Stage.ProgressListener {
+public abstract class ProblemExecutor<P extends TrainableLayer, D extends DatasetTarget, T extends Problem<P, D>> implements Stage.ProgressListener {
 
     private final DataBinder dataBinder;
     private final AtomicInteger progressCounter = new AtomicInteger();
-    private final Problem<P, D> problem;
-    protected EvaluationTarget EVALUATION_TARGET;
+    private final T problem;
+    protected EvaluationTarget evaluationTarget;
     protected boolean
-        PERCENT_OF_FITNESS = false,
-        PERSON_MIGRATION = true;
+        percentOfFitness = false,
+        personMigration = true;
     protected double
-        MIGRATION_PERCENT = 0.1;
+        migrationPercent = 0.1;
     protected int
-        THREADS = 5,
-        EPOCHS = 2000,
-        POPULATION_SIZE = 40;
+        threads = 5,
+        epochs = 2000,
+        populationSize = 40;
     private HashMap<Long, Integer> threadToDatasetMap = null;
-    private double[] evolutionBest; // holds the (best person fitness) for each subpopulation
 
     private int totalEpochs;
 
     public ProblemExecutor(
         DataBinder dataBinder,
-        Problem<P, D> problem
+        T problem
     ) {
         this.problem = Objects.requireNonNull(problem);
         if (dataBinder == null) throw new IllegalArgumentException(
@@ -46,24 +45,26 @@ public abstract class ProblemExecutor<P, D extends DatasetTarget> implements Sta
 
     public abstract void executionEnds(ExecutionResponse[] responses);
 
-    protected abstract EvaluationResult evaluation(D dataset);
+    protected abstract EvaluationResult evaluation(P person, D dataset);
+
+    public T getProblem() {
+        return problem;
+    }
 
     public void execute() {
         progressCounter.set(0);
         // compute the total epochs
-        totalEpochs = THREADS * EPOCHS;
-
-        evolutionBest = new double[THREADS];
+        totalEpochs = threads * epochs;
 
         threadToDatasetMap = new HashMap<>();
 
-        PersonMigration personMigration = new PersonMigration(MIGRATION_PERCENT, EPOCHS, THREADS);
+        PersonMigration personMigration = new PersonMigration(migrationPercent, epochs, threads);
 
-        final ExecutionResponse[] executionResponses = new ExecutionResponse[THREADS];
+        final ExecutionResponse[] executionResponses = new ExecutionResponse[threads];
 
         final AtomicInteger threadCount = new AtomicInteger(0);
         final long startTimestamp = System.currentTimeMillis();
-        for (int i = 0; i < THREADS; i++) {
+        for (int i = 0; i < threads; i++) {
 
 
             final int internalI = i;
@@ -74,35 +75,35 @@ public abstract class ProblemExecutor<P, D extends DatasetTarget> implements Sta
 
                 threadToDatasetMap.put(threadId, internalI);
 
-                Evolution evolution = new Evolution(
-                    Population.generate(problem.getPersonManager(), POPULATION_SIZE),
-                    PERCENT_OF_FITNESS,
+                Evolution<P> evolution = new Evolution<>(
+                    Population.generate(problem.getPersonManager(), populationSize),
+                    percentOfFitness,
                     problem
                 );
 
-                if (PERSON_MIGRATION) personMigration.addPopulation(evolution);
+                if (this.personMigration) personMigration.addPopulation(evolution);
 
-                Stage<P, D> stage = new Stage<>(problem, EPOCHS);
+                Stage<P, D> stage = new Stage<>(problem, epochs);
 
                 stage.setProgressListener(this);
 
-                if (PERSON_MIGRATION) stage.setMigration(personMigration);
+                if (this.personMigration) stage.setMigration(personMigration);
 
-                evolution.startEvolution(EPOCHS, stage);
+                evolution.startEvolution(epochs, stage);
 
-                Network network = null;
-                switch (EVALUATION_TARGET) {
+                P trainableLayer = null;
+                switch (evaluationTarget) {
                     case EVOLUTION_BEST:
 
-                        network = (Network) evolution.getTotalBestPerson().getGeneCode();
+                        trainableLayer = evolution.getTotalBestPerson().getGeneCode();
                         break;
                     case VALIDATION_BEST:
 
-                        network = (Network) stage.getValidationBestPerson().getGeneCode();
+                        trainableLayer = stage.getValidationBestPerson().getGeneCode();
                         break;
                 }
 
-                EvaluationResult testResult = evaluation(problem.getTestingDataset());
+                EvaluationResult testResult = evaluation(trainableLayer, problem.getTestingDataset());
 
                 dataBinder.addResults(new ResultsData(
                     stage.getEvolutionStatistics(),
@@ -118,9 +119,9 @@ public abstract class ProblemExecutor<P, D extends DatasetTarget> implements Sta
                     )
                 ));
 
-                executionResponses[threadCount.getAndIncrement()] = new ExecutionResponse(network, testResult);
+                executionResponses[threadCount.getAndIncrement()] = new ExecutionResponse(trainableLayer, testResult);
 
-                if (threadCount.get() == THREADS) {
+                if (threadCount.get() == threads) {
                     executionEnds(executionResponses);
                     System.out.printf(
                         "Total execution time: %.2fs",

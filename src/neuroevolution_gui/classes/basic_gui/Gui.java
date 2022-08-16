@@ -1,6 +1,8 @@
 package basic_gui;
 
 import execution.NeuroevolutionProblemExecutor;
+import execution.Problem;
+import execution.ProblemExecutor;
 import execution.ResultsData;
 import execution.common.DataBinder;
 import org.jfree.chart.ChartFactory;
@@ -17,9 +19,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 public class Gui extends javax.swing.JFrame implements DataBinder {
-    private static NeuroevolutionProblemExecutor problemExecutor;
+    private static ProblemExecutor<?, ?, ?> problemExecutor;
 
-    public static void create(Class<? extends NeuroevolutionProblemExecutor> problemExecutor) {
+    public static void create(Class<? extends ProblemExecutor<?, ?, ?>> problemExecutor) {
 
         if (problemExecutor == null) throw new IllegalArgumentException(
                 "problem executor not null"

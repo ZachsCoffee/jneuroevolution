@@ -5,12 +5,14 @@ import core.layer.MatrixReader;
 
 public class MatrixReaderDataset implements DatasetTarget {
 
-    private MatrixReader[][] data;
-    private double[][] targets;
+    private final int dataLength;
+    private final MatrixReader[][] data;
+    private final double[][] targets;
 
     public MatrixReaderDataset(MatrixReader[][] data, double[][] targets) {
         this.data = data;
         this.targets = targets;
+        dataLength = this.data.length;
     }
 
     public MatrixReader[][] getData() {
@@ -20,6 +22,10 @@ public class MatrixReaderDataset implements DatasetTarget {
     @Override
     public double[][] getTargets() {
         return targets;
+    }
+
+    public int getDataLength() {
+        return dataLength;
     }
 
     private void validate(MatrixReader[][] data, double[][] targets) {

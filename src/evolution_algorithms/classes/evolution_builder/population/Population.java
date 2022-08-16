@@ -98,7 +98,7 @@ public class Population<P> {
     
     public void createPopulation(){//ftiaxnei to population
         for (int i=1; i<=size; i++){
-            population.add(personManager.newRandomPerson());
+            population.add(personManager.newPerson());
         }
     }
     

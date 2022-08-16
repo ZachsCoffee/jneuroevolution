@@ -8,6 +8,7 @@ module neuroevolution {
     requires evolution_algorithms;
     requires machine_learning;
     requires utils;
+    requires core;
 
     exports neuroevolution;
     exports execution;

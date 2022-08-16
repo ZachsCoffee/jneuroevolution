@@ -6,6 +6,7 @@ public abstract class AbstractChainableBuilder<T> implements TrainableBuilder<T>
 
     @Override
     public ChainableBuilder<T> setParentBuilder(T builder) {
+        this.builder = builder;
         return this;
     }
 

@@ -4,7 +4,7 @@ import core.layer.TrainableLayer;
 import dataset.MatrixReaderDataset;
 import execution.common.CommonProblem;
 
-public interface Convolution2DProblem<P> extends CommonProblem<P, MatrixReaderDataset> {
+public interface Convolution2DProblem extends CommonProblem<TrainableLayer, MatrixReaderDataset> {
 
     TrainableLayer buildConvolution();
 
