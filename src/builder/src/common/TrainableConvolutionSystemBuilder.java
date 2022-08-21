@@ -59,6 +59,8 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
             layers.add(lastLayerBuilder.build());
         }
 
+        lastLayerBuilder = builder;
+
         if (!layers.isEmpty()) {
             Layer lastLayer = layers.get(layers.size() -1);
 

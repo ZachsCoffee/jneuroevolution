@@ -13,7 +13,7 @@ import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
 import execution.NeuroevolutionPersonManager;
 import functions.ActivationFunction;
-import input.HsbInput;
+import input.RgbInput;
 import maths.MinMax;
 
 import javax.imageio.ImageIO;
@@ -37,7 +37,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         setDynamicMutation(new MinMax(1000, 2000), EPOCHS);
 
         Path basePath = Paths.get("/home/zachs/Develop/MachineLearning/stl10_binary");
-        int trainLimit = 1000;
+        int trainLimit = 100;
         int testLimit = 8000;
         MatrixReader[][] trainImages = readX(basePath.resolve("images/train"), trainLimit);
 
@@ -61,7 +61,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         try {
             int count = 0;
             for (File file : files) {
-                data.add(new HsbInput(ImageIO.read(file)).getChannels());
+                data.add(new RgbInput(ImageIO.read(file)).getChannels());
                 if (++count == limit) {
                     break;
                 }

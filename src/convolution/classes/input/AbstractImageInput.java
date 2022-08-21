@@ -78,6 +78,18 @@ public abstract class AbstractImageInput implements MatrixReader {
         return getHsb(bufferedImage.getRGB(columnIndex, rowIndex));
     }
 
+    protected int getRed(int rgb) {
+        return rgb >> 16 & 0xFF;
+    }
+
+    protected int getGreen(int rgb) {
+        return rgb >> 8 & 0xFF;
+    }
+
+    protected int getBlue(int rgb) {
+        return rgb & 0xFF;
+    }
+
     protected float[] getHsb(int rgb) {
         Color.RGBtoHSB(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF, hsb);
 

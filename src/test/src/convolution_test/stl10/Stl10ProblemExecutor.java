@@ -18,7 +18,7 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
     ) {
         super(dataBinder, new Stl10ConvolutionProblem());
         epochs = 10;
-        threads = 1;
+        threads = 5;
         populationSize = 10;
     }
 

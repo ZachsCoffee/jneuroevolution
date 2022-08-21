@@ -12,6 +12,8 @@ import schema.BluePrint;
 import schema.SchemaComputer;
 import utils.MatrixReaderUtils;
 
+import java.util.Arrays;
+
 public class TrainableConvolutionLayer extends AbstractConvolutionLayer implements TrainableLayer, LayerSchemaResolver {
 
     private static final int KERNEL_SIZE = 3;
@@ -63,6 +65,7 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
         int totalWeightsCount = findTotalWeightsCount();
 
         kernelsWeights = new double[totalWeightsCount];
+        Arrays.setAll(kernelsWeights, value -> Math.random());
         biasWeightIndexes = createBiasWeightIndexes(totalWeightsCount);
 
         schemaComputer = new SchemaComputer(stride, keepSize);
