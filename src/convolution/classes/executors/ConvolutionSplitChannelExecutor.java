@@ -70,7 +70,7 @@ public class ConvolutionSplitChannelExecutor extends ConvolutionExecutor {
             };
 
             for (Layer channelLayer : channelsLayers[i]) {
-                tempLayerSchema = channelLayer.getSchema(tempLayerSchema, convolutionSchemaPrinter);
+                tempLayerSchema = channelLayer.getSchema(tempLayerSchema);
             }
 
             i++;

@@ -1,17 +1,18 @@
 package executors;
 
 import core.layer.*;
+import core.schema.SchemaRow;
 
 import java.util.*;
 
 public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
 
-    private final List<Layer> layers;
-    private final List<TrainableLayer> trainableLayers = new ArrayList<>();
+    private final ArrayList<Layer> layers;
+    private final ArrayList<TrainableLayer> trainableLayers = new ArrayList<>();
     private final int totalWeights;
     private final int[] layerPosition = new int[2];
 
-    public TrainableSystem(List<Layer> layers) {
+    public TrainableSystem(ArrayList<Layer> layers) {
         this.layers = Objects.requireNonNull(layers);
 
         if (layers.isEmpty()) throw new IllegalArgumentException(
@@ -82,29 +83,22 @@ public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
         return previousMatrixReader;
     }
 
-    @Override
-    public MatrixSchema[] getSchema(
-        MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter
-    ) {
-        return new MatrixSchema[0];
-    }
-
-    public void printSchema(MatrixReader[] channels) {
-        System.out.println("Total channels " + channels.length);
-
-        ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channels[0]);
-        MatrixSchema[] tempLayerSchema;
-
-        tempLayerSchema = channels;
-
-        System.out.println("Channels #1..." + channels.length);
-
-        for (Layer channelLayer : layers) {
-            tempLayerSchema = channelLayer.getSchema(tempLayerSchema, convolutionSchemaPrinter);
-        }
-
-        convolutionSchemaPrinter.print();
-    }
+//    public void printSchema(MatrixReader[] channels) {
+//        System.out.println("Total channels " + channels.length);
+//
+//        ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channels[0]);
+//        MatrixSchema[] tempLayerSchema;
+//
+//        tempLayerSchema = channels;
+//
+//        System.out.println("Channels #1..." + channels.length);
+//
+//        for (Layer channelLayer : layers) {
+//            tempLayerSchema = channelLayer.getSchema(tempLayerSchema, convolutionSchemaPrinter);
+//        }
+//
+//        convolutionSchemaPrinter.print();
+//    }
 
     @Override
     public Iterator<Layer> iterator() {
@@ -113,7 +107,7 @@ public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
 
     @Override
     public TrainableLayer copy() {
-        List<Layer> copiedLayers = new LinkedList<>();
+        ArrayList<Layer> copiedLayers = new ArrayList<>(layers.size());
 
         for (Layer layer : layers) {
             copiedLayers.add(layer.copy());
@@ -122,6 +116,16 @@ public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
         return new TrainableSystem(
             copiedLayers
         );
+    }
+
+    @Override
+    public MatrixSchema[] getSchema(MatrixSchema[] inputSchema) {
+        return new MatrixSchema[0];
+    }
+
+    @Override
+    public SchemaRow getSchemaRow(MatrixSchema[] inputSchema) {
+        return null;
     }
 
     protected ConvolutionSchemaPrinter getConvolutionSchemaPrinter(MatrixReader channel) {

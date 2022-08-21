@@ -4,6 +4,7 @@ import core.layer.ConvolutionSchemaPrinter;
 import core.layer.Layer;
 import core.layer.MatrixReader;
 import core.layer.MatrixSchema;
+import core.schema.SchemaRow;
 import layers.convolution.ConvolutionUtils;
 import core.schema.LayerSchema;
 import maths.matrix.Matrix2D;
@@ -47,7 +48,7 @@ public class PoolLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+    public MatrixSchema[] getSchema(MatrixSchema[] inputChannels) {
         if (inputChannels.length == 0) throw new IllegalArgumentException(
             "Need at least one input channel."
         );
@@ -66,17 +67,26 @@ public class PoolLayer implements Layer {
             matrixSchemas[i] = new LayerSchema(dimensions[0], dimensions[1]);
         }
 
-        convolutionSchemaPrinter.addRow(
-            "Pool",
-            inputChannels.length,
-            "-",
-            sampleSize + "x" + sampleSize,
-            stride,
-            0,
-            inputChannels.length + "x" + dimensions[0] + "x" + dimensions[1]
-        );
 
         return matrixSchemas;
+    }
+
+    @Override
+    public SchemaRow getSchemaRow(MatrixSchema[] inputSchema) {
+        int[] dimensions = ConvolutionUtils.outputDimensions(
+            inputSchema[0].getRowsCount(),
+            inputSchema[0].getColumnsCount(),
+            sampleSize,
+            0,
+            stride
+        );
+
+        return new SchemaRow()
+            .setLayerType("Pool")
+            .setChannelsCount(inputSchema.length)
+            .setStride(stride+"x"+stride)
+            .setSampleSize(sampleSize)
+            .setOutput(inputSchema.length+"x"+dimensions[0]+"x"+dimensions[1]);
     }
 
     @Override

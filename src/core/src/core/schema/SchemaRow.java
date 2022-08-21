@@ -8,9 +8,9 @@ public class SchemaRow {
     private Integer channelsCount = null;
     private Integer filtersCount = null;
     private Integer sampleSize = null;
-    private Integer stride = null;
-    private Integer padding = null;
-    private int output;
+    private String stride = null;
+    private String padding = null;
+    private String output;
 
     public SchemaRow setLayerType(String layerType) {
         this.layerType = layerType;
@@ -32,17 +32,17 @@ public class SchemaRow {
         return this;
     }
 
-    public SchemaRow setStride(Integer stride) {
+    public SchemaRow setStride(String stride) {
         this.stride = stride;
         return this;
     }
 
-    public SchemaRow setPadding(Integer padding) {
+    public SchemaRow setPadding(String padding) {
         this.padding = padding;
         return this;
     }
 
-    public SchemaRow setOutput(int output) {
+    public SchemaRow setOutput(String output) {
         this.output = output;
         return this;
     }
@@ -55,7 +55,7 @@ public class SchemaRow {
             format(sampleSize),
             format(stride),
             format(padding),
-            format(output),
+            Objects.requireNonNull(output),
         };
     }
 

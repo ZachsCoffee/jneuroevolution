@@ -1,11 +1,13 @@
 package layers.convolution;
 
 import core.layer.Layer;
+import core.layer.LayerSchemaResolver;
+import core.schema.LayerSchema;
+import core.schema.SchemaRow;
 import filters.Filter;
-import core.layer.ConvolutionSchemaPrinter;
 import core.layer.MatrixReader;
 import core.layer.MatrixSchema;
-import core.schema.LayerSchema;
+import schema.BluePrint;
 import schema.SchemaComputer;
 import utils.MatrixReaderUtils;
 
@@ -121,34 +123,42 @@ public class ConvolutionLayer extends AbstractConvolutionLayer {
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
-        MatrixSchema[] matrixSchemas = new MatrixSchema[inputChannels.length * filters.length];
-        for (int i = 0; i < inputChannels.length; i++) {
+    public MatrixSchema[] getSchema(MatrixSchema[] inputSchema) {
+        MatrixSchema[] matrixSchemas = new MatrixSchema[inputSchema.length * filters.length];
+        for (int i = 0; i < inputSchema.length; i++) {
             for (int j = 0; j < filters.length; j++) {
-                schemaComputer.compute(
-                    inputChannels[i].getRowsCount(),
-                    inputChannels[i].getColumnsCount(),
+                BluePrint bluePrint = schemaComputer.compute(
+                    inputSchema[i].getRowsCount(),
+                    inputSchema[i].getColumnsCount(),
                     filters[j].getKernelSize()
                 );
 
                 matrixSchemas[i * filters.length + j] = new LayerSchema(
-                    schemaComputer.getRowsCount(),
-                    schemaComputer.getColumnsCount()
+                    bluePrint.getRowsCount(),
+                    bluePrint.getColumnsCount()
                 );
             }
         }
-
-        convolutionSchemaPrinter.addRow(
-            "Convolution",
-            inputChannels.length,
-            filters.length,
-            "-",
-            schemaComputer.getStrideRows() + "x" + schemaComputer.getStrideColumns(),
-            schemaComputer.getPaddingRows() + "x" + schemaComputer.getPaddingColumns(),
-            inputChannels.length + "x" + filters.length + "x" + schemaComputer.getRowsCount() + "x" + schemaComputer.getColumnsCount()
-        );
+//
+//        convolutionSchemaPrinter.addRow(
+//            "Convolution",
+//            inputSchema.length,
+//            filters.length,
+//            "-",
+//            schemaComputer.getStrideRows() + "x" + schemaComputer.getStrideColumns(),
+//            schemaComputer.getPaddingRows() + "x" + schemaComputer.getPaddingColumns(),
+//            inputSchema.length + "x" + filters.length + "x" + schemaComputer.getRowsCount() + "x" + schemaComputer.getColumnsCount()
+//        );
 
         return matrixSchemas;
+    }
+
+    @Override
+    public SchemaRow getSchemaRow(MatrixSchema[] inputSchema) {
+        return new SchemaRow()
+            .setLayerType("Convolution")
+            .setChannelsCount(inputSchema.length)
+            .setOutput("");
     }
 
     private void validateState(Object value) {

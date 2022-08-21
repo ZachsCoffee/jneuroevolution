@@ -1,6 +1,6 @@
 package convolution_test.stl10;
 
-import common.TrainableSystemBuilder;
+import common.TrainableConvolutionSystemBuilder;
 import core.layer.MatrixReader;
 import core.layer.TrainableLayer;
 import dataset.MatrixReaderDataset;
@@ -10,8 +10,8 @@ import evolution.ConvolutionPersonManager;
 import evolution_builder.components.Mutation;
 import evolution_builder.components.Recombination;
 import evolution_builder.components.Selection;
-import evolution_builder.population.PersonManager;
 import evolution_builder.population.Population;
+import execution.NeuroevolutionPersonManager;
 import functions.ActivationFunction;
 import input.HsbInput;
 import maths.MinMax;
@@ -37,29 +37,34 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         setDynamicMutation(new MinMax(1000, 2000), EPOCHS);
 
         Path basePath = Paths.get("/home/zachs/Develop/MachineLearning/stl10_binary");
-
-        MatrixReader[][] trainImages = readX(basePath.resolve("images/train"));
+        int trainLimit = 1000;
+        int testLimit = 8000;
+        MatrixReader[][] trainImages = readX(basePath.resolve("images/train"), trainLimit);
 
         trainingDataset = new MatrixReaderDataset(
             trainImages,
-            readY(trainImages.length, basePath.resolve("train_y.bin"))
+            readY(trainImages.length, basePath.resolve("train_y.bin"), trainLimit)
         );
 
-        MatrixReader[][] testImages = readX(basePath.resolve("images/test"));
+        MatrixReader[][] testImages = readX(basePath.resolve("images/test"), testLimit);
 
         testingDataset = new MatrixReaderDataset(
             testImages,
-            readY(testImages.length, basePath.resolve("test_y.bin"))
+            readY(testImages.length, basePath.resolve("test_y.bin"), testLimit)
         );
     }
 
-    private MatrixReader[][] readX(Path folder) {
+    private MatrixReader[][] readX(Path folder, int limit) {
         File[] files = folder.toFile().listFiles();
         List<MatrixReader[]> data = new LinkedList<>();
 
         try {
+            int count = 0;
             for (File file : files) {
                 data.add(new HsbInput(ImageIO.read(file)).getChannels());
+                if (++count == limit) {
+                    break;
+                }
             }
         }
         catch (IOException e) {
@@ -69,14 +74,18 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         return data.toArray(new MatrixReader[0][]);
     }
 
-    private double[][] readY(int targetsCount, Path file) {
+    private double[][] readY(int targetsCount, Path file, int limit) {
         double[][] targets = new double[targetsCount][1];
 
         int i = 0;
         try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file.toString()))){
             int label;
+            int count = 0;
             while ((label = inputStream.read()) != -1) {
                 targets[i++][0] = label;
+                if (++count == limit) {
+                    break;
+                }
             }
         }
         catch (IOException e) {
@@ -87,13 +96,13 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     }
 
     @Override
-    public PersonManager<TrainableLayer> getPersonManager() {
+    public NeuroevolutionPersonManager<TrainableLayer> getPersonManager() {
         return personManager;
     }
 
     @Override
     public TrainableLayer buildConvolution() {
-        return TrainableSystemBuilder.getInstance(3)
+        return TrainableConvolutionSystemBuilder.getInstance(3, 96, 96)
             .addConvolutionLayer()
             .setStride(2)
             .setKernelsPerChannel(2)
@@ -101,6 +110,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             .addNeuralNetworkLayer()
             .addLayer(10, ActivationFunction.SIGMOID.getFunction())
             .addLayer(1, ActivationFunction.SIGMOID.getFunction())
+            .and()
             .build();
     }
 
@@ -147,6 +157,6 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         double[] results = convolution.execute(dataset.getData()[index])[0].getRow(0);
         results[0] = Math.round(results[0] * 10);
 
-        return results;
+        return new double[] {results[0], dataset.getTargets()[index][0]};
     }
 }

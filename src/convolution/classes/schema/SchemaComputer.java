@@ -11,10 +11,7 @@ public class SchemaComputer {
 
     private final LayerSchema fixedSchema;
     private final boolean keepSize;
-
-    private int paddingRows, paddingColumns;
-    private int strideRows, strideColumns;
-    private int rowsCount, columnsCount;
+    private final int strideRows, strideColumns;
 
     public SchemaComputer(int stride, boolean keepSize) {
         if (stride < 1) throw new IllegalArgumentException(
@@ -35,82 +32,65 @@ public class SchemaComputer {
         strideRows = strideColumns = DEFAULT_STRIDE;
     }
 
-    public void compute(int inputRows, int inputColumns, int kernelSize) {
-        if (keepSize) {
-            paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, strideRows, inputRows);
-            paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, strideColumns, inputColumns);
+    public BluePrint compute(int inputRows, int inputColumns, int kernelSize) {
+        BluePrint bluePrint = new BluePrint();
 
-            rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, strideRows);
-            columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, strideColumns);
+        bluePrint.strideRows = strideRows;
+        bluePrint.strideColumns = strideColumns;
+
+        if (keepSize) {
+            bluePrint.paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, bluePrint.strideRows, inputRows);
+            bluePrint.paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, bluePrint.strideColumns, inputColumns);
+
+            bluePrint.rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, bluePrint.paddingRows, bluePrint.strideRows);
+            bluePrint.columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, bluePrint.paddingColumns, bluePrint.strideColumns);
 
             // validate
-            if (rowsCount != inputRows || columnsCount != inputColumns) throw new RuntimeException(
-                    "Failed to keep the fixed size input rows "+inputRows+" input columns: "+inputColumns+" computed rows: "+rowsCount+" columns: "+columnsCount
+            if (bluePrint.rowsCount != inputRows || bluePrint.columnsCount != inputColumns) throw new RuntimeException(
+                    "Failed to keep the fixed size input rows "+inputRows+" input columns: "+inputColumns+" computed rows: "+bluePrint.rowsCount+" columns: "+bluePrint.columnsCount
             );
         }
         else if (fixedSchema != null) {
             if (inputRows > fixedSchema.getRowsCount()) {
-                paddingRows = 0;
-                strideRows = ConvolutionUtils.stride(inputRows, kernelSize, 0, fixedSchema.getRowsCount());
+                bluePrint.paddingRows = 0;
+                bluePrint.strideRows = ConvolutionUtils.stride(inputRows, kernelSize, 0, fixedSchema.getRowsCount());
             }
             else {
-                strideRows = DEFAULT_STRIDE;
-                paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, strideRows, fixedSchema.getRowsCount());
+                bluePrint.strideRows = DEFAULT_STRIDE;
+                bluePrint.paddingRows = ConvolutionUtils.padding(inputRows, kernelSize, bluePrint.strideRows, fixedSchema.getRowsCount());
             }
 
             if (inputColumns > fixedSchema.getColumnsCount()) {
-                paddingColumns = 0;
-                strideColumns = ConvolutionUtils.stride(inputColumns, kernelSize, 0, fixedSchema.getColumnsCount());
+                bluePrint.paddingColumns = 0;
+                bluePrint.strideColumns = ConvolutionUtils.stride(inputColumns, kernelSize, 0, fixedSchema.getColumnsCount());
             }
             else {
-                strideColumns = DEFAULT_STRIDE;
-                paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, strideColumns, fixedSchema.getColumnsCount());
+                bluePrint.strideColumns = DEFAULT_STRIDE;
+                bluePrint.paddingColumns = ConvolutionUtils.padding(inputColumns, kernelSize, strideColumns, fixedSchema.getColumnsCount());
             }
 
-            rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, strideRows);
-            columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, strideColumns);
+            bluePrint.rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, bluePrint.paddingRows, strideRows);
+            bluePrint.columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, bluePrint.paddingColumns, strideColumns);
 
             // validate
 //            if (rowsCount != fixedSchema.getRowCount() || columnsCount != fixedSchema.getColumnCount()) throw new RuntimeException(
 //                    "Failed to keep the fixed size "+fixedSchema+" computed rows: "+rowsCount+" columns: "+columnsCount
 //            );
-            if (rowsCount != fixedSchema.getRowsCount() || columnsCount != fixedSchema.getColumnsCount()) {
+            if (bluePrint.rowsCount != fixedSchema.getRowsCount() || bluePrint.columnsCount != fixedSchema.getColumnsCount()) {
 //                System.err.println(
 //                        "Failed to keep the fixed size "+fixedSchema+" computed rows: "+rowsCount+" columns: "+columnsCount
 //                );
-                rowsCount = fixedSchema.getRowsCount();
-                columnsCount = fixedSchema.getColumnsCount();
+                bluePrint.rowsCount = fixedSchema.getRowsCount();
+                bluePrint.columnsCount = fixedSchema.getColumnsCount();
             }
         }
         else {
-            paddingRows = paddingColumns = 0;
+            bluePrint.paddingRows = bluePrint.paddingColumns = 0;
 
-            rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, paddingRows, strideRows);
-            columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, paddingColumns, strideColumns);
+            bluePrint.rowsCount = ConvolutionUtils.outputDimension(inputRows, kernelSize, bluePrint.paddingRows, strideRows);
+            bluePrint.columnsCount = ConvolutionUtils.outputDimension(inputColumns, kernelSize, bluePrint.paddingColumns, strideColumns);
         }
-    }
 
-    public int getPaddingRows() {
-        return paddingRows;
-    }
-
-    public int getPaddingColumns() {
-        return paddingColumns;
-    }
-
-    public int getRowsCount() {
-        return rowsCount;
-    }
-
-    public int getColumnsCount() {
-        return columnsCount;
-    }
-
-    public int getStrideRows() {
-        return strideRows;
-    }
-
-    public int getStrideColumns() {
-        return strideColumns;
+        return bluePrint;
     }
 }

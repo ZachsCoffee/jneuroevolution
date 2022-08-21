@@ -8,7 +8,7 @@ public interface NeuroevolutionPersonManager<P> extends PersonManager<P> {
 
     @Override
     default double computeFitness(PopulationPerson<P> populationPerson) {
-        throw new UnsupportedOperationException("Need to specify the rawDataset in order to compute the fitness.");
+        return computeFitness(populationPerson, DatasetType.TRAINING);
     }
 
     double computeFitness(PopulationPerson<P> populationPerson, DatasetType datasetType);

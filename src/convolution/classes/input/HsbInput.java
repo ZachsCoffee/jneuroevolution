@@ -16,20 +16,20 @@ public class HsbInput implements ConvolutionInput {
         channels = new MatrixReader[] {
                 new AbstractImageInput(image) {
                     @Override
-                    public double valueAt(int rowIndex, int columnIndex) {
-                        return getHsb(rowIndex, columnIndex)[0];
+                    protected double readValueOf(int rgb) {
+                        return getHsb(rgb)[0];
                     }
                 },
                 new AbstractImageInput(image) {
                     @Override
-                    public double valueAt(int rowIndex, int columnIndex) {
-                        return getHsb(rowIndex, columnIndex)[1];
+                    protected double readValueOf(int rgb) {
+                        return getHsb(rgb)[1];
                     }
                 },
                 new AbstractImageInput(image) {
                     @Override
-                    public double valueAt(int rowIndex, int columnIndex) {
-                        return getHsb(rowIndex, columnIndex)[2];
+                    protected double readValueOf(int rgb) {
+                        return getHsb(rgb)[2];
                     }
                 }
         };

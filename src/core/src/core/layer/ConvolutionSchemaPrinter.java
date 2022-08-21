@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.Objects;
 
 public class ConvolutionSchemaPrinter {
+
     private final String[] columns;
     private final LinkedList<Object[]> data = new LinkedList<>();
 

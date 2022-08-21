@@ -16,6 +16,8 @@
     <orderEntry type="module" module-name="neuroevolution_gui" />
     <orderEntry type="module" module-name="core" />
     <orderEntry type="module" module-name="core" />
+    <orderEntry type="module" module-name="builder1" />
+    <orderEntry type="module" module-name="builder" />
     <orderEntry type="module" module-name="builder" />
   </component>
 </module>

@@ -13,6 +13,7 @@ public abstract class AbstractImageInput implements MatrixReader {
     protected final float[] hsb = new float[3];
     protected final int realRowsCount, realColumnsCount;
     protected final int rowsCount, columnsCount;
+    private final int[] rgbRow;
 
     public AbstractImageInput(BufferedImage bufferedImage) {
         this.bufferedImage = Objects.requireNonNull(bufferedImage);
@@ -33,6 +34,28 @@ public abstract class AbstractImageInput implements MatrixReader {
         else {
             columnsCount = realColumnsCount;
         }
+
+        rgbRow = new int[realColumnsCount];
+    }
+
+    protected abstract double readValueOf(int rgb);
+
+    @Override
+    public double valueAt(int rowIndex, int columnIndex) {
+        return readValueOf(bufferedImage.getRGB(columnIndex, rowIndex));
+    }
+
+    @Override
+    public double[] getRow(int position) {
+        bufferedImage.getRGB(0, position, rgbRow.length, 1, rgbRow, 0, 0);
+
+        double[] data = new double[rgbRow.length];
+
+        for (int i=0; i<data.length; i++) {
+            data[i] = readValueOf(rgbRow[i]);
+        }
+
+        return data;
     }
 
     @Override
@@ -51,8 +74,11 @@ public abstract class AbstractImageInput implements MatrixReader {
             Arrays.fill(hsb, 0);
             return hsb;
         }
-        int rgb = bufferedImage.getRGB(columnIndex, rowIndex);
 
+        return getHsb(bufferedImage.getRGB(columnIndex, rowIndex));
+    }
+
+    protected float[] getHsb(int rgb) {
         Color.RGBtoHSB(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF, hsb);
 
         return hsb;

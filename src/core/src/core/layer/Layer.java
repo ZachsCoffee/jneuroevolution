@@ -1,7 +1,5 @@
 package core.layer;
 
-public interface Layer extends Imitable<Layer>{
+public interface Layer extends Imitable<Layer>, LayerSchemaResolver{
     MatrixReader[] execute(MatrixReader[] inputChannels);
-
-    MatrixSchema[] getSchema(MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter);
 }

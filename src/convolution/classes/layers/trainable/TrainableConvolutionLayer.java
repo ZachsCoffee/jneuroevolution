@@ -1,19 +1,18 @@
 package layers.trainable;
 
+import core.layer.*;
+import core.schema.SchemaRow;
 import filters.TrainableKernel;
 import functions.ActivationFunction;
-import core.layer.ConvolutionSchemaPrinter;
-import core.layer.MatrixReader;
-import core.layer.MatrixSchema;
-import core.layer.TrainableLayer;
 import layers.convolution.AbstractConvolutionLayer;
 import maths.Function;
 import maths.matrix.MatrixRW;
 import core.schema.LayerSchema;
+import schema.BluePrint;
 import schema.SchemaComputer;
 import utils.MatrixReaderUtils;
 
-public class TrainableConvolutionLayer extends AbstractConvolutionLayer implements TrainableLayer {
+public class TrainableConvolutionLayer extends AbstractConvolutionLayer implements TrainableLayer, LayerSchemaResolver {
 
     private static final int KERNEL_SIZE = 3;
     private static final Function FUNCTION = ActivationFunction.GROUND_RELU.getFunction();
@@ -27,7 +26,7 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
     private final double[] kernelsWeights;
     private final TrainableKernel[] kernels;
     private final int[] biasWeightIndexes;
-    private SchemaComputer schemaComputer;
+    private final SchemaComputer schemaComputer;
 
     public TrainableConvolutionLayer(
         int channelsCount,
@@ -65,6 +64,12 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
 
         kernelsWeights = new double[totalWeightsCount];
         biasWeightIndexes = createBiasWeightIndexes(totalWeightsCount);
+
+        schemaComputer = new SchemaComputer(stride, keepSize);
+
+        for (TrainableKernel kernel : kernels) {
+            kernel.setGlobalWeights(kernelsWeights);
+        }
     }
 
     @Override
@@ -120,43 +125,50 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
 
     @Override
     public MatrixSchema[] getSchema(
-        MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter
+        MatrixSchema[] inputChannels
     ) {
-        setupSchema();
+        BluePrint[] bluePrints = getBluePrints(inputChannels);
 
-        MatrixSchema[] matrixSchemas;
+        MatrixSchema[] matrixSchemas = new MatrixSchema[bluePrints.length];
+
+        for (int i=0; i<bluePrints.length; i++) {
+            matrixSchemas[i] = new LayerSchema(
+                bluePrints[i].getRowsCount(),
+                bluePrints[i].getColumnsCount()
+            );
+        }
+
+        return matrixSchemas;
+    }
+
+    public BluePrint[] getBluePrints(
+        MatrixSchema[] inputChannels
+    ) {
+        BluePrint[] bluePrints;
         if (sumKernels) {
-            matrixSchemas = new MatrixSchema[kernelsPerChannel];
+            bluePrints = new BluePrint[kernelsPerChannel];
             for (int i = 0; i < kernelsPerChannel; i++) {
-                schemaComputer.compute(
+                bluePrints[i] = schemaComputer.compute(
                     inputChannels[i].getRowsCount(),
                     inputChannels[i].getColumnsCount(),
                     KERNEL_SIZE
                 );
-                matrixSchemas[i] = new LayerSchema(
-                    schemaComputer.getRowsCount(),
-                    schemaComputer.getColumnsCount()
-                );
             }
         }
         else {
-            matrixSchemas = new MatrixSchema[inputChannels.length * kernelsPerChannel];
+            bluePrints = new BluePrint[inputChannels.length * kernelsPerChannel];
             for (int i = 0; i < inputChannels.length; i++) {
                 for (int j = 0; j < kernelsPerChannel; j++) {
-                    schemaComputer.compute(
+                    bluePrints[i * kernelsPerChannel + j] = schemaComputer.compute(
                         inputChannels[i].getRowsCount(),
                         inputChannels[i].getColumnsCount(),
                         KERNEL_SIZE
-                    );
-                    matrixSchemas[i * kernelsPerChannel + j] = new LayerSchema(
-                        schemaComputer.getRowsCount(),
-                        schemaComputer.getColumnsCount()
                     );
                 }
             }
         }
 
-        return matrixSchemas;
+        return bluePrints;
     }
 
     @Override
@@ -170,8 +182,18 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
         );
     }
 
-    private void setupSchema() {
-        schemaComputer = new SchemaComputer(stride, keepSize);
+    @Override
+    public SchemaRow getSchemaRow(MatrixSchema[] inputSchema) {
+        BluePrint[] bluePrints = getBluePrints(inputSchema);
+        BluePrint bluePrint = bluePrints[0];
+
+        return new SchemaRow()
+            .setLayerType("Trainable convolution")
+            .setChannelsCount(inputSchema.length)
+            .setFiltersCount(kernels.length)
+            .setPadding(bluePrint.getPaddingRows()+"x"+bluePrint.getPaddingColumns())
+            .setStride(bluePrint.getStrideRows()+"x"+bluePrint.getStrideColumns())
+            .setOutput(bluePrints.length+"x"+bluePrint.getRowsCount()+"x"+bluePrint.getStrideRows());
     }
 
     private int[] createBiasWeightIndexes(int totalWeightsCount) {

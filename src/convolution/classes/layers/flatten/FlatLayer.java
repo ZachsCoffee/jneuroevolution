@@ -1,10 +1,11 @@
 package layers.flatten;
 
 import core.layer.*;
+import core.schema.SchemaRow;
 import maths.matrix.VectorReader;
 import core.schema.LayerSchema;
 
-public class FlatLayer implements Layer {
+public class FlatLayer implements Layer, LayerSchemaResolver {
 
     @Override
     public MatrixReader[] execute(MatrixReader[] inputChannels) {
@@ -27,18 +28,8 @@ public class FlatLayer implements Layer {
     }
 
     @Override
-    public MatrixSchema[] getSchema(MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter) {
+    public MatrixSchema[] getSchema(MatrixSchema[] inputChannels) {
         int outputSize = computeOutputSize(inputChannels);
-
-        convolutionSchemaPrinter.addRow(
-            "Flatten",
-            inputChannels.length,
-            '-',
-            '-',
-            '-',
-            '-',
-            "1x"+outputSize
-        );
 
         return new MatrixSchema[] {
                 new LayerSchema(1, outputSize)
@@ -46,11 +37,21 @@ public class FlatLayer implements Layer {
     }
 
     @Override
+    public SchemaRow getSchemaRow(MatrixSchema[] inputSchema) {
+        int outputSize = computeOutputSize(inputSchema);
+
+        return new SchemaRow()
+            .setLayerType("Flatten")
+            .setChannelsCount(inputSchema.length)
+            .setOutput("1x"+outputSize);
+    }
+
+    @Override
     public Layer copy() {
         return new FlatLayer();
     }
 
-    private <T extends MatrixSchema> int computeOutputSize(T[] channel) {
+    public int computeOutputSize(MatrixSchema[] channel) {
         int flatSize = 0;
 
         for (MatrixSchema filter : channel) {

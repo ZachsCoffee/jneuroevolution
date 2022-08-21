@@ -5,6 +5,7 @@ import core.layer.Layer;
 import core.layer.MatrixReader;
 import maths.matrix.MatrixRW;
 import maths.matrix.Matrix2D;
+import schema.BluePrint;
 import schema.SchemaComputer;
 
 import java.util.Objects;
@@ -22,23 +23,23 @@ public abstract class AbstractConvolutionLayer implements Layer {
         int inputColumns = channel.getColumnsCount();
         int kernelSize = kernel.getKernelSize();
 
-        schemaComputer.compute(inputRows, inputColumns, kernelSize);
+        BluePrint bluePrint = schemaComputer.compute(inputRows, inputColumns, kernelSize);
 
-        double[][] output = new double[schemaComputer.getRowsCount()][schemaComputer.getColumnsCount()];
+        double[][] output = new double[bluePrint.getRowsCount()][bluePrint.getColumnsCount()];
 
-        int inputRowsBound = inputRows + schemaComputer.getPaddingRows() - kernelSize;
-        int inputColumnsBound = inputColumns + schemaComputer.getPaddingColumns() - kernelSize;
+        int inputRowsBound = inputRows + bluePrint.getPaddingRows() - kernelSize;
+        int inputColumnsBound = inputColumns + bluePrint.getPaddingColumns() - kernelSize;
 
         try {
             for (
-                int i = - schemaComputer.getPaddingRows(), outI = 0;
+                int i = - bluePrint.getPaddingRows(), outI = 0;
                 i < inputRowsBound;
-                i += schemaComputer.getStrideRows(), outI++
+                i += bluePrint.getStrideRows(), outI++
             ) {
                 for (
-                    int j = - schemaComputer.getPaddingColumns(), outJ = 0;
+                    int j = - bluePrint.getPaddingColumns(), outJ = 0;
                     j < inputColumnsBound;
-                    j += schemaComputer.getStrideColumns(), outJ++
+                    j += bluePrint.getStrideColumns(), outJ++
                 ) {
                     output[outI][outJ] = kernel.compute(channel, i, j);
                 }

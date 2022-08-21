@@ -12,16 +12,13 @@ public class ImageInput implements ConvolutionInput {
     public ImageInput(BufferedImage image) {
         Objects.requireNonNull(image);
 
+
+
         channels = new MatrixReader[] {
                 new AbstractImageInput(image) {
                     @Override
-                    public double valueAt(int rowIndex, int columnIndex) {
-                        return bufferedImage.getRGB(columnIndex, rowIndex);
-                    }
-
-                    @Override
-                    public double[] getRow(int position) {
-                        throw new UnsupportedOperationException();
+                    protected double readValueOf(int rgb) {
+                        return rgb;
                     }
                 }
         };

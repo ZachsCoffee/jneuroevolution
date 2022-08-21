@@ -185,7 +185,7 @@ public class NeuralNetwork implements Network, TrainableLayer {
             "The input core.matrix must be flat, exactly one row needed as input. Found: " + inputChannels[0].getRowsCount()
         );
 
-        if (inputChannels[0].getColumnsCount() > 0) throw new IllegalArgumentException(
+        if (inputChannels[0].getColumnsCount() < 1) throw new IllegalArgumentException(
             "Need at least one column as input. Found: " + inputChannels[0].getColumnsCount()
         );
 
@@ -202,19 +202,23 @@ public class NeuralNetwork implements Network, TrainableLayer {
 
     @Override
     public MatrixSchema[] getSchema(
-        MatrixSchema[] inputChannels, ConvolutionSchemaPrinter convolutionSchemaPrinter
+        MatrixSchema[] inputChannels
     ) {
         int output = layers[layers.length - 1].getNeuronsCount();
-        convolutionSchemaPrinter.addRow(
-            new SchemaRow()
-                .setLayerType("Dense")
-                .setChannelsCount(inputChannels.length)
-                .setOutput(output)
-        );
 
         return new MatrixSchema[]{
             new LayerSchema(1, output)
         };
+    }
+
+    @Override
+    public SchemaRow getSchemaRow(MatrixSchema[] inputSchema) {
+        int output = layers[layers.length - 1].getNeuronsCount();
+
+        return new SchemaRow()
+            .setLayerType("Dense")
+            .setChannelsCount(inputSchema.length)
+            .setOutput("1x" + output);
     }
 
     public String toString() {

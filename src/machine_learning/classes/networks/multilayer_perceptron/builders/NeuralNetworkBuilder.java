@@ -11,8 +11,8 @@ import java.util.List;
 
 public class NeuralNetworkBuilder<T> extends AbstractChainableBuilder<T> {
 
-    public static NeuralNetwork buildFrom(NetworkModel networkModel) {
-        NeuralNetworkBuilder builder = new NeuralNetworkBuilder(
+    public static <T> NeuralNetwork buildFrom(NetworkModel networkModel) {
+        NeuralNetworkBuilder<T> builder = new NeuralNetworkBuilder<>(
             networkModel.getFeatures(),
             networkModel.getLayers()[0].neurons,
             networkModel.getLayers()[0].activationFunction != null
@@ -36,12 +36,12 @@ public class NeuralNetworkBuilder<T> extends AbstractChainableBuilder<T> {
         return new NeuralNetworkBuilder<>(featureLength);
     }
 
-    public static NeuralNetworkBuilder initialize(int featureLength, int firstLayerNeurons) {
-        return new NeuralNetworkBuilder(featureLength, firstLayerNeurons, null);
+    public static <T> NeuralNetworkBuilder<T> initialize(int featureLength, int firstLayerNeurons) {
+        return new <T> NeuralNetworkBuilder<T>(featureLength, firstLayerNeurons, null);
     }
 
-    public static NeuralNetworkBuilder initialize(int featureLength, int firstLayerNeurons, Function function) {
-        return new NeuralNetworkBuilder(featureLength, firstLayerNeurons, function);
+    public static <T> NeuralNetworkBuilder<T> initialize(int featureLength, int firstLayerNeurons, Function function) {
+        return new <T> NeuralNetworkBuilder<T>(featureLength, firstLayerNeurons, function);
     }
 
     private final List<LayerSchema> layerSchemas = new LinkedList<>();
@@ -56,13 +56,13 @@ public class NeuralNetworkBuilder<T> extends AbstractChainableBuilder<T> {
         layerSchemas.add(new LayerSchema(firstLayerNeurons, function));
     }
 
-    public NeuralNetworkBuilder addLayer(int neurons) {
+    public NeuralNetworkBuilder<T> addLayer(int neurons) {
         layerSchemas.add(new LayerSchema(neurons, null));
 
         return this;
     }
 
-    public NeuralNetworkBuilder addLayer(int neurons, Function function) {
+    public NeuralNetworkBuilder<T> addLayer(int neurons, Function function) {
         layerSchemas.add(new LayerSchema(neurons, function));
 
         return this;

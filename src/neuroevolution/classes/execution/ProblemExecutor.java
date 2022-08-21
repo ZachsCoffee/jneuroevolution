@@ -17,7 +17,7 @@ public abstract class ProblemExecutor<P extends TrainableLayer, D extends Datase
     private final DataBinder dataBinder;
     private final AtomicInteger progressCounter = new AtomicInteger();
     private final T problem;
-    protected EvaluationTarget evaluationTarget;
+    protected EvaluationTarget evaluationTarget = EvaluationTarget.EVOLUTION_BEST;
     protected boolean
         percentOfFitness = false,
         personMigration = true;

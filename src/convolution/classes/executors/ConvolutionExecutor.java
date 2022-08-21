@@ -93,7 +93,7 @@ public class ConvolutionExecutor {
         System.out.println("Channels #1..." + channels.length);
 
         for (Layer channelLayer : layers) {
-            tempLayerSchema = channelLayer.getSchema(tempLayerSchema, convolutionSchemaPrinter);
+            tempLayerSchema = channelLayer.getSchema(tempLayerSchema);
         }
 
         convolutionSchemaPrinter.print();
