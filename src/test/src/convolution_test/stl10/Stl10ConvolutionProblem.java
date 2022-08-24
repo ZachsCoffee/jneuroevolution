@@ -13,8 +13,9 @@ import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
 import execution.NeuroevolutionPersonManager;
 import functions.ActivationFunction;
-import input.RgbInput;
+import input.RawImageInput;
 import maths.MinMax;
+import multithreaded.RecursiveEvaluation;
 
 import javax.imageio.ImageIO;
 import java.io.*;
@@ -22,8 +23,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
+
+    private static final ForkJoinPool forkJoinPool = new ForkJoinPool(5);
 
     private static final int EPOCHS = 100;
 
@@ -37,7 +41,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         setDynamicMutation(new MinMax(1000, 2000), EPOCHS);
 
         Path basePath = Paths.get("/home/zachs/Develop/MachineLearning/stl10_binary");
-        int trainLimit = 100;
+        int trainLimit = 5000;
         int testLimit = 8000;
         MatrixReader[][] trainImages = readX(basePath.resolve("images/train"), trainLimit);
 
@@ -61,7 +65,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         try {
             int count = 0;
             for (File file : files) {
-                data.add(new RgbInput(ImageIO.read(file)).getChannels());
+                data.add(new RawImageInput(ImageIO.read(file)).getChannels());
                 if (++count == limit) {
                     break;
                 }
@@ -104,8 +108,11 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     public TrainableLayer buildConvolution() {
         return TrainableConvolutionSystemBuilder.getInstance(3, 96, 96)
             .addConvolutionLayer()
+            .setKernelsPerChannel(3)
+            .and()
+            .addConvolutionLayer()
             .setStride(2)
-            .setKernelsPerChannel(2)
+            .setKernelsPerChannel(3)
             .and()
             .addNeuralNetworkLayer()
             .addLayer(10, ActivationFunction.SIGMOID.getFunction())
@@ -116,17 +123,24 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
     @Override
     public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
-        int total = dataset.getData().length;
-        int errors = 0;
+        RecursiveEvaluation task = new RecursiveEvaluation(
+            dataset,
+            100,
+            (startIndex, endIndex) -> {
+                double error = 0;
 
-        for (int i = 0; i < total; i++) {
-            double[] results = evaluateSystemAtIndex(convolution, dataset, i);
-            if (results[0] != (int) dataset.getTargets()[i][0]) {
-                errors++;
+                for (int i = startIndex; i < endIndex; i++) {
+                    double[] results = evaluateSystemAtIndex(convolution, dataset, i);
+                    if (results[0] != dataset.getTargets()[i][0]) {
+                        error++;
+                    }
+                }
+
+                return error;
             }
-        }
+        );
 
-        return total - errors;
+        return dataset.getDataLength() - forkJoinPool.invoke(task);
     }
 
     @Override

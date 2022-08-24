@@ -20,4 +20,5 @@ module convolution {
     exports dataset;
     exports builder;
     exports schema;
+    exports multithreaded;
 }

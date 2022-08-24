@@ -27,19 +27,19 @@ public abstract class Problem<P, D extends DatasetTarget> implements CommonProbl
     private int fixedMutation;
 
     public D getTrainingDataset() {
-        System.out.println(Thread.currentThread().getId());
+//        System.out.println(Thread.currentThread().getId());
 
         return trainingDataset;
     }
 
     public D getValidationDataset() {
-        System.out.println(Thread.currentThread().getId());
+//        System.out.println(Thread.currentThread().getId());
 
         return validationDataset;
     }
 
     public D getTestingDataset() {
-        System.out.println(Thread.currentThread().getId());
+//        System.out.println(Thread.currentThread().getId());
 
         return testingDataset;
     }
