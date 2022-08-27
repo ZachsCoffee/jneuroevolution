@@ -6,7 +6,6 @@
 
 module utils {
     requires java.desktop;
-    requires json.simple;
     requires core;
 
     exports files.binary;
