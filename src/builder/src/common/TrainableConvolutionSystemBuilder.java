@@ -14,8 +14,6 @@ import layers.pool.PoolLayer;
 import networks.multilayer_perceptron.builders.NeuralNetworkBuilder;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuilder<T> {
 
@@ -24,8 +22,6 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
     }
 
     private final int inputChannelsCount;
-    private final int inputRows;
-    private final int inputColumns;
     private final ArrayList<Layer> layers = new ArrayList<>();
     private MatrixSchema[] lastLayerOutputSchema;
     private TrainableBuilder<?> lastLayerBuilder = null;
@@ -40,8 +36,6 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
         );
 
         this.inputChannelsCount = inputChannelsCount;
-        this.inputRows = inputRows;
-        this.inputColumns = inputColumns;
 
         LayerSchema layerSchema = new LayerSchema(inputRows, inputColumns);
         lastLayerOutputSchema = new MatrixSchema[inputChannelsCount];
