@@ -1,7 +1,6 @@
 package builder;
 
 import core.builder.AbstractChainableBuilder;
-import core.builder.TrainableBuilder;
 import layers.trainable.TrainableConvolutionLayer;
 
 public class TrainableConvolutionLayerBuilder<T> extends AbstractChainableBuilder<T> {

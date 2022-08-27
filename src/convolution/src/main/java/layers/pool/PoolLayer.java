@@ -1,6 +1,5 @@
 package layers.pool;
 
-import core.layer.ConvolutionSchemaPrinter;
 import core.layer.Layer;
 import core.layer.MatrixReader;
 import core.layer.MatrixSchema;

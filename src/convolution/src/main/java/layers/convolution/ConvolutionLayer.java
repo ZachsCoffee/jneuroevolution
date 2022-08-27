@@ -1,7 +1,6 @@
 package layers.convolution;
 
 import core.layer.Layer;
-import core.layer.LayerSchemaResolver;
 import core.schema.LayerSchema;
 import core.schema.SchemaRow;
 import filters.Filter;
