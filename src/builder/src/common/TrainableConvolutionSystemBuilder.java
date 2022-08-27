@@ -92,8 +92,18 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
     }
 
     public TrainableConvolutionSystemBuilder<T> addPoolingLayer(PoolFunction poolFunction, int sampleSize, int stride) {
+        if (lastLayerBuilder != null) {
+            TrainableLayer layer = lastLayerBuilder.build();
+            layers.add(layer);
+            lastLayerOutputSchema = layer.getSchema(lastLayerOutputSchema);
+            lastLayerBuilder = null;
+        }
 
-        layers.add(new PoolLayer(poolFunction, sampleSize, stride));
+        PoolLayer poolLayer = new PoolLayer(poolFunction, sampleSize, stride);
+
+        layers.add(poolLayer);
+
+        lastLayerOutputSchema = poolLayer.getSchema(lastLayerOutputSchema);
 
         return this;
     }
