@@ -14,6 +14,7 @@ import evolution_builder.population.Population;
 import execution.NeuroevolutionPersonManager;
 import functions.ActivationFunction;
 import input.RawImageInput;
+import layers.pool.PoolFunction;
 import maths.MinMax;
 import multithreaded.RecursiveEvaluation;
 
@@ -108,13 +109,17 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     public TrainableLayer buildConvolution() {
         return TrainableConvolutionSystemBuilder.getInstance(3, 96, 96)
             .addConvolutionLayer()
-            .setKernelsPerChannel(3)
+            .setKernelsPerChannel(1)
+            .setStride(3)
             .and()
             .addConvolutionLayer()
-            .setStride(2)
-            .setKernelsPerChannel(3)
+            .setStride(3)
+            .setKernelsPerChannel(1)
             .and()
+            .addPoolingLayer(PoolFunction.AVERAGE, 3, 1)
             .addNeuralNetworkLayer()
+            .addLayer(10, ActivationFunction.SIGMOID.getFunction())
+            .addLayer(10, ActivationFunction.SIGMOID.getFunction())
             .addLayer(10, ActivationFunction.SIGMOID.getFunction())
             .addLayer(1, ActivationFunction.SIGMOID.getFunction())
             .and()
