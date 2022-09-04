@@ -21,7 +21,7 @@ public class TrainableKernelTest {
     private Function function;
 
     @ParameterizedTest
-    @MethodSource("testCompute2")
+    @MethodSource("testCompute")
     public void testCompute(int startRowIndex, int startColumnIndex, double expected) {
         TrainableKernel trainableKernel = new TrainableKernel(
             0,
@@ -54,7 +54,7 @@ public class TrainableKernelTest {
         assertEquals(expected, result);
     }
 
-    private static Stream<Arguments> testCompute2() {
+    private static Stream<Arguments> testCompute() {
         return Stream.of(
             Arguments.of(0, 0, 23),
             Arguments.of(0, 2, 18),
