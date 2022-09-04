@@ -8,8 +8,6 @@ import maths.matrix.Matrix2D;
 import schema.BluePrint;
 import schema.SchemaComputer;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Objects;
 
 public abstract class AbstractConvolutionLayer implements Layer {
@@ -32,29 +30,19 @@ public abstract class AbstractConvolutionLayer implements Layer {
         int inputRowsBound = inputRows + bluePrint.getPaddingRows() - kernelSize;
         int inputColumnsBound = inputColumns + bluePrint.getPaddingColumns() - kernelSize;
 
-        ArrayList<Iterator<Double>> yielders = new ArrayList<>(inputColumnsBound);
-
         try {
             for (
                 int i = - bluePrint.getPaddingRows(), outI = 0;
                 i < inputRowsBound;
                 i += bluePrint.getStrideRows(), outI++
             ) {
-                for (int r = i; r < i + kernelSize; r++) {
-                    for (
-                        int j = - bluePrint.getPaddingColumns(), outJ = 0;
-                        j < inputColumnsBound;
-                        j += bluePrint.getStrideColumns(), outJ++
-                    ) {
-                        if (outJ >= yielders.size()) {
-                            yielders.add(kernel.compute(channel, i, j));
-                        }
-
-                        output[outI][outJ] = yielders.get(outJ).next();
-                    }
+                for (
+                    int j = - bluePrint.getPaddingColumns(), outJ = 0;
+                    j < inputColumnsBound;
+                    j += bluePrint.getStrideColumns(), outJ++
+                ) {
+                    output[outI][outJ] = kernel.compute(channel, i, j);
                 }
-
-                yielders.clear();
             }
         }
         catch (ArrayIndexOutOfBoundsException ex) {

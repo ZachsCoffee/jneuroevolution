@@ -3,8 +3,6 @@ package filters;
 import core.layer.MatrixReader;
 import maths.Function;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class TrainableKernel implements Kernel {
@@ -92,7 +90,7 @@ public class TrainableKernel implements Kernel {
         return withBias;
     }
 
-    public Iterator<Double> compute(MatrixReader data, int startRowIndex, int startColumnIndex) {
+    public double compute(MatrixReader data, int startRowIndex, int startColumnIndex) {
         if (globalWeights == null) throw new IllegalStateException(
             "Need the global weights in order to compute"
         );
@@ -100,40 +98,26 @@ public class TrainableKernel implements Kernel {
         int endRowIndex = startRowIndex + kernelSize;
         int endColumnIndex = startColumnIndex + kernelSize;
 
-        return new Iterator<>() {
-            private int i = startRowIndex;
-            private double result = 0;
+        double result = 0;
 
-            @Override
-            public boolean hasNext() {
-                return i < endRowIndex;
+        int kernelIndex = startIndex;
+
+        for (int i = startRowIndex; i < endRowIndex; i++) {
+            for (int j = startColumnIndex; j < endColumnIndex; j++) {
+                result += globalWeights[kernelIndex] * data.valueAt(i, j);
+                kernelIndex++;
             }
+        }
 
-            @Override
-            public Double next() {
-                if (!(i < endRowIndex)) {
-                    throw new NoSuchElementException();
-                }
+        if (withBias) {
+            result += globalWeights[biasIndex];
+        }
 
-                for (int j = startColumnIndex, kIndex = startIndex; j < endColumnIndex; j++, kIndex++) {
-                    result += globalWeights[kIndex] * data.valueAt(i, j);
-                }
+        if (withFunction) {
+            result = function.compute(result);
+        }
 
-                i++;
-
-                if (i >= endRowIndex) {
-                    if (withBias) {
-                        result += globalWeights[biasIndex];
-                    }
-
-                    if (withFunction) {
-                        result = function.compute(result);
-                    }
-                }
-
-                return result;
-            }
-        };
+        return result;
     }
 
     @Override
