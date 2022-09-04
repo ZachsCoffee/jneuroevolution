@@ -2,8 +2,10 @@ package filters;
 
 import core.layer.MatrixReader;
 
+import java.util.Iterator;
+
 public interface Kernel {
-    double compute(MatrixReader matrixReader, int startRowIndex, int startColumnIndex);
+    Iterator<Double> compute(MatrixReader matrixReader, int startRowIndex, int startColumnIndex);
 
     int getKernelSize();
 }

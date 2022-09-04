@@ -28,7 +28,7 @@ import java.util.concurrent.ForkJoinPool;
 
 public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
-    private static final ForkJoinPool forkJoinPool = new ForkJoinPool(5);
+    private static final ForkJoinPool forkJoinPool = new ForkJoinPool(10);
 
     private static final int EPOCHS = 100;
 

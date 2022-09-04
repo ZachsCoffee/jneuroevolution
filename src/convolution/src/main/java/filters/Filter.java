@@ -4,6 +4,7 @@ import core.layer.MatrixReader;
 import maths.Function;
 import maths.matrix.Matrix;
 
+import java.util.Iterator;
 import java.util.Objects;
 
 public class Filter implements Kernel {
@@ -35,30 +36,42 @@ public class Filter implements Kernel {
      * @param columnIndex The column index to start the filter.
      * @return The result.
      */
-    public double compute(MatrixReader matrixReader, int rowIndex, int columnIndex) {
-        Objects.requireNonNull(matrixReader);
-        if (matrixReader.getRowsCount() == 0) {
-            throw new IllegalArgumentException("Matrix reader don't have any rows!");
-        }
+    public Iterator<Double> compute(MatrixReader matrixReader, int rowIndex, int columnIndex) {
+//        Objects.requireNonNull(matrixReader);
+//        if (matrixReader.getRowsCount() == 0) {
+//            throw new IllegalArgumentException("Matrix reader don't have any rows!");
+//        }
+//
+//        int rowLength = rowIndex + kernel.length;
+//        int columnLength = columnIndex + kernel.length;
+//
+//        double sum = 0;
+//        for (int i = rowIndex, ki = 0; i < rowLength; i++, ki++) {
+//            for (int j = columnIndex, kj = 0; j < columnLength; j++, kj++) {
+//                // if kernel value is zero then no need to compute
+//                // if the input is outbounds no need to compute. (Is a valid case because the layers.convolution can have padding)
+//                if (kernel[ki][kj] == 0 || i < 0 || i >= matrixReader.getRowsCount() || j < 0 || j >= matrixReader.getColumnsCount()) {
+//                    continue;
+//                }
+//
+//                sum += matrixReader.valueAt(i, j) * kernel[ki][kj];
+//            }
+//        }
+//
+//        return outputFunction != null
+//                ? outputFunction.compute(sum)
+//                : sum;
 
-        int rowLength = rowIndex + kernel.length;
-        int columnLength = columnIndex + kernel.length;
-
-        double sum = 0;
-        for (int i = rowIndex, ki = 0; i < rowLength; i++, ki++) {
-            for (int j = columnIndex, kj = 0; j < columnLength; j++, kj++) {
-                // if kernel value is zero then no need to compute
-                // if the input is outbounds no need to compute. (Is a valid case because the layers.convolution can have padding)
-                if (kernel[ki][kj] == 0 || i < 0 || i >= matrixReader.getRowsCount() || j < 0 || j >= matrixReader.getColumnsCount()) {
-                    continue;
-                }
-
-                sum += matrixReader.valueAt(i, j) * kernel[ki][kj];
+        return new Iterator<>() {
+            @Override
+            public boolean hasNext() {
+                return false;
             }
-        }
 
-        return outputFunction != null
-                ? outputFunction.compute(sum)
-                : sum;
+            @Override
+            public Double next() {
+                return null;
+            }
+        };
     }
 }
