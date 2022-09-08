@@ -25,7 +25,7 @@ public class MatrixReaderIterator implements Iterator<Double> {
     @Override
     public Double next() {
         int rowIndex = index / rowSize;
-        int columnIndex = index % rowIndex;
+        int columnIndex = index % rowSize;
         if (!hasNext()) {
             throw new NoSuchElementException("Failed to read position at rowIndex: " + rowIndex + " columnIndex: " + columnIndex);
         }

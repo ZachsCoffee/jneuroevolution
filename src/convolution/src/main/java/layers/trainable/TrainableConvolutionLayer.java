@@ -65,7 +65,8 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
         int totalWeightsCount = findTotalWeightsCount();
 
         kernelsWeights = new double[totalWeightsCount];
-        Arrays.setAll(kernelsWeights, value -> Math.random());
+        Arrays.setAll(kernelsWeights, value -> Math.random() * 100);
+
         biasWeightIndexes = createBiasWeightIndexes(totalWeightsCount);
 
         schemaComputer = new SchemaComputer(stride, keepSize);
@@ -152,8 +153,8 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
             bluePrints = new BluePrint[kernelsPerChannel];
             for (int i = 0; i < kernelsPerChannel; i++) {
                 bluePrints[i] = schemaComputer.compute(
-                    inputChannels[i].getRowsCount(),
-                    inputChannels[i].getColumnsCount(),
+                    inputChannels[0].getRowsCount(),
+                    inputChannels[0].getColumnsCount(),
                     KERNEL_SIZE
                 );
             }
@@ -204,7 +205,7 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
             int[] biasWeightIndexes = new int[kernelsPerChannel];
 
             for (int i = 0; i < kernelsPerChannel; i++) {
-                biasWeightIndexes[i] = i + totalWeightsCount;
+                biasWeightIndexes[i] = i + totalWeightsCount - kernelsPerChannel;
             }
 
             return biasWeightIndexes;
@@ -236,9 +237,13 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
     }
 
     private int findTotalWeightsCount() {
+        int biasWeight = sumKernels
+            ? 1
+            : 0;
+
         int count = 0;
         for (TrainableKernel kernel : kernels) {
-            count += kernel.getKernelTotalWeightsCount();
+            count += kernel.getKernelTotalWeightsCount() + biasWeight;
         }
 
         return count;

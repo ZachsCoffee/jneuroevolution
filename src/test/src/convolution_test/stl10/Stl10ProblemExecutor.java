@@ -17,8 +17,8 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
         DataBinder dataBinder
     ) {
         super(dataBinder, new Stl10ConvolutionProblem());
-        epochs = 100;
-        threads = 2;
+        epochs = Stl10ConvolutionProblem.EPOCHS;
+        threads = 5;
         populationSize = 10;
     }
 
@@ -29,15 +29,35 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
 
     @Override
     protected EvaluationResult evaluation(TrainableLayer layer, MatrixReaderDataset dataset) {
-        double[][] predictions = new double[dataset.getDataLength()][];
+        double[][] predictions = new double[dataset.getDataLength()][2];
         int totalError = 0;
         for (int i = 0; i < dataset.getDataLength(); i++) {
-            predictions[i] = getProblem().evaluateSystemAtIndex(layer, dataset, i);
-            if (predictions[i][0] != dataset.getTargets()[i][0]) {
+            double[][] results = getProblem().evaluateSystemAtIndex(layer, dataset, i);
+            int targetIndex = (int)(dataset.getTargets()[i][0]);
+//            predictions[i] = new double[] {Math.round(results[0][targetIndex]), results[1][0]};
+            int predictedIndex = bestIndex(results[0]);
+
+            if (predictedIndex != targetIndex) {
                 totalError++;
             }
+
+            predictions[i][0] = predictedIndex;
+            predictions[i][1] = targetIndex;
         }
 
         return new EvaluationResult(predictions, totalError);
+    }
+
+    private int bestIndex(double[] results) {
+        double maxValue = results[0];
+        int maxValueIndex = 0;
+        for (int i = 1; i < results.length; i++) {
+            if (results[i] > maxValue) {
+                maxValue = results[i];
+                maxValueIndex = i;
+            }
+        }
+
+        return maxValueIndex;
     }
 }

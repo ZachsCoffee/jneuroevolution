@@ -10,6 +10,7 @@ public class MatrixReaderDataset implements DatasetTarget {
     private final double[][] targets;
 
     public MatrixReaderDataset(MatrixReader[][] data, double[][] targets) {
+        validate(data, targets);
         this.data = data;
         this.targets = targets;
         dataLength = this.data.length;
