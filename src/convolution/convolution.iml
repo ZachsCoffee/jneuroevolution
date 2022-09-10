@@ -16,7 +16,6 @@
     <orderEntry type="library" name="commons-lang3-3.12.0-javadoc" level="project" />
     <orderEntry type="library" name="j-text-utils-0.3.4-javadoc" level="project" />
     <orderEntry type="library" name="j-text-utils-0.3.4" level="project" />
-    <orderEntry type="module" module-name="evolution_algorithms" />
     <orderEntry type="module" module-name="neuroevolution" />
     <orderEntry type="module" module-name="neuroevolution" />
     <orderEntry type="module" module-name="core" />
