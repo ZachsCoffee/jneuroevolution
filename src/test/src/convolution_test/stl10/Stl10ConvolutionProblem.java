@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 
 public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
-    public static final int EPOCHS = 10;
-    private static final ForkJoinPool forkJoinPool = new ForkJoinPool(7);
+    public static final int EPOCHS = 50;
+    private static final ForkJoinPool forkJoinPool = new ForkJoinPool(10);
     private final ConvolutionPersonManager personManager;
     private final ConvolutionGenes convolutionGenes;
     private final double[][] evaluationResult = new double[2][10];
@@ -56,25 +56,25 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
         List<double[]> trainTargets = readY(basePath.resolve("train_y.bin"), trainLimit);
 
-        trainTargets.stream()
-            .collect(Collectors.groupingBy(doubles -> doubles[0], LinkedHashMap::new, Collectors.counting()))
-            .entrySet()
-            .stream()
-            .sorted((o1, o2) -> (int) (o2.getValue() - o1.getValue()))
-            .forEach(doubleLongEntry -> System.out.println("Class: " + doubleLongEntry.getKey() +" count: " + doubleLongEntry.getValue()));
 
+        List<double[]> validationTargets = trainTargets.subList(trainLimit / 2, trainLimit);
         validationDataset = toDataset(
             trainImages.subList(trainLimit / 2, trainLimit),
-            trainTargets.subList(trainLimit / 2, trainLimit)
+            validationTargets
         );
 
+        System.out.println("Validation classes");
+        printLabelsCount(validationTargets);
 //        pickSpecificLabels(trainImages, trainTargets, specificLabels);
 
-        System.out.println("Train size:" + trainTargets.size());
+        List<double[]> trainTargetsFinal = trainTargets.subList(0, trainLimit / 2);
+
+        System.out.println("Train classes");
+        printLabelsCount(trainTargetsFinal);
 
         trainingDataset = toDataset(
             trainImages.subList(0, trainLimit / 2),
-            trainTargets.subList(0, trainLimit / 2)
+            trainTargetsFinal
         );
 
         List<MatrixReader[]> testImages = readX(basePath.resolve("images/test"), testLimit);
@@ -84,8 +84,19 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 //        pickSpecificLabels(testImages, testTargets, specificLabels);
 
         System.out.println("Test size:" + testTargets.size());
+        System.out.println("Test classes");
+        printLabelsCount(testTargets);
 
         testingDataset = toDataset(testImages, testTargets);
+    }
+
+    private static void printLabelsCount(List<double[]> targets) {
+        targets.stream()
+            .collect(Collectors.groupingBy(doubles -> doubles[0], LinkedHashMap::new, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .sorted((o1, o2) -> (int) (o2.getValue() - o1.getValue()))
+            .forEach(doubleLongEntry -> System.out.println("Class: " + doubleLongEntry.getKey() +" count: " + doubleLongEntry.getValue()));
     }
 
     private MatrixReaderDataset toDataset(
@@ -130,7 +141,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
         RecursiveEvaluation task = new RecursiveEvaluation(
             dataset,
-            100,
+            50,
             (startIndex, endIndex) -> {
                 double error = 0;
 
@@ -138,10 +149,8 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
                     double[][] results = evaluateSystemAtIndex(convolution, dataset, i);
 
                     int targetIndex = (int) results[1][0];
-                    int prediction = (int) Math.round(results[0][targetIndex]);
-                    if (targetIndex != prediction) {
-                        error++;
-                    }
+
+                    error += - 1 * Math.log(results[0][targetIndex]);
                 }
 
                 return error;
@@ -172,7 +181,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         Population<TrainableLayer> population,
         int epoch
     ) {
-        return Recombination.random(population, 3, convolutionGenes);
+        return Recombination.fixed(population, 3, convolutionGenes);
     }
 
     @Override
