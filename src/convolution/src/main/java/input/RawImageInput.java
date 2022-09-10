@@ -3,10 +3,12 @@ package input;
 import core.layer.MatrixReader;
 import maths.matrix.Matrix2D;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class RawImageInput implements ConvolutionInput {
 
+    private final float[] hsb = new float[3];
     private final MatrixReader[] channels;
 
     public RawImageInput(BufferedImage image) {
@@ -18,9 +20,16 @@ public class RawImageInput implements ConvolutionInput {
             for (int width = 0; width < imageWidth; width++) {
                 int rgb = image.getRGB(width, height);
 
-                rawData[0][height][width] = rgb >> 16 & 0xFF;
-                rawData[1][height][width] = rgb >> 8 & 0xFF;
-                rawData[2][height][width] = rgb & 0xFF;
+                Color.RGBtoHSB(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF, hsb);
+
+
+                rawData[0][height][width] = hsb[0];
+                rawData[1][height][width] = hsb[1];
+                rawData[2][height][width] = hsb[2];
+
+//                rawData[0][height][width] = rgb >> 16 & 0xFF;
+//                rawData[1][height][width] = rgb >> 8 & 0xFF;
+//                rawData[2][height][width] = rgb & 0xFF;
             }
         }
 

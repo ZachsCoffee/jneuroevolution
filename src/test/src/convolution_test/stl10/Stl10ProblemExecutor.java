@@ -3,6 +3,7 @@ package convolution_test.stl10;
 import basic_gui.Gui;
 import core.layer.TrainableLayer;
 import dataset.MatrixReaderDataset;
+import execution.EvaluationTarget;
 import execution.ExecutionResponse;
 import execution.ProblemExecutor;
 import execution.common.DataBinder;
@@ -20,6 +21,7 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
         epochs = Stl10ConvolutionProblem.EPOCHS;
         threads = 5;
         populationSize = 10;
+        evaluationTarget = EvaluationTarget.VALIDATION_BEST;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
         int totalError = 0;
         for (int i = 0; i < dataset.getDataLength(); i++) {
             double[][] results = getProblem().evaluateSystemAtIndex(layer, dataset, i);
-            int targetIndex = (int)(dataset.getTargets()[i][0]);
+            int targetIndex = (int) results[1][0];
 //            predictions[i] = new double[] {Math.round(results[0][targetIndex]), results[1][0]};
             int predictedIndex = bestIndex(results[0]);
 

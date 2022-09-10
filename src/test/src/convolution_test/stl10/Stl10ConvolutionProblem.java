@@ -23,12 +23,14 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
-    public static final int EPOCHS = 50;
+    public static final int EPOCHS = 10;
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool(7);
     private final ConvolutionPersonManager personManager;
     private final ConvolutionGenes convolutionGenes;
@@ -47,20 +49,32 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             add(2);
         }};
 
-        int trainLimit = 200;
+        int trainLimit = 400;
         int testLimit = 200;
 
         List<MatrixReader[]> trainImages = readX(basePath.resolve("images/train"), trainLimit);
 
         List<double[]> trainTargets = readY(basePath.resolve("train_y.bin"), trainLimit);
 
+        trainTargets.stream()
+            .collect(Collectors.groupingBy(doubles -> doubles[0], LinkedHashMap::new, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .sorted((o1, o2) -> (int) (o2.getValue() - o1.getValue()))
+            .forEach(doubleLongEntry -> System.out.println("Class: " + doubleLongEntry.getKey() +" count: " + doubleLongEntry.getValue()));
+
+        validationDataset = toDataset(
+            trainImages.subList(trainLimit / 2, trainLimit),
+            trainTargets.subList(trainLimit / 2, trainLimit)
+        );
+
 //        pickSpecificLabels(trainImages, trainTargets, specificLabels);
 
         System.out.println("Train size:" + trainTargets.size());
 
-        trainingDataset = new MatrixReaderDataset(
-            trainImages.toArray(new MatrixReader[0][]),
-            trainTargets.toArray(new double[0][])
+        trainingDataset = toDataset(
+            trainImages.subList(0, trainLimit / 2),
+            trainTargets.subList(0, trainLimit / 2)
         );
 
         List<MatrixReader[]> testImages = readX(basePath.resolve("images/test"), testLimit);
@@ -71,9 +85,16 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
         System.out.println("Test size:" + testTargets.size());
 
-        testingDataset = new MatrixReaderDataset(
-            testImages.toArray(new MatrixReader[0][]),
-            testTargets.toArray(new double[0][])
+        testingDataset = toDataset(testImages, testTargets);
+    }
+
+    private MatrixReaderDataset toDataset(
+        List<MatrixReader[]> trainImages,
+        List<double[]> trainTargets
+    ) {
+        return new MatrixReaderDataset(
+            trainImages.toArray(new MatrixReader[0][]),
+            trainTargets.toArray(new double[0][])
         );
     }
 
@@ -91,15 +112,15 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             .setSumKernels(true)
             .and()
             .addConvolutionLayer()
-            .setStride(3)
-            .setKernelsPerChannel(10)
+            .setStride(1)
+            .setKernelsPerChannel(5)
             .setSumKernels(true)
             .and()
-            .addPoolingLayer(PoolFunction.AVERAGE, 3, 2)
+            .addPoolingLayer(PoolFunction.MAX, 3, 1)
             .addNeuralNetworkLayer()
-            .addLayer(9, ActivationFunction.SIGMOID.getFunction())
-            .addLayer(5, ActivationFunction.SIGMOID.getFunction())
-            .addLayer(5, ActivationFunction.SIGMOID.getFunction())
+            .addLayer(9, ActivationFunction.GAUSS.getFunction())
+            .addLayer(5, ActivationFunction.GAUSS.getFunction())
+            .addLayer(5, ActivationFunction.GAUSS.getFunction())
             .addLayer(10, ActivationFunction.SIGMOID.getFunction())
             .and()
             .build();
@@ -109,41 +130,34 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
         RecursiveEvaluation task = new RecursiveEvaluation(
             dataset,
-            50,
+            100,
             (startIndex, endIndex) -> {
                 double error = 0;
 
                 for (int i = startIndex; i < endIndex; i++) {
                     double[][] results = evaluateSystemAtIndex(convolution, dataset, i);
 
-                    softMax(results[0]);
-
-                    int targetIndex = (int) (dataset.getTargets()[i][0]);
-
-                    double tempError = 0;
-                    for (int j = 0; j < results[0].length; j++) {
-                        double real = j == targetIndex ? 1 : 1E-10;
-
-                        tempError += real * Math.log(results[0][j]);
+                    int targetIndex = (int) results[1][0];
+                    int prediction = (int) Math.round(results[0][targetIndex]);
+                    if (targetIndex != prediction) {
+                        error++;
                     }
-
-                    error += - tempError / results[0].length;
                 }
 
                 return error;
             }
         );
 
-        return  dataset.getDataLength() - forkJoinPool.invoke(task);
+        return dataset.getDataLength() - forkJoinPool.invoke(task);
     }
 
     private void softMax(double[] predictions) {
         double sum = 0;
 
-        for (int i=0; i<predictions.length; i++) {
+        for (int i = 0; i < predictions.length; i++) {
             sum += Math.exp(predictions[i]);
         }
-        for (int i=0; i<predictions.length; i++) {
+        for (int i = 0; i < predictions.length; i++) {
             predictions[i] = Math.exp(predictions[i]) / sum;
         }
     }
