@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 public class TrainableConvolutionLayer extends AbstractConvolutionLayer implements TrainableLayer, LayerSchemaResolver {
 
-    private static final int KERNEL_SIZE = 3;
+    private static final int KERNEL_SIZE = 5;
     private static final Function FUNCTION = ActivationFunction.GROUND_RELU.getFunction();
     private final int kernelsPerChannel;
     private final boolean sumKernels;
@@ -150,6 +150,8 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
     ) {
         BluePrint[] bluePrints;
         if (sumKernels) {
+            validateInputChannels(inputChannels);
+
             bluePrints = new BluePrint[kernelsPerChannel];
             for (int i = 0; i < kernelsPerChannel; i++) {
                 bluePrints[i] = schemaComputer.compute(
@@ -173,6 +175,25 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
         }
 
         return bluePrints;
+    }
+
+    private void validateInputChannels(MatrixSchema[] inputChannels) {
+        if (inputChannels.length == 0) throw new IllegalArgumentException(
+            "Need at least on input channel."
+        );
+
+        int rows = inputChannels[0].getRowsCount();
+        int columns = inputChannels[0].getColumnsCount();
+
+        for (int i=1; i<inputChannels.length; i++) {
+            if (rows != inputChannels[i].getRowsCount()) throw new IllegalArgumentException(
+                "All the rows of the input channels must have the same size."
+            );
+
+            if (columns != inputChannels[i].getColumnsCount()) throw new IllegalArgumentException(
+                "All the columns of the input channels must have the same size."
+            );
+        }
     }
 
     @Override
