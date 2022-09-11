@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="evolution_algorithms" />
     <orderEntry type="module" module-name="convolution" />
     <orderEntry type="library" name="Maven: org.apache.maven.plugins:maven-clean-plugin:maven-plugin:3.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.shared:maven-shared-utils:3.3.4" level="project" />
