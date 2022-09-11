@@ -29,8 +29,9 @@ public class RecombinationTest {
             - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
         };
 
-        int[] expected1 = new int[]{
-            -1, -1, 1, 2, -1, -1, 2, 3, -1
+        int[][] expected = new int[][]{
+            {-1, -1, 1, 2, -1, -1, 2, 3, -1},
+            {1, 1, -1, -1, 2, 2, -1, -1, 3},
         };
 
         PersonManager<int[]> personManagerMock = mock(PersonManager.class);
@@ -68,8 +69,9 @@ public class RecombinationTest {
 
         assertEquals(recombinedPerson1.length, recombinedPerson2.length);
 
-        for (int i = 0; i < expected1.length; i++) {
-            assertEquals(expected1[i], recombinedPerson1[i], "Failed on index: " + i);
+        for (int i = 0; i < expected.length; i++) {
+            assertEquals(expected[0][i], recombinedPerson1[i], "Failed on index: " + i);
+            assertEquals(expected[1][i], recombinedPerson2[i], "Failed on index: " + i);
         }
     }
 
