@@ -134,7 +134,6 @@
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.5" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:1.4" level="project" />
     <orderEntry type="module" module-name="utils" />
-    <orderEntry type="module" module-name="core" />
     <orderEntry type="module" module-name="machine_learning" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.9.1" level="project" />
     <orderEntry type="module" module-name="evolution_algorithms" />
@@ -142,5 +141,6 @@
     <orderEntry type="library" name="Maven: com.massisframework:j-text-utils:0.3.4" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:21.0" level="project" />
     <orderEntry type="library" name="Maven: au.com.bytecode:opencsv:2.4" level="project" />
+    <orderEntry type="module" module-name="core" />
   </component>
 </module>

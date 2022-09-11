@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 /**
- *
  * @author main
  */
 public class Population<P> {
@@ -30,91 +29,94 @@ public class Population<P> {
         return tempPopulation;
     }
 
-    private int size = 100;
-    private final ArrayList<PopulationPerson<P>> population = new ArrayList<>();
-    
+    private final ArrayList<PopulationPerson<P>> population;
+
     private final PersonManager<P> personManager;
     private PopulationPerson<P> bestPopulationPerson = null;
-    
-    public Population(PersonManager<P> personManager){
-        if (personManager == null){
+
+    public Population(PersonManager<P> personManager) {
+        this(personManager, 100);
+    }
+
+    public Population(PersonManager<P> personManager, int size) {
+        if (personManager == null) {
             throw new IllegalArgumentException("Argument at pos 1: not null.");
         }
-        
-        this.personManager = personManager;
-    }
-    
-    public Population(PersonManager<P> personManager, int size){
-        this(personManager);
-        if (size <= 0){
+        if (size <= 0) {
             throw new IllegalArgumentException("Argument at pos 1: must be greater than zero.");
         }
-        
-        this.size = size;
+
+        this.personManager = personManager;
+
+        population = new ArrayList<>(size);
     }
-    
+
     //start get/set
-    public void addPerson(PopulationPerson<P> populationPerson){
+    public void addPerson(PopulationPerson<P> populationPerson) {
         population.add(populationPerson);
     }
-    
-    public PopulationPerson<P> getPersonAt(int position){
+
+    public PopulationPerson<P> getPersonAt(int position) {
         return population.get(position);
     }
-    public void setPersonAt(PopulationPerson<P> populationPerson, int position){
+
+    public void setPersonAt(PopulationPerson<P> populationPerson, int position) {
         population.set(position, populationPerson);
     }
-    
-    public int getSize(){
-        return size;
-    }
-    
-    public int getRunningSize(){
+
+    public int getSize() {
         return population.size();
     }
-    
-    public PersonManager<P> getPersonManager(){
+
+    public int getRunningSize() {
+        return population.size();
+    }
+
+    public PersonManager<P> getPersonManager() {
         return personManager;
     }
 
     public PopulationPerson<P> getBestPerson() {
         if (bestPopulationPerson == null) throw new IllegalStateException(
-                "Can't give the best person if the fitness isn't computed"
+            "Can't give the best person if the fitness isn't computed"
         );
 
         return bestPopulationPerson;
     }
 
     //end get/set
-    
+
     //start methods
-    public PopulationPerson<P> createPerson(){
+    public PopulationPerson<P> createPerson() {
         return personManager.newPerson();
     }
-    
-    public PopulationPerson<P> newSameLengthAs(PopulationPerson<P> populationPerson){
+
+    public PopulationPerson<P> newSameLengthAs(PopulationPerson<P> populationPerson) {
         return personManager.newSameLengthAs(populationPerson);
     }
-    
-    public void createPopulation(){//ftiaxnei to population
-        for (int i=1; i<=size; i++){
+
+    public void createPopulation() {
+        int size = population.size();
+        for (int i = 1; i <= size; i++) {
             population.add(personManager.newPerson());
         }
     }
-    
-    public PopulationPerson<P> findBestPerson(){
+
+    public PopulationPerson<P> findBestPerson() {
         int bestPos = 0;
         double bestFitness = population.get(0).getFitness();
-        for (int i=1; i<size; i++){
-            if (population.get(i).getFitness() > bestFitness){
+        int size = population.size();
+
+        for (int i = 1; i < size; i++) {
+            if (population.get(i).getFitness() > bestFitness) {
                 bestPos = i;
             }
         }
-        
+
         return population.get(bestPos);
     }
-    
-    public void sortPopulation(){
+
+    public void sortPopulation() {
         Collections.sort(population);
     }
 
@@ -126,7 +128,7 @@ public class Population<P> {
         populationBestPopulationPerson.setFitness(personManager.computeFitness(populationBestPopulationPerson));
 
         PopulationPerson<P> tempPopulationPerson;
-        for (int i=1; i<population.size(); i++) {
+        for (int i = 1; i < population.size(); i++) {
             tempPopulationPerson = population.get(i);
             tempPopulationPerson.setFitness(personManager.computeFitness(tempPopulationPerson));
 
@@ -137,14 +139,14 @@ public class Population<P> {
 
         bestPopulationPerson = PopulationPerson.copyPerson(populationBestPopulationPerson);
     }
-    
-    public String toString(){
+
+    public String toString() {
         StringBuilder print = new StringBuilder();
 
-        for (int i=0; i<size; i++){
-            print.append(population.get(i)).append("\n");
+        for (PopulationPerson<P> pPopulationPerson : population) {
+            print.append(pPopulationPerson).append("\n");
         }
-        
+
         return print.toString();
     }
 }
