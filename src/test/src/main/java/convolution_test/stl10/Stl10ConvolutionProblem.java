@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
-    public static final int EPOCHS = 100;
+    public static final int EPOCHS = 50;
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool(7);
     private final ConvolutionPersonManager personManager;
     private final ConvolutionGenes convolutionGenes;
@@ -107,16 +107,16 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     public TrainableLayer buildConvolution() {
         return TrainableConvolutionSystemBuilder.getInstance(3, 96, 96)
             .addConvolutionLayer()
-            .setKernelsPerChannel(10)
+            .setKernelsPerChannel(1)
             .setStride(3)
             .setSumKernels(true)
             .and()
             .addConvolutionLayer()
             .setStride(1)
-            .setKernelsPerChannel(5)
+            .setKernelsPerChannel(1)
             .setSumKernels(true)
             .and()
-            .addPoolingLayer(PoolFunction.MAX, 3, 1)
+            .addPoolingLayer(PoolFunction.AVERAGE, 3, 1)
             .addNeuralNetworkLayer()
             .addLayer(9, ActivationFunction.GAUSS.getFunction())
             .addLayer(5, ActivationFunction.GAUSS.getFunction())
@@ -172,7 +172,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         Population<TrainableLayer> population,
         int epoch
     ) {
-        return Recombination.random(population, 5, convolutionGenes);
+        return Recombination.fixed(population, 1, convolutionGenes);
     }
 
     @Override
