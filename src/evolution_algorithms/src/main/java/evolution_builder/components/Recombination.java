@@ -21,7 +21,7 @@ public class Recombination {
         int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
         int personCount = 0;
 
-        PopulationPerson<P> populationPerson1, populationPerson2, newPopulationPerson1, newPopulationPerson2;
+        PopulationPerson<P> populationPerson1, populationPerson2;
 
         Population<P> newPopulation = new Population<>(population.getPersonManager(), populationSize);
 
@@ -32,7 +32,6 @@ public class Recombination {
             throw new IllegalArgumentException("Argument, at pos 2: must be greater than zero.");
         }
 
-        boolean changeGenesSide;
         int randomPerson1Position = 0;
         int randomPerson2Position = 1;
         while (personCount < populationSize) {
@@ -41,37 +40,41 @@ public class Recombination {
 
             populationPerson1 = population.getPersonAt(randomPerson1Position);
             populationPerson2 = population.getPersonAt(randomPerson2Position);
-            newPopulationPerson1 = population.createPerson();
-            newPopulationPerson2 = population.createPerson();
 
-            changeGenesSide = true;
-            for (int i = 0; i < genesCount; i++) {
-                if (i % breakSize == 0) {
-                    changeGenesSide = ! changeGenesSide;
-                }
-
-                if (changeGenesSide) {
-                    genes.setGenAt(newPopulationPerson1, genes.getGenAt(populationPerson1, i), i);
-                    genes.setGenAt(newPopulationPerson2, genes.getGenAt(populationPerson2, i), i);
+            int i = 0;
+            while (i < genesCount) {
+                swapGenes(populationPerson1, populationPerson2, genes, i);
+                if (i % breakSize == breakSize -1) {
+                    i += breakSize + 1;
                 }
                 else {
-                    genes.setGenAt(newPopulationPerson1, genes.getGenAt(populationPerson2, i), i);
-                    genes.setGenAt(newPopulationPerson2, genes.getGenAt(populationPerson1, i), i);
+                    i++;
                 }
             }
 
             if (personCount + 2 <= populationSize) {
-                newPopulation.addPerson(newPopulationPerson1);
-                newPopulation.addPerson(newPopulationPerson2);
+                newPopulation.addPerson(populationPerson1);
+                newPopulation.addPerson(populationPerson2);
                 personCount += 2;
             }
             else if (personCount + 1 <= populationSize) {
-                newPopulation.addPerson(newPopulationPerson1);
+                newPopulation.addPerson(populationPerson1);
                 personCount++;
             }
         }
 
         return newPopulation;
+    }
+
+    private static <T, P> void swapGenes(
+        PopulationPerson<P> person1,
+        PopulationPerson<P> person2,
+        Genes<T, P> genes,
+        int position
+    ) {
+        T temp = genes.getGenAt(person1, position);
+        genes.setGenAt(person1, genes.getGenAt(person2, position), position);
+        genes.setGenAt(person2, temp, position);
     }
 
     public static <T, P> Population<P> random(Population<P> population, int breakSize, Genes<T, P> genes) {

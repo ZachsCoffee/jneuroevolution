@@ -5,35 +5,29 @@ import evolution_builder.population.Genes;
 import evolution_builder.population.PersonManager;
 import evolution_builder.population.Population;
 import evolution_builder.population.PopulationPerson;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RecombinationTest {
 
-    @Test
-    public void testFixed() {
-
-        int[] person1 = new int[]{
-            1, 1, 1, 2, 2, 2, 2, 3, 3
-        };
-
-        int[] person2 = new int[]{
-            - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
-        };
-
-        int[][] expected = new int[][]{
-            {-1, -1, 1, 2, -1, -1, 2, 3, -1},
-            {1, 1, -1, -1, 2, 2, -1, -1, 3},
-        };
-
+    @ParameterizedTest
+    @MethodSource("testFixed")
+    public void testFixed(
+        int[] person1,
+        int[] person2,
+        int breakSize,
+        int[][] expected
+    ) {
         PersonManager<int[]> personManagerMock = mock(PersonManager.class);
 
         PopulationPerson<int[]> populationPerson1 = new PopulationPerson<>(person1);
@@ -53,11 +47,7 @@ public class RecombinationTest {
             .when(populationSpy)
             .getPersonManager();
 
-        doReturn(createPerson(), createPerson())
-            .when(populationSpy)
-            .createPerson();
-
-        populationSpy = Recombination.fixed(populationSpy, 2, new GenesStub(person1.length));
+        populationSpy = Recombination.fixed(populationSpy, breakSize, new GenesStub(person1.length));
 
         int[] recombinedPerson1 = populationSpy
             .getPersonAt(0)
@@ -73,6 +63,50 @@ public class RecombinationTest {
             assertEquals(expected[0][i], recombinedPerson1[i], "Failed on index: " + i);
             assertEquals(expected[1][i], recombinedPerson2[i], "Failed on index: " + i);
         }
+    }
+
+    private static Stream<Arguments> testFixed() {
+        return Stream.of(
+            arguments(
+                new int[]{
+                    1, 1, 1, 2, 2, 2, 2, 3, 3
+                },
+                new int[]{
+                    - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1, - 1,
+                },
+                2,
+                new int[][]{
+                    {- 1, - 1, 1, 2, - 1, - 1, 2, 3, - 1},
+                    {1, 1, - 1, - 1, 2, 2, - 1, - 1, 3},
+                }
+            ),
+            arguments(
+                new int[]{
+                    1, 1, 1, 2, 2, 9
+                },
+                new int[]{
+                    - 1, - 1, - 1, - 1, - 1, - 1
+                },
+                3,
+                new int[][]{
+                    {- 1, - 1, -1, 2, 2, 9},
+                    {1, 1, 1, - 1, -1, -1},
+                }
+            ),
+            arguments(
+                new int[]{
+                    1, 1, 1, 2, 2, 9
+                },
+                new int[]{
+                    - 1, - 1, - 1, - 1, - 1, - 1
+                },
+                1,
+                new int[][]{
+                    {- 1, 1, -1, 2, -1, 9},
+                    {1, -1, 1, - 1, 2, -1},
+                }
+            )
+        );
     }
 
     private PopulationPerson<int[]> createPerson() {
