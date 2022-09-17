@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
-    public static final int EPOCHS = 10;
+    public static final int EPOCHS = 100;
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool(7);
     private final ConvolutionPersonManager personManager;
     private final ConvolutionGenes convolutionGenes;
@@ -49,8 +49,8 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             add(2);
         }};
 
-        int trainLimit = 50;
-        int testLimit = 50;
+        int trainLimit = 200;
+        int testLimit = 200;
 
         List<MatrixReader[]> trainImages = readX(basePath.resolve("images/train"), trainLimit);
 
@@ -130,7 +130,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
         RecursiveEvaluation task = new RecursiveEvaluation(
             dataset,
-            100,
+            50,
             (startIndex, endIndex) -> {
                 double error = 0;
 
@@ -172,7 +172,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         Population<TrainableLayer> population,
         int epoch
     ) {
-        return Recombination.fixed(population, 3, convolutionGenes);
+        return Recombination.random(population, 5, convolutionGenes);
     }
 
     @Override
