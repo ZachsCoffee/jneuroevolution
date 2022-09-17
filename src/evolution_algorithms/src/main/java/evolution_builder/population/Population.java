@@ -30,7 +30,7 @@ public class Population<P> {
     }
 
     private final ArrayList<PopulationPerson<P>> population;
-
+    private final int populationSize;
     private final PersonManager<P> personManager;
     private PopulationPerson<P> bestPopulationPerson = null;
 
@@ -46,9 +46,9 @@ public class Population<P> {
             throw new IllegalArgumentException("Argument at pos 1: must be greater than zero.");
         }
 
+        populationSize = size;
         this.personManager = personManager;
-
-        population = new ArrayList<>(size);
+        population = new ArrayList<>(populationSize);
     }
 
     //start get/set
@@ -96,8 +96,7 @@ public class Population<P> {
     }
 
     public void createPopulation() {
-        int size = population.size();
-        for (int i = 1; i <= size; i++) {
+        for (int i = 1; i <= populationSize; i++) {
             population.add(personManager.newPerson());
         }
     }

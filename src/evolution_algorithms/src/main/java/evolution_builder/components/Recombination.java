@@ -34,6 +34,9 @@ public class Recombination {
 
         int randomPerson1Position = 0;
         int randomPerson2Position = 1;
+        final int SKIP_STEP = breakSize + 1;
+        final int BREAK_POINT = breakSize -1;
+
         while (personCount < populationSize) {
             randomPerson1Position = getRandom(populationSize, randomPerson1Position);
             randomPerson2Position = getRandom(populationSize, randomPerson2Position);
@@ -43,9 +46,12 @@ public class Recombination {
 
             int i = 0;
             while (i < genesCount) {
-                swapGenes(populationPerson1, populationPerson2, genes, i);
-                if (i % breakSize == breakSize -1) {
-                    i += breakSize + 1;
+                T temp = genes.getGenAt(populationPerson1, i);
+                genes.setGenAt(populationPerson1, genes.getGenAt(populationPerson2, i), i);
+                genes.setGenAt(populationPerson2, temp, i);
+
+                if (i % breakSize == BREAK_POINT) {
+                    i += SKIP_STEP;
                 }
                 else {
                     i++;
@@ -64,17 +70,6 @@ public class Recombination {
         }
 
         return newPopulation;
-    }
-
-    private static <T, P> void swapGenes(
-        PopulationPerson<P> person1,
-        PopulationPerson<P> person2,
-        Genes<T, P> genes,
-        int position
-    ) {
-        T temp = genes.getGenAt(person1, position);
-        genes.setGenAt(person1, genes.getGenAt(person2, position), position);
-        genes.setGenAt(person2, temp, position);
     }
 
     public static <T, P> Population<P> random(Population<P> population, int breakSize, Genes<T, P> genes) {

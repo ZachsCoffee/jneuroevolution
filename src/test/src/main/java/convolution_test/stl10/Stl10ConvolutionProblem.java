@@ -49,8 +49,8 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             add(2);
         }};
 
-        int trainLimit = 400;
-        int testLimit = 200;
+        int trainLimit = 50;
+        int testLimit = 50;
 
         List<MatrixReader[]> trainImages = readX(basePath.resolve("images/train"), trainLimit);
 
@@ -172,7 +172,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         Population<TrainableLayer> population,
         int epoch
     ) {
-        return Recombination.random(population, 3, convolutionGenes);
+        return Recombination.fixed(population, 3, convolutionGenes);
     }
 
     @Override
