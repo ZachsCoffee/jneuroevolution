@@ -116,3 +116,4 @@ nbdist/
 datasets/
 
 target/
+.attach*
