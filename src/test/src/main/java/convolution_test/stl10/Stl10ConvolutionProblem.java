@@ -20,6 +20,7 @@ import multithreaded.RecursiveEvaluation;
 
 import javax.imageio.ImageIO;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         personManager = new ConvolutionPersonManager(this);
         convolutionGenes = new ConvolutionGenes();
 
-        setDynamicMutation(new MinMax(1000, 2000), EPOCHS);
+        setDynamicMutation(new MinMax(4000, 8000), EPOCHS);
 
         Path basePath = Paths.get("/home/zachs/Develop/MachineLearning/stl10_binary");
 
@@ -49,7 +50,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             add(2);
         }};
 
-        int trainLimit = 200;
+        int trainLimit = 400;
         int testLimit = 200;
 
         List<MatrixReader[]> trainImages = readX(basePath.resolve("images/train"), trainLimit);
@@ -86,6 +87,8 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         System.out.println("Test size:" + testTargets.size());
 
         testingDataset = toDataset(testImages, testTargets);
+
+        ((TrainableSystem)buildConvolution()).printSchema(testImages.get(0));
     }
 
     private MatrixReaderDataset toDataset(
@@ -107,21 +110,20 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     public TrainableLayer buildConvolution() {
         return TrainableConvolutionSystemBuilder.getInstance(3, 96, 96)
             .addConvolutionLayer()
-            .setKernelsPerChannel(1)
+            .setKernelsPerChannel(3)
             .setStride(3)
-            .setSumKernels(true)
             .and()
             .addConvolutionLayer()
-            .setStride(1)
-            .setKernelsPerChannel(1)
+            .setStride(3)
+            .setKernelsPerChannel(3)
             .setSumKernels(true)
             .and()
             .addPoolingLayer(PoolFunction.AVERAGE, 3, 1)
             .addNeuralNetworkLayer()
-            .addLayer(9, ActivationFunction.GAUSS.getFunction())
-            .addLayer(5, ActivationFunction.GAUSS.getFunction())
-            .addLayer(5, ActivationFunction.GAUSS.getFunction())
-            .addLayer(10, ActivationFunction.SIGMOID.getFunction())
+            .addLayer(200, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(100, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(50, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(1, ActivationFunction.GROUND_RELU.getFunction())
             .and()
             .build();
     }
@@ -172,12 +174,12 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         Population<TrainableLayer> population,
         int epoch
     ) {
-        return Recombination.fixed(population, 1, convolutionGenes);
+        return Recombination.random(population, 5, convolutionGenes);
     }
 
     @Override
     public Population<TrainableLayer> selectionMethod(Population<TrainableLayer> population) {
-        return Selection.tournament(population, 3, false);
+        return Selection.tournament(population, 5, false);
     }
 
     @Override
@@ -187,6 +189,8 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
     @Override
     public double[][] evaluateSystemAtIndex(TrainableLayer convolution, MatrixReaderDataset dataset, int index) {
+//        ((TrainableSystem)convolution).printSchema(dataset.getData()[index]);
+//        System.exit(0);
         double[] results = convolution.execute(dataset.getData()[index])[0].getRow(0);
         evaluationResult[0] = results;
         evaluationResult[1][0] = (int) dataset.getTargets()[index][0] - 1;
@@ -229,7 +233,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     private List<double[]> readY(Path file, int limit) {
         List<double[]> targets = new ArrayList<>();
 
-        try (BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file.toString()))) {
+        try (BufferedInputStream inputStream = new BufferedInputStream(Files.newInputStream(Paths.get(file.toString())))) {
             int label;
             int count = 0;
             while ((label = inputStream.read()) != - 1) {

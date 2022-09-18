@@ -72,7 +72,7 @@ public class TrainableKernel implements Kernel {
         );
 
         if (endIndex > globalWeights.length) throw new IndexOutOfBoundsException(
-            "The end is out of bounds. Start index: " + endIndex + " global weights length: " + globalWeights.length
+            "The end is out of bounds. End index: " + endIndex + " global weights length: " + globalWeights.length
         );
 
         this.globalWeights = globalWeights;

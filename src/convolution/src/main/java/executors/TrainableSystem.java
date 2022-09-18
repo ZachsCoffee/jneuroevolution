@@ -83,22 +83,23 @@ public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
         return previousMatrixReader;
     }
 
-//    public void printSchema(MatrixReader[] channels) {
-//        System.out.println("Total channels " + channels.length);
-//
-//        ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channels[0]);
-//        MatrixSchema[] tempLayerSchema;
-//
-//        tempLayerSchema = channels;
-//
-//        System.out.println("Channels #1..." + channels.length);
-//
-//        for (Layer channelLayer : layers) {
-//            tempLayerSchema = channelLayer.getSchema(tempLayerSchema, convolutionSchemaPrinter);
-//        }
-//
-//        convolutionSchemaPrinter.print();
-//    }
+    public void printSchema(MatrixReader[] channels) {
+        System.out.println("Total channels " + channels.length);
+
+        ConvolutionSchemaPrinter convolutionSchemaPrinter = getConvolutionSchemaPrinter(channels[0]);
+        MatrixSchema[] tempLayerSchema;
+
+        tempLayerSchema = channels;
+
+        System.out.println("Channels #1..." + channels.length);
+
+        for (Layer channelLayer : layers) {
+            convolutionSchemaPrinter.addRow(channelLayer.getSchemaRow(tempLayerSchema));
+            tempLayerSchema = channelLayer.getSchema(tempLayerSchema);
+        }
+
+        convolutionSchemaPrinter.print();
+    }
 
     @Override
     public Iterator<Layer> iterator() {
@@ -130,7 +131,7 @@ public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
 
     protected ConvolutionSchemaPrinter getConvolutionSchemaPrinter(MatrixReader channel) {
         ConvolutionSchemaPrinter convolutionSchemaPrinter = new ConvolutionSchemaPrinter(new String[]{
-            "Layer type", "Channels", "Filters", "Sample size", "Stride", "Padding", "Output"
+            "Layer type", "Channels", "Filters", "Sample size", "Stride", "Padding", "Trainable weights", "Output"
         });
 
         convolutionSchemaPrinter.addRow(
@@ -138,6 +139,7 @@ public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
             "-",
             "-",
             channel.getRowsCount() + "x" + channel.getColumnsCount(),
+            "-",
             "-",
             "-",
             "-"

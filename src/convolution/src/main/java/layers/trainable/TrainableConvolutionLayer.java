@@ -65,7 +65,7 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
         int totalWeightsCount = findTotalWeightsCount();
 
         kernelsWeights = new double[totalWeightsCount];
-        Arrays.setAll(kernelsWeights, value -> Math.random() * 2);
+        Arrays.setAll(kernelsWeights, value -> Math.random() * 10);
 
         biasWeightIndexes = createBiasWeightIndexes(totalWeightsCount);
 
@@ -218,7 +218,8 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
             .setFiltersCount(kernels.length)
             .setPadding(bluePrint.getPaddingRows()+"x"+bluePrint.getPaddingColumns())
             .setStride(bluePrint.getStrideRows()+"x"+bluePrint.getStrideColumns())
-            .setOutput(bluePrints.length+"x"+bluePrint.getRowsCount()+"x"+bluePrint.getStrideRows());
+            .setOutput(bluePrints.length+"x"+bluePrint.getRowsCount()+"x"+bluePrint.getStrideRows())
+            .setTrainableWeights(kernelsWeights.length);
     }
 
     private int[] createBiasWeightIndexes(int totalWeightsCount) {

@@ -11,6 +11,7 @@ public class SchemaRow {
     private String stride = null;
     private String padding = null;
     private String output;
+    private Integer trainableWeights = null;
 
     public SchemaRow setLayerType(String layerType) {
         this.layerType = layerType;
@@ -47,6 +48,11 @@ public class SchemaRow {
         return this;
     }
 
+    public SchemaRow setTrainableWeights(Integer trainableWeights) {
+        this.trainableWeights = trainableWeights;
+        return this;
+    }
+
     public String[] toRow() {
         return new String[] {
             Objects.requireNonNull(layerType),
@@ -55,6 +61,7 @@ public class SchemaRow {
             format(sampleSize),
             format(stride),
             format(padding),
+            format(trainableWeights),
             Objects.requireNonNull(output),
         };
     }

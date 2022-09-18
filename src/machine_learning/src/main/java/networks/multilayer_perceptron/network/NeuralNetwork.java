@@ -116,6 +116,10 @@ public class NeuralNetwork implements Network, TrainableLayer {
 
         MAX_START_VALUE = maxStartValue;
 
+        for (int i = 0; i<weights.length; i++) {
+            weights[i] = Math.random() * MAX_START_VALUE * 2;
+        }
+
         int startPoint = 0;
         for (int i = 0; i < layers.length; i++) {
             layers[i].maxStartValue = MAX_START_VALUE;
@@ -218,7 +222,8 @@ public class NeuralNetwork implements Network, TrainableLayer {
         return new SchemaRow()
             .setLayerType("Dense")
             .setChannelsCount(inputSchema.length)
-            .setOutput("1x" + output);
+            .setOutput("1x" + output)
+            .setTrainableWeights(weights.length);
     }
 
     public String toString() {
