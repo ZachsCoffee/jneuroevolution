@@ -119,9 +119,9 @@ public class Benchmark {
     private static ConvolutionExecutor getConvolutionExecutor(File file, boolean printSchema) throws IOException {
         ConvolutionExecutor convolutionExecutor = ConvolutionExecutor.initialize(new ImageInput(ImageIO.read(file)))
             .addLayer(new ConvolutionLayer(filters1, 1))
-            .addLayer(new PoolLayer(PoolFunction.MAX, 5, 1))
+            .addLayer(new PoolLayer(1, PoolFunction.MAX, 5, 1))
             .addLayer(new ConvolutionLayer(filters1, 1))
-            .addLayer(new PoolLayer(PoolFunction.MAX, 5, 2))
+            .addLayer(new PoolLayer(1, PoolFunction.MAX, 5, 2))
 //            .addLayerForAllChannels(new ConvolutionLayer(filters, 3))
 //            .addLayerForAllChannels(new PoolLayer(PoolFunction.AVERAGE, 3, 4))
             .addLayer(new FlatLayer());

@@ -1,5 +1,6 @@
 package layers.pool;
 
+import core.layer.CountableOutput;
 import core.layer.Layer;
 import core.layer.MatrixReader;
 import core.layer.MatrixSchema;
@@ -10,25 +11,35 @@ import maths.matrix.Matrix2D;
 
 import java.util.Objects;
 
-public class PoolLayer implements Layer {
+public class PoolLayer implements Layer, CountableOutput {
 
     public static final int MIN_SAMPLE_SIZE = 2;
 
     private final PoolFunction poolFunction;
     private final int sampleSize;
     private final int stride;
+    private final int inputChannelsCount;
 
-    public PoolLayer(PoolFunction poolFunction, int sampleSize, int stride) {
+    public PoolLayer(int inputChannelsCount, PoolFunction poolFunction, int sampleSize, int stride) {
         if (sampleSize < MIN_SAMPLE_SIZE) throw new IllegalArgumentException(
                 "Sample size must be at least: "+MIN_SAMPLE_SIZE+" and not: "+sampleSize
         );
         if (stride < 1) throw new IllegalArgumentException(
                 "Stride must be at least 1, and not: "+stride
         );
+        if (inputChannelsCount < 1) throw new IllegalArgumentException(
+            "Need at least one channel input."
+        );
 
         this.poolFunction = Objects.requireNonNull(poolFunction);
         this.sampleSize = sampleSize;
         this.stride = stride;
+        this.inputChannelsCount = inputChannelsCount;
+    }
+
+    @Override
+    public int getOutputChannelsCount() {
+        return inputChannelsCount;
     }
 
     public MatrixReader[] execute(MatrixReader[] inputChannels) {
@@ -53,7 +64,7 @@ public class PoolLayer implements Layer {
         );
 
         MatrixSchema[] matrixSchemas = new MatrixSchema[inputChannels.length];
-        int[] dimensions = null;
+        int[] dimensions;
         for (int i = 0; i< inputChannels.length; i++) {
             dimensions = ConvolutionUtils.outputDimensions(
                 inputChannels[i].getRowsCount(),
@@ -90,7 +101,7 @@ public class PoolLayer implements Layer {
 
     @Override
     public Layer copy() {
-        return new PoolLayer(poolFunction, sampleSize, stride);
+        return new PoolLayer(inputChannelsCount, poolFunction, sampleSize, stride);
     }
 
     private MatrixReader computeMatrix(MatrixReader input) {

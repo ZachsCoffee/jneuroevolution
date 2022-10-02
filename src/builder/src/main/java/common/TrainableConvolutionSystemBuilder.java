@@ -1,16 +1,15 @@
 package common;
 
+import builder.PoolingLayerBuilder;
 import builder.TrainableConvolutionLayerBuilder;
 import core.builder.AbstractChainableBuilder;
-import core.builder.TrainableBuilder;
+import core.builder.LayerBuilder;
+import core.layer.CountableOutput;
 import core.layer.Layer;
 import core.layer.MatrixSchema;
 import core.schema.LayerSchema;
 import executors.TrainableSystem;
-import core.layer.TrainableLayer;
 import layers.flatten.FlatLayer;
-import layers.pool.PoolFunction;
-import layers.pool.PoolLayer;
 import networks.multilayer_perceptron.builders.NeuralNetworkBuilder;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
     private final int inputChannelsCount;
     private final ArrayList<Layer> layers = new ArrayList<>();
     private MatrixSchema[] lastLayerOutputSchema;
-    private TrainableBuilder<?> lastLayerBuilder = null;
+    private LayerBuilder<?> lastLayerBuilder = null;
 
     private TrainableConvolutionSystemBuilder(int inputChannelsCount, int inputRows, int inputColumns) {
         if (inputRows < 1) throw new IllegalArgumentException(
@@ -50,16 +49,12 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
         builder.setParentBuilder(this);
 
         if (lastLayerBuilder != null) {
-            layers.add(lastLayerBuilder.build());
+            Layer layer = lastLayerBuilder.build();
+            layers.add(layer);
+            lastLayerOutputSchema = layer.getSchema(lastLayerOutputSchema);
         }
 
         lastLayerBuilder = builder;
-
-        if (!layers.isEmpty()) {
-            Layer lastLayer = layers.get(layers.size() -1);
-
-            lastLayerOutputSchema = lastLayer.getSchema(lastLayerOutputSchema);
-        }
 
         return builder;
     }
@@ -68,9 +63,10 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
         FlatLayer flatLayer = new FlatLayer();
 
         if (lastLayerBuilder != null) {
-            TrainableLayer layer = lastLayerBuilder.build();
+            Layer layer = lastLayerBuilder.build();
             layers.add(layer);
             lastLayerOutputSchema = layer.getSchema(lastLayerOutputSchema);
+            lastLayerOutputSchema = flatLayer.getSchema(lastLayerOutputSchema);
         }
 
         NeuralNetworkBuilder<TrainableConvolutionSystemBuilder<T>> builder = NeuralNetworkBuilder.initialize(
@@ -85,21 +81,20 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
         return builder;
     }
 
-    public TrainableConvolutionSystemBuilder<T> addPoolingLayer(PoolFunction poolFunction, int sampleSize, int stride) {
+    public PoolingLayerBuilder<TrainableConvolutionSystemBuilder<T>> addPoolingLayer() {
         if (lastLayerBuilder != null) {
-            TrainableLayer layer = lastLayerBuilder.build();
+            Layer layer = lastLayerBuilder.build();
             layers.add(layer);
             lastLayerOutputSchema = layer.getSchema(lastLayerOutputSchema);
-            lastLayerBuilder = null;
         }
 
-        PoolLayer poolLayer = new PoolLayer(poolFunction, sampleSize, stride);
+        PoolingLayerBuilder<TrainableConvolutionSystemBuilder<T>> poolingLayerBuilder = PoolingLayerBuilder.initialize(lastLayerOutputSchema.length);
 
-        layers.add(poolLayer);
+        poolingLayerBuilder.setParentBuilder(this);
 
-        lastLayerOutputSchema = poolLayer.getSchema(lastLayerOutputSchema);
+        lastLayerBuilder = poolingLayerBuilder;
 
-        return this;
+        return poolingLayerBuilder;
     }
 
     public TrainableSystem build() {
@@ -121,9 +116,14 @@ public class TrainableConvolutionSystemBuilder<T> extends AbstractChainableBuild
             channelsCount = inputChannelsCount;
         }
         else {
-            TrainableLayer layer = lastLayerBuilder.build();
+            Layer layer = lastLayerBuilder.build();
 
-            channelsCount = layer.getOutputChannelsCount();
+            if (layer instanceof CountableOutput) {
+                channelsCount = ((CountableOutput)layer).getOutputChannelsCount();
+            }
+            else {
+                throw new IllegalStateException("The previous layer must have countable output.");
+            }
         }
 
         return channelsCount;

@@ -58,7 +58,7 @@ public class PersonMigration {
             tempPopulationPerson = EVOLUTIONS.get(i).getTotalBestPerson();
 
             if (tempPopulationPerson != null) {
-                tempPopulationPerson = (PopulationPerson) tempPopulationPerson.clone();
+                tempPopulationPerson = population.newSameLengthAs(tempPopulationPerson);
 
                 if (tempPopulationPerson.getGeneCode() instanceof BackpropagationMLP) {
                     propagate((BackpropagationMLP) tempPopulationPerson.getGeneCode(), currentEpoch);

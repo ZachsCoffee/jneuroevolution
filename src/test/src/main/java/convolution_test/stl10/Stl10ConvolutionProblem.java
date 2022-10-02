@@ -12,6 +12,7 @@ import evolution_builder.components.Recombination;
 import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
 import execution.NeuroevolutionPersonManager;
+import executors.TrainableSystem;
 import functions.ActivationFunction;
 import input.RawImageInput;
 import layers.pool.PoolFunction;
@@ -50,7 +51,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             add(2);
         }};
 
-        int trainLimit = 400;
+        int trainLimit = 600;
         int testLimit = 200;
 
         List<MatrixReader[]> trainImages = readX(basePath.resolve("images/train"), trainLimit);
@@ -62,7 +63,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             .entrySet()
             .stream()
             .sorted((o1, o2) -> (int) (o2.getValue() - o1.getValue()))
-            .forEach(doubleLongEntry -> System.out.println("Class: " + doubleLongEntry.getKey() +" count: " + doubleLongEntry.getValue()));
+            .forEach(doubleLongEntry -> System.out.println("Class: " + doubleLongEntry.getKey() + " count: " + doubleLongEntry.getValue()));
 
         validationDataset = toDataset(
             trainImages.subList(trainLimit / 2, trainLimit),
@@ -88,7 +89,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
         testingDataset = toDataset(testImages, testTargets);
 
-        ((TrainableSystem)buildConvolution()).printSchema(testImages.get(0));
+        ((TrainableSystem) buildConvolution()).printSchema(testImages.get(0));
     }
 
     private MatrixReaderDataset toDataset(
@@ -110,20 +111,33 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     public TrainableLayer buildConvolution() {
         return TrainableConvolutionSystemBuilder.getInstance(3, 96, 96)
             .addConvolutionLayer()
-            .setKernelsPerChannel(3)
+            .setKernelsPerChannel(1)
             .setStride(3)
+            .and()
+            .addPoolingLayer()
+            .setPoolFunction(PoolFunction.MAX)
+            .setStride(1)
+            .setSampleSize(3)
             .and()
             .addConvolutionLayer()
-            .setStride(3)
-            .setKernelsPerChannel(3)
-            .setSumKernels(true)
             .and()
-            .addPoolingLayer(PoolFunction.AVERAGE, 3, 1)
+            .addPoolingLayer()
+            .setStride(1)
+            .setSampleSize(3)
+            .and()
+            .addConvolutionLayer()
+            .and()
+            .addConvolutionLayer()
+            .and()
+            .addPoolingLayer()
+            .setStride(1)
+            .setSampleSize(3)
+            .and()
             .addNeuralNetworkLayer()
             .addLayer(200, ActivationFunction.GROUND_RELU.getFunction())
             .addLayer(100, ActivationFunction.GROUND_RELU.getFunction())
             .addLayer(50, ActivationFunction.GROUND_RELU.getFunction())
-            .addLayer(1, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(10, ActivationFunction.SIGMOID.getFunction())
             .and()
             .build();
     }
@@ -140,28 +154,35 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
                     double[][] results = evaluateSystemAtIndex(convolution, dataset, i);
 
                     int targetIndex = (int) results[1][0];
-                    int prediction = (int) Math.round(results[0][targetIndex]);
-                    if (targetIndex != prediction) {
-                        error++;
-                    }
+
+                    error += softMaxError(results[0], targetIndex);
                 }
 
                 return error;
             }
         );
 
-        return dataset.getDataLength() - forkJoinPool.invoke(task);
+        return 1000000 - forkJoinPool.invoke(task);
+    }
+
+    private double softMaxError(double[] predictions, int targetPosition) {
+        return - Math.log(Math.exp(predictions[targetPosition]) / sumOfE(predictions));
     }
 
     private void softMax(double[] predictions) {
-        double sum = 0;
-
-        for (int i = 0; i < predictions.length; i++) {
-            sum += Math.exp(predictions[i]);
-        }
+        double sum = sumOfE(predictions);
         for (int i = 0; i < predictions.length; i++) {
             predictions[i] = Math.exp(predictions[i]) / sum;
         }
+    }
+
+    private static double sumOfE(double[] predictions) {
+        double sum = 0;
+        for (int i = 0; i < predictions.length; i++) {
+            sum += Math.exp(predictions[i]);
+        }
+
+        return sum;
     }
 
     @Override
@@ -174,12 +195,12 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         Population<TrainableLayer> population,
         int epoch
     ) {
-        return Recombination.random(population, 5, convolutionGenes);
+        return Recombination.random(population, 50, convolutionGenes);
     }
 
     @Override
     public Population<TrainableLayer> selectionMethod(Population<TrainableLayer> population) {
-        return Selection.tournament(population, 5, false);
+        return Selection.tournament(population, 3, false);
     }
 
     @Override

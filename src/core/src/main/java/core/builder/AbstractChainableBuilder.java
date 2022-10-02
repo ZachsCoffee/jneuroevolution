@@ -1,6 +1,6 @@
 package core.builder;
 
-public abstract class AbstractChainableBuilder<T> implements TrainableBuilder<T> {
+public abstract class AbstractChainableBuilder<T> implements LayerBuilder<T> {
 
     private T builder;
 
