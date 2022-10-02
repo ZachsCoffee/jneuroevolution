@@ -19,7 +19,6 @@
     <orderEntry type="module" module-name="core" />
     <orderEntry type="library" name="Maven: com.massisframework:j-text-utils:0.3.4" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:21.0" level="project" />
-    <orderEntry type="library" name="Maven: com.jai.evolution.algorithms:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" name="Maven: au.com.bytecode:opencsv:2.4" level="project" />
   </component>

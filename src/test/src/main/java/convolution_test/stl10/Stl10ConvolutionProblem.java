@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
-    public static final int EPOCHS = 50;
+    public static final int EPOCHS = 100;
     private static final ForkJoinPool forkJoinPool = new ForkJoinPool(7);
     private final ConvolutionPersonManager personManager;
     private final ConvolutionGenes convolutionGenes;
@@ -195,7 +195,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         Population<TrainableLayer> population,
         int epoch
     ) {
-        return Recombination.random(population, 50, convolutionGenes);
+        return Recombination.random(population, 2, convolutionGenes);
     }
 
     @Override

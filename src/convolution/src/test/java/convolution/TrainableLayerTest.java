@@ -37,10 +37,8 @@ public class TrainableLayerTest {
             assertNotEquals(trainableLayer.getWeightAt(i), trainableLayer.getWeightAt(i-1));
         }
 
-        Random random = new Random();
-
         for (int i=0; i<count; i++) {
-            double randomNumber = random.nextDouble() * 100;
+            double randomNumber = Math.random() * 100;
 
             trainableLayer.setWeightAt(i, randomNumber);
 
