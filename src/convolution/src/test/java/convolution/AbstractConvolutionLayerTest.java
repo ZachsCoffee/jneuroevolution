@@ -10,7 +10,6 @@ import functions.ActivationFunction;
 import layers.convolution.AbstractConvolutionLayer;
 import maths.matrix.Matrix2D;
 import maths.matrix.MatrixRW;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -76,32 +75,6 @@ public class AbstractConvolutionLayerTest {
                 }
             )
         );
-    }
-
-    private MatrixReader[] getChannels() {
-        return new MatrixReader[] {
-            new Matrix2D(
-                new double[][] {
-                    {1, 1, -1, -1, -1,},
-                    {1, 2, 1, -1, -1,},
-                    {0, 1, -1, -1, 1,},
-                    {5, 1, 4, 6, 1,},
-                }
-            ),
-            new Matrix2D(
-                new double[][] {
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                    {1, 1, 1, 1, 1, 1, 1, 1, 1},
-                }
-            )
-        };
     }
 
     private static class StubConvolutionLayer extends AbstractConvolutionLayer{
