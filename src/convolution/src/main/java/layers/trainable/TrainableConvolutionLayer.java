@@ -259,13 +259,13 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
     }
 
     private int findTotalWeightsCount() {
-        int biasWeight = sumKernels
-            ? 1
-            : 0;
-
         int count = 0;
         for (TrainableKernel kernel : kernels) {
-            count += kernel.getKernelTotalWeightsCount() + biasWeight;
+            count += kernel.getKernelTotalWeightsCount();
+        }
+
+        if (sumKernels) {
+            count += kernelsPerChannel;
         }
 
         return count;

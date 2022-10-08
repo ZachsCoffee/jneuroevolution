@@ -8,6 +8,6 @@ public interface MatrixRW extends MatrixReader, MatrixWriter{
     }
 
     default void incrementBy(int index, double value) {
-        setValueAt(index / getRowsCount(), index % getColumnsCount(), value);
+        setValueAt(index / getColumnsCount(), index % getColumnsCount(), value);
     }
 }
