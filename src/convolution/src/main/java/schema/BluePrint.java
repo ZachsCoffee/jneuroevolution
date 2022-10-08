@@ -6,6 +6,24 @@ public class BluePrint {
     int strideRows, strideColumns;
     int rowsCount, columnsCount;
 
+    public BluePrint() {}
+
+    public BluePrint(
+        int paddingRows,
+        int paddingColumns,
+        int strideRows,
+        int strideColumns,
+        int rowsCount,
+        int columnsCount
+    ) {
+        this.paddingRows = paddingRows;
+        this.paddingColumns = paddingColumns;
+        this.strideRows = strideRows;
+        this.strideColumns = strideColumns;
+        this.rowsCount = rowsCount;
+        this.columnsCount = columnsCount;
+    }
+
     public int getPaddingRows() {
         return paddingRows;
     }

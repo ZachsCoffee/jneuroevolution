@@ -19,10 +19,10 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
     ) {
         super(dataBinder, new Stl10ConvolutionProblem());
         epochs = Stl10ConvolutionProblem.EPOCHS;
-        threads = 1;
-        populationSize = 10;
+        threads = 3;
+        populationSize = 20;
         evaluationTarget = EvaluationTarget.VALIDATION_BEST;
-        personMigration = false;
+        personMigration = true;
     }
 
     @Override
@@ -38,6 +38,7 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
             double[][] results = getProblem().evaluateSystemAtIndex(layer, dataset, i);
             int targetIndex = (int) results[1][0];
 //            predictions[i] = new double[] {Math.round(results[0][targetIndex]), results[1][0]};
+//            softMax(results[0]);
             int predictedIndex = bestIndex(results[0]);
 
             if (predictedIndex != targetIndex) {
@@ -62,5 +63,21 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
         }
 
         return maxValueIndex;
+    }
+
+    private void softMax(double[] predictions) {
+        double sum = sumOfE(predictions);
+        for (int i = 0; i < predictions.length; i++) {
+            predictions[i] = Math.exp(predictions[i]) / sum;
+        }
+    }
+
+    private static double sumOfE(double[] predictions) {
+        double sum = 0;
+        for (int i = 0; i < predictions.length; i++) {
+            sum += Math.exp(predictions[i]);
+        }
+
+        return sum;
     }
 }

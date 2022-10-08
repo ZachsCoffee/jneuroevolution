@@ -33,13 +33,15 @@ public class Selection {
         }
         else {
 
-            for (int i = 1; i <= size; i++) {
+            for (int i = 0; i < size; i++) {
                 personPosition = getRandom(size);
                 maxFitness = population.getPersonAt(personPosition).getFitness();
-                for (int j = 2; j <= rankSize; j++) {
+                for (int j = 1; j < rankSize; j++) {
                     randomValue = getRandom(size);
-                    if (population.getPersonAt(randomValue).getFitness() > maxFitness) {
-                        maxFitness = population.getPersonAt(randomValue).getFitness();
+                    double currentPersonFitness = population.getPersonAt(randomValue).getFitness();
+
+                    if (currentPersonFitness > maxFitness) {
+                        maxFitness = currentPersonFitness;
                         personPosition = randomValue;
                     }
                 }

@@ -27,8 +27,8 @@ public abstract class AbstractConvolutionLayer implements Layer {
 
         double[][] output = new double[bluePrint.getRowsCount()][bluePrint.getColumnsCount()];
 
-        int inputRowsBound = inputRows + bluePrint.getPaddingRows() - kernelSize;
-        int inputColumnsBound = inputColumns + bluePrint.getPaddingColumns() - kernelSize;
+        int inputRowsBound = inputRows + bluePrint.getPaddingRows() - kernelSize + 1;
+        int inputColumnsBound = inputColumns + bluePrint.getPaddingColumns() - kernelSize + 1;
 
         try {
             for (

@@ -7,10 +7,10 @@ import layers.trainable.TrainableConvolutionLayer;
 import networks.multilayer_perceptron.network.NetworkLayer;
 import networks.multilayer_perceptron.network.NeuralNetwork;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class TrainableLayerTest {
 

@@ -17,7 +17,7 @@ import java.util.Arrays;
 public class TrainableConvolutionLayer extends AbstractConvolutionLayer implements TrainableLayer, LayerSchemaResolver {
 
     private static final int KERNEL_SIZE = 3;
-    private static final Function FUNCTION = ActivationFunction.LOGSIG.getFunction();
+    private static final Function FUNCTION = ActivationFunction.GROUND_RELU.getFunction();
     private final int kernelsPerChannel;
     private final boolean sumKernels;
     private final int stride;
@@ -65,7 +65,7 @@ public class TrainableConvolutionLayer extends AbstractConvolutionLayer implemen
         int totalWeightsCount = findTotalWeightsCount();
 
         kernelsWeights = new double[totalWeightsCount];
-        Arrays.setAll(kernelsWeights, value -> Math.random());
+        Arrays.setAll(kernelsWeights, value -> Math.random() * 2 -1);
 
         biasWeightIndexes = createBiasWeightIndexes(totalWeightsCount);
 

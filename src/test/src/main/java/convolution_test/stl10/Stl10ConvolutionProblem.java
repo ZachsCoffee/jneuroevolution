@@ -15,25 +15,23 @@ import execution.NeuroevolutionPersonManager;
 import executors.TrainableSystem;
 import functions.ActivationFunction;
 import input.RawImageInput;
-import layers.pool.PoolFunction;
 import maths.MinMax;
 import multithreaded.RecursiveEvaluation;
 
 import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
-    public static final int EPOCHS = 100;
-    private static final ForkJoinPool forkJoinPool = new ForkJoinPool(7);
+    public static final int EPOCHS = 200;
+    private static final ForkJoinPool forkJoinPool = new ForkJoinPool(9);
     private final ConvolutionPersonManager personManager;
     private final ConvolutionGenes convolutionGenes;
     private final double[][] evaluationResult = new double[2][10];
@@ -42,8 +40,67 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         personManager = new ConvolutionPersonManager(this);
         convolutionGenes = new ConvolutionGenes();
 
-        setDynamicMutation(new MinMax(4000, 8000), EPOCHS);
+        setDynamicMutation(new MinMax(10000, 10000), EPOCHS);
 
+        cifar();
+//        stl();
+    }
+
+    private void cifar() {
+        Path basePath = Paths.get("/home/zachs/Develop/Python/quick_plot/cifar-10");
+
+        List<Integer> specificLabels = new ArrayList<>() {{
+            add(1);
+            add(2);
+        }};
+
+        int trainLimit = 600;
+        int testLimit = 200;
+
+        List<MatrixReader[]> trainImages = readX(basePath.resolve("output/training/images"), trainLimit);
+
+        List<double[]> trainTargets = readY(basePath.resolve("output/training/targets.b"), trainLimit);
+
+        trainTargets.stream()
+            .collect(Collectors.groupingBy(doubles -> doubles[0], LinkedHashMap::new, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .sorted((o1, o2) -> (int) (o2.getValue() - o1.getValue()))
+            .forEach(doubleLongEntry -> System.out.println("Class: " + doubleLongEntry.getKey() + " count: " + doubleLongEntry.getValue()));
+
+        trainingDataset = toDataset(
+            trainImages.subList(0, trainLimit / 2),
+            trainTargets.subList(0, trainLimit / 2)
+        );
+
+//        toImage(trainingDataset, "t");
+
+        validationDataset = toDataset(
+            trainImages.subList(trainLimit / 2, trainLimit),
+            trainTargets.subList(trainLimit / 2, trainLimit)
+        );
+
+//        toImage(validationDataset, "v");
+
+//        pickSpecificLabels(trainImages, trainTargets, specificLabels);
+
+        System.out.println("Train size:" + trainTargets.size());
+
+        List<MatrixReader[]> testImages = readX(basePath.resolve("output/testing/images"), testLimit);
+
+        List<double[]> testTargets = readY(basePath.resolve("output/testing/targets.b"), testLimit);
+
+//        pickSpecificLabels(testImages, testTargets, specificLabels);
+
+        System.out.println("Test size:" + testTargets.size());
+
+        testingDataset = toDataset(testImages, testTargets);
+//        toImage(testingDataset, "T");
+
+        ((TrainableSystem) buildConvolution()).printSchema(testImages.get(0));
+    }
+
+    private void stl() {
         Path basePath = Paths.get("/home/zachs/Develop/MachineLearning/stl10_binary");
 
         List<Integer> specificLabels = new ArrayList<>() {{
@@ -65,19 +122,23 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             .sorted((o1, o2) -> (int) (o2.getValue() - o1.getValue()))
             .forEach(doubleLongEntry -> System.out.println("Class: " + doubleLongEntry.getKey() + " count: " + doubleLongEntry.getValue()));
 
+        trainingDataset = toDataset(
+            trainImages.subList(0, trainLimit / 2),
+            trainTargets.subList(0, trainLimit / 2)
+        );
+
+//        toImage(trainingDataset, "t");
+
         validationDataset = toDataset(
             trainImages.subList(trainLimit / 2, trainLimit),
             trainTargets.subList(trainLimit / 2, trainLimit)
         );
 
+//        toImage(validationDataset, "v");
+
 //        pickSpecificLabels(trainImages, trainTargets, specificLabels);
 
         System.out.println("Train size:" + trainTargets.size());
-
-        trainingDataset = toDataset(
-            trainImages.subList(0, trainLimit / 2),
-            trainTargets.subList(0, trainLimit / 2)
-        );
 
         List<MatrixReader[]> testImages = readX(basePath.resolve("images/test"), testLimit);
 
@@ -88,8 +149,32 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         System.out.println("Test size:" + testTargets.size());
 
         testingDataset = toDataset(testImages, testTargets);
+//        toImage(testingDataset, "T");
 
         ((TrainableSystem) buildConvolution()).printSchema(testImages.get(0));
+    }
+
+    private void toImage(MatrixReaderDataset dataset, String prefix) {
+
+        for (int i=0; i<10; i++) {
+            BufferedImage image = new BufferedImage(96, 96, BufferedImage.TYPE_INT_RGB);
+
+            for (int j=0; j<dataset.getData()[i].length; j++) {
+
+                for (int r=0; r<dataset.getData()[i][j].getRowsCount(); r++) {
+                    for (int c=0; c<dataset.getData()[i][j].getColumnsCount(); c++) {
+                        image.setRGB(c, r, image.getRGB(c, r) | ((int)dataset.getData()[i][j].valueAt(r, c) << 8 * (2 - j)));
+                    }
+                }
+            }
+
+            try {
+                ImageIO.write(image, "jpg", new File("./"+prefix+i));
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private MatrixReaderDataset toDataset(
@@ -109,38 +194,80 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 
     @Override
     public TrainableLayer buildConvolution() {
-        return TrainableConvolutionSystemBuilder.getInstance(3, 96, 96)
+        return TrainableConvolutionSystemBuilder.getInstance(3, 32, 32)
+            .addConvolutionLayer()
+            .setKernelsPerChannel(4)
+            .setSumKernels(true)
+            .setStride(2)
+            .and()
+            .addConvolutionLayer()
+            .setKernelsPerChannel(5)
+            .setSumKernels(true)
+            .setKernelsPerChannel(3)
+            .and()
+            .addPoolingLayer()
+            .and()
             .addConvolutionLayer()
             .setKernelsPerChannel(1)
-            .setStride(3)
             .and()
             .addPoolingLayer()
-            .setPoolFunction(PoolFunction.MAX)
-            .setStride(1)
-            .setSampleSize(3)
-            .and()
-            .addConvolutionLayer()
-            .and()
-            .addPoolingLayer()
-            .setStride(1)
-            .setSampleSize(3)
-            .and()
-            .addConvolutionLayer()
-            .and()
-            .addConvolutionLayer()
-            .and()
-            .addPoolingLayer()
-            .setStride(1)
-            .setSampleSize(3)
             .and()
             .addNeuralNetworkLayer()
-            .addLayer(200, ActivationFunction.GROUND_RELU.getFunction())
-            .addLayer(100, ActivationFunction.GROUND_RELU.getFunction())
-            .addLayer(50, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(150, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(75, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(55, ActivationFunction.GROUND_RELU.getFunction())
             .addLayer(10, ActivationFunction.SIGMOID.getFunction())
             .and()
             .build();
     }
+
+//    @Override
+//    public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
+//        RecursiveEvaluation task = new RecursiveEvaluation(
+//            dataset,
+//            100,
+//            (startIndex, endIndex) -> {
+//                double error = 0;
+//
+//                for (int i = startIndex; i < endIndex; i++) {
+//                    double[][] results = evaluateSystemAtIndex(convolution, dataset, i);
+//
+//                    int targetIndex = (int) results[1][0];
+//                    int predictedIndex = bestIndex(results[0]);
+//                    if (targetIndex != predictedIndex) {
+//                        error++;
+//                    }
+//                }
+//
+//                return error;
+//            }
+//        );
+//
+//        return dataset.getDataLength() - forkJoinPool.invoke(task);
+//    }
+
+//    @Override
+//    public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
+//        RecursiveEvaluation task = new RecursiveEvaluation(
+//            dataset,
+//            50,
+//            (startIndex, endIndex) -> {
+//                double error = 0;
+//
+//                for (int i = startIndex; i < endIndex; i++) {
+//                    double[][] results = evaluateSystemAtIndex(convolution, dataset, i);
+//
+//                    int targetIndex = (int) results[1][0];
+//
+//                    error += softMaxError(results[0], targetIndex);
+//                }
+//
+//                return error;
+//            }
+//        );
+//
+//        return  forkJoinPool.invoke(task);
+//    }
 
     @Override
     public double evaluateFitness(TrainableLayer convolution, MatrixReaderDataset dataset) {
@@ -148,25 +275,63 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             dataset,
             50,
             (startIndex, endIndex) -> {
-                double error = 0;
+                double fitness = 0;
 
                 for (int i = startIndex; i < endIndex; i++) {
                     double[][] results = evaluateSystemAtIndex(convolution, dataset, i);
 
                     int targetIndex = (int) results[1][0];
 
-                    error += softMaxError(results[0], targetIndex);
+                    fitness += accuracyFitness(results[0], targetIndex);
                 }
 
-                return error;
+                return fitness;
             }
         );
 
-        return 1000000 - forkJoinPool.invoke(task);
+        return forkJoinPool.invoke(task);
+    }
+
+//    private double softMaxError(double[] predictions, int targetPosition) {
+//        return - Math.log(Math.exp(predictions[targetPosition]) / sumOfE(predictions));
+//    }
+
+    private double accuracyFitness(double[] predictions, int targetPosition) {
+        double truePositives = 0, trueNegatives = 0, falsePositives = 0, falseNegatives = 0;
+
+        for (int i=0; i<predictions.length; i++) {
+            int prediction = (int)Math.round(predictions[i]);
+
+            if (i == targetPosition) {
+                if (prediction == 1) {
+                    truePositives++;
+                }
+                else {
+                    falseNegatives++;
+                }
+            }
+            else {
+                if (prediction == 0) {
+                    trueNegatives++;
+                }
+                else {
+                    falsePositives++;
+                }
+            }
+        }
+
+        double accuracy = (truePositives + trueNegatives) / (truePositives + falsePositives + trueNegatives + falseNegatives);
+        double truePositiveRate = truePositives / (truePositives + falseNegatives);
+        double trueNegativeRate = trueNegatives / (trueNegatives + falsePositives);
+        double positivePredictiveValue = truePositives / (truePositives + falsePositives);
+        double negativePredictiveValue = trueNegatives / (falseNegatives + trueNegatives);
+
+        return accuracy + truePositiveRate + trueNegativeRate + positivePredictiveValue + negativePredictiveValue;
     }
 
     private double softMaxError(double[] predictions, int targetPosition) {
-        return - Math.log(Math.exp(predictions[targetPosition]) / sumOfE(predictions));
+        double sum = sumOfE(predictions);
+        return - Math.exp(predictions[targetPosition]) / sum + Math.exp(predictions[bestIndex(predictions)]) / sum;
     }
 
     private void softMax(double[] predictions) {
@@ -195,17 +360,17 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
         Population<TrainableLayer> population,
         int epoch
     ) {
-        return Recombination.random(population, 2, convolutionGenes);
+        return Recombination.random(population, 1, convolutionGenes);
     }
 
     @Override
     public Population<TrainableLayer> selectionMethod(Population<TrainableLayer> population) {
-        return Selection.tournament(population, 3, false);
+        return Selection.tournament(population, 50, false);
     }
 
     @Override
     public void mutationMethod(Population<TrainableLayer> population, int epoch, int maxEpoch) {
-        Mutation.mutation(population, getMutationChange(epoch), 1, true, convolutionGenes);
+        Mutation.mutation(population, getMutationChange(epoch), 0.5, true, convolutionGenes);
     }
 
     @Override
@@ -214,7 +379,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
 //        System.exit(0);
         double[] results = convolution.execute(dataset.getData()[index])[0].getRow(0);
         evaluationResult[0] = results;
-        evaluationResult[1][0] = (int) dataset.getTargets()[index][0] - 1;
+        evaluationResult[1][0] = (int) dataset.getTargets()[index][0];
         return evaluationResult;
     }
 
@@ -232,7 +397,8 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
     }
 
     private List<MatrixReader[]> readX(Path folder, int limit) {
-        File[] files = folder.toFile().listFiles();
+        File[] files = folder.toFile().listFiles((dir, name) -> Integer.parseInt(name) < limit);
+        Arrays.sort(files, Comparator.comparingInt(o -> Integer.parseInt(o.getName())));
         List<MatrixReader[]> data = new ArrayList<>();
 
         try {
