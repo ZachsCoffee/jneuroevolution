@@ -147,11 +147,6 @@ public class TrainableSystem implements TrainableLayer, Iterable<Layer> {
         return convolutionSchemaPrinter;
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
     private int[] getLayer(int index) {
         int layerIndex = 0;
         for (TrainableLayer trainableLayer : trainableLayers) {

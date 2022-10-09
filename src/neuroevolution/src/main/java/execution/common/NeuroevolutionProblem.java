@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package execution;
+package execution.common;
 
 import data_manipulation.RawDataset;
+import execution.Problem;
 import networks.interfaces.Network;
 
 

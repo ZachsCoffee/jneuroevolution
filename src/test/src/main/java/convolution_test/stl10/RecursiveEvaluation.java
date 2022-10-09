@@ -59,11 +59,11 @@ public class RecursiveEvaluation extends RecursiveTask<Double> {
         }
         else {
             for (int i = startIndex; i < endIndex && i < rawDataset.SIZE; i++) {
-                double[] result = network.compute(rawDataset.features[i]);
+                double[] result = network.compute(rawDataset.getFeatures()[i]);
 //                double prediction = (int) Math.round(result[0] * 9);
 //                double prediction = Math.round(result[(int)dataset.targets[i][0]]);
                 int predictionPosition = ArrayUtils.maxPosition(result);
-                if (rawDataset.targets[i][0] != predictionPosition) {
+                if (rawDataset.getTargets()[i][0] != predictionPosition) {
 //                        error += result[predictionPosition] - result[(int)dataset.targets[i][0]];
                     error++;
                 }
@@ -74,7 +74,7 @@ public class RecursiveEvaluation extends RecursiveTask<Double> {
 
                 if (predictionValues != null) {
                     predictionValues[i][0] = predictionPosition;
-                    predictionValues[i][1] = rawDataset.targets[i][0];
+                    predictionValues[i][1] = rawDataset.getTargets()[i][0];
                 }
             }
         }

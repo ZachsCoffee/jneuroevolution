@@ -11,7 +11,7 @@ import evolution_builder.components.Mutation;
 import evolution_builder.components.Recombination;
 import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
-import execution.NeuroevolutionPersonManager;
+import execution.common.NeuroevolutionPersonManager;
 import executors.TrainableSystem;
 import functions.ActivationFunction;
 import input.RawImageInput;
@@ -108,7 +108,7 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             add(2);
         }};
 
-        int trainLimit = 600;
+        int trainLimit = 12000;
         int testLimit = 200;
 
         List<MatrixReader[]> trainImages = readX(basePath.resolve("images/train"), trainLimit);
@@ -211,11 +211,12 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             .setKernelsPerChannel(1)
             .and()
             .addPoolingLayer()
+            .setStride(2)
             .and()
             .addNeuralNetworkLayer()
-            .addLayer(150, ActivationFunction.GROUND_RELU.getFunction())
-            .addLayer(75, ActivationFunction.GROUND_RELU.getFunction())
-            .addLayer(55, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(200, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(100, ActivationFunction.GROUND_RELU.getFunction())
+            .addLayer(70, ActivationFunction.GROUND_RELU.getFunction())
             .addLayer(10, ActivationFunction.SIGMOID.getFunction())
             .and()
             .build();
@@ -320,11 +321,11 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             }
         }
 
-        double accuracy = (truePositives + trueNegatives) / (truePositives + falsePositives + trueNegatives + falseNegatives);
-        double truePositiveRate = truePositives / (truePositives + falseNegatives);
-        double trueNegativeRate = trueNegatives / (trueNegatives + falsePositives);
-        double positivePredictiveValue = truePositives / (truePositives + falsePositives);
-        double negativePredictiveValue = trueNegatives / (falseNegatives + trueNegatives);
+        final double accuracy = (truePositives + trueNegatives) / (truePositives + falsePositives + trueNegatives + falseNegatives);
+        final double truePositiveRate = truePositives / (truePositives + falseNegatives);
+        final double trueNegativeRate = trueNegatives / (trueNegatives + falsePositives);
+        final double positivePredictiveValue = truePositives / (truePositives + falsePositives);
+        final double negativePredictiveValue = trueNegatives / (falseNegatives + trueNegatives);
 
         return accuracy + truePositiveRate + trueNegativeRate + positivePredictiveValue + negativePredictiveValue;
     }

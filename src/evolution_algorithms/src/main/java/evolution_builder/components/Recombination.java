@@ -63,7 +63,7 @@ public class Recombination {
         int personCount = 0;
         int randomBreakSize;
 
-        PopulationPerson<P> populationPerson1, populationPerson2;
+        PopulationPerson<P> populationPerson1, populationPerson2, newPopulationPerson1, newPopulationPerson2;
 
         Population<P> newPopulation = new Population<>(population.getPersonManager(), populationSize);
 
@@ -74,21 +74,37 @@ public class Recombination {
             throw new IllegalArgumentException("Argument, at pos 2: must be greater than zero.");
         }
 
+        boolean changeGenesSide;
         while (personCount < populationSize) {
             populationPerson1 = population.getPersonAt(getRandom(populationSize));
             populationPerson2 = population.getPersonAt(getRandom(populationSize));
+            newPopulationPerson1 = population.createPerson();
+            newPopulationPerson2 = population.createPerson();
 
             randomBreakSize = getRandom(breakSize) + 1;
+            changeGenesSide = true;
+            for (int i = 0; i < genesCount; i++) {
+                if (i % randomBreakSize == 0) {
+                    changeGenesSide = ! changeGenesSide;
+                }
 
-            recombine(populationPerson1, populationPerson2, genes, randomBreakSize, genesCount);
+                if (changeGenesSide) {
+                    genes.setGenAt(newPopulationPerson1, genes.getGenAt(populationPerson1, i), i);
+                    genes.setGenAt(newPopulationPerson2, genes.getGenAt(populationPerson2, i), i);
+                }
+                else {
+                    genes.setGenAt(newPopulationPerson1, genes.getGenAt(populationPerson2, i), i);
+                    genes.setGenAt(newPopulationPerson2, genes.getGenAt(populationPerson1, i), i);
+                }
+            }
 
             if (personCount + 2 <= populationSize) {
-                newPopulation.addPerson(populationPerson1);
-                newPopulation.addPerson(populationPerson2);
+                newPopulation.addPerson(newPopulationPerson1);
+                newPopulation.addPerson(newPopulationPerson2);
                 personCount += 2;
             }
             else if (personCount + 1 <= populationSize) {
-                newPopulation.addPerson(populationPerson1);
+                newPopulation.addPerson(newPopulationPerson1);
                 personCount++;
             }
         }

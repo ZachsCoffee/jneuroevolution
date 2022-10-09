@@ -5,6 +5,10 @@
  */
 package networks.recurrent_neural_network;
 
+import core.layer.Layer;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
+import core.schema.SchemaRow;
 import maths.Function;
 import functions.ActivationFunction;
 import networks.interfaces.TimeNetwork;
@@ -51,7 +55,12 @@ public class MultilayerRNN implements TimeNetwork{
         RNN_LAYERS = layers;
         this.weightsCount = weightsCount;
     }
-    
+
+    @Override
+    public int getOutputChannelsCount() {
+        return 0;
+    }
+
     @Override
     public void startCompute() {
         RNN_LAYERS[0].startCompute();
@@ -86,5 +95,25 @@ public class MultilayerRNN implements TimeNetwork{
     @Override
     public int getTotalWeights() {
         return weightsCount;
+    }
+
+    @Override
+    public Layer copy() {
+        return null;
+    }
+
+    @Override
+    public MatrixReader[] execute(MatrixReader[] inputChannels) {
+        return new MatrixReader[0];
+    }
+
+    @Override
+    public MatrixSchema[] getSchema(MatrixSchema[] inputSchema) {
+        return new MatrixSchema[0];
+    }
+
+    @Override
+    public SchemaRow getSchemaRow(MatrixSchema[] inputSchema) {
+        return null;
     }
 }

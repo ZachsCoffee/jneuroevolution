@@ -101,7 +101,7 @@ public class NeuralNetwork implements Network, TrainableLayer {
             throw new IllegalArgumentException("Layers not null.");
         }
 
-        if (layers.length <= 0) {
+        if (layers.length == 0) {
             throw new IllegalArgumentException("Layers length, must be greater than zero");
         }
 

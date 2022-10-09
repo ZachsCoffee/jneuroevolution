@@ -5,11 +5,13 @@
  */
 package networks.interfaces;
 
+import core.layer.TrainableLayer;
+
 /**
  *
  * @author Zachs
  */
-public interface Network {
+public interface Network extends TrainableLayer {
     double[] compute(double[] features);
     
     double getWeightAt(int position);

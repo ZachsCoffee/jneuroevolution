@@ -134,11 +134,6 @@ public class PopulationPerson<T> implements Person<T> {
         return Double.compare(fitness, otherPopulationPerson.fitness);
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
-
     public String toString() {
         return "Person: " + geneCode + "\nFitness: " + fitness + "\nPercent of fitness: " + percentOfFitness;
     }

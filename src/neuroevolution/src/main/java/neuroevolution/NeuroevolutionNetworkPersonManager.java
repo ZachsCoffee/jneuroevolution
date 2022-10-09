@@ -5,11 +5,12 @@
  */
 package neuroevolution;
 
+import core.layer.TrainableLayer;
 import data_manipulation.RawDataset;
 import data_manipulation.DatasetType;
 import evolution_builder.population.PopulationPerson;
-import execution.NeuroevolutionPersonManager;
-import execution.NeuroevolutionProblem;
+import execution.common.NeuroevolutionPersonManager;
+import execution.common.NeuroevolutionProblem;
 import networks.interfaces.Network;
 import networks.interfaces.TimeNetwork;
 import maths.Function;
@@ -95,8 +96,8 @@ public class NeuroevolutionNetworkPersonManager<P> implements NeuroevolutionPers
                 new BackpropagationMLP(
                     networkLayers,
                     ((BackpropagationMLP) givenNetwork).LEARN_RATE,
-                    neuroevolutionProblem.getProblem().getTrainingDataset().features,
-                    neuroevolutionProblem.getProblem().getTrainingDataset().targets
+                    neuroevolutionProblem.getProblem().getTrainingDataset().getFeatures(),
+                    neuroevolutionProblem.getProblem().getTrainingDataset().getTargets()
                 )
             );
         }
@@ -135,8 +136,7 @@ public class NeuroevolutionNetworkPersonManager<P> implements NeuroevolutionPers
             timeNetwork.endCompute();
         }
         else {
-            Network network = (Network) populationPerson.getGeneCode();
-            //krataw thn 8esh tou target apo to training set
+            Network network = populationPerson.getGeneCode();
 
             fitness = neuroevolutionProblem.evaluateNetwork(network, rawDataset);
         }

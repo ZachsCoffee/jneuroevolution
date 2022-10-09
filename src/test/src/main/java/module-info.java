@@ -12,4 +12,5 @@ module test {
 
     exports convolution_test;
     exports convolution_test.stl10;
+    exports simple;
 }

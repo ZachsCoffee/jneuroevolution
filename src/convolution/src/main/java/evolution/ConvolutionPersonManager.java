@@ -3,7 +3,7 @@ package evolution;
 import core.layer.TrainableLayer;
 import data_manipulation.DatasetType;
 import evolution_builder.population.PopulationPerson;
-import execution.NeuroevolutionPersonManager;
+import execution.common.NeuroevolutionPersonManager;
 
 import java.util.Objects;
 

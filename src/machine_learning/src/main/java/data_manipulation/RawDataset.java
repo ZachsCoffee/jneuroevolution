@@ -98,7 +98,7 @@ public class RawDataset implements DatasetTarget {
     }
 
     public final int SIZE;
-    public final double[][] features, targets;
+    private final double[][] features, targets;
 
     private RawDataset(double[][] features, double[][] targets) {
 

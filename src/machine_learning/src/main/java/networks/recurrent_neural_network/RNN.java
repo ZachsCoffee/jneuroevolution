@@ -6,6 +6,11 @@
 package networks.recurrent_neural_network;
 
 import java.util.Random;
+
+import core.layer.Layer;
+import core.layer.MatrixReader;
+import core.layer.MatrixSchema;
+import core.schema.SchemaRow;
 import maths.Function;
 import networks.interfaces.TimeNetwork;
 
@@ -70,7 +75,12 @@ public class RNN implements TimeNetwork{
         
         weightsCount = allArrays.length * numberOfFeatures;
     }
-    
+
+    @Override
+    public int getOutputChannelsCount() {
+        return 0;
+    }
+
     void setHiddenValue(double hiddenValue) {
         this.hiddenValue = hiddenValue;
     }
@@ -104,6 +114,26 @@ public class RNN implements TimeNetwork{
         }
 
         return new double[]{outputFunction.compute(sum)};// + Functions.groundRelu().compute(sum))};
+    }
+
+    @Override
+    public Layer copy() {
+        return null;
+    }
+
+    @Override
+    public MatrixReader[] execute(MatrixReader[] inputChannels) {
+        return new MatrixReader[0];
+    }
+
+    @Override
+    public MatrixSchema[] getSchema(MatrixSchema[] inputSchema) {
+        return new MatrixSchema[0];
+    }
+
+    @Override
+    public SchemaRow getSchemaRow(MatrixSchema[] inputSchema) {
+        return null;
     }
 
     protected double simpleCompute(double[] features) {
