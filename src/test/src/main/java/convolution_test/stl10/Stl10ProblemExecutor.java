@@ -19,7 +19,7 @@ public class Stl10ProblemExecutor extends ProblemExecutor<TrainableLayer, Matrix
     ) {
         super(dataBinder, new Stl10ConvolutionProblem());
         epochs = Stl10ConvolutionProblem.EPOCHS;
-        threads = 3;
+        threads = 5;
         populationSize = 20;
         evaluationTarget = EvaluationTarget.VALIDATION_BEST;
         personMigration = true;

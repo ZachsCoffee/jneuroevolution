@@ -107,7 +107,11 @@ public class Stage<P, D extends DatasetTarget> implements EvolutionStage<P> {
                 epochBestPopulationPerson,
                 DatasetType.VALIDATION
             );
-            if (currentBestValidationFitness > validationMaxFitness) {
+
+            if (epoch == 0) {
+                validationMaxFitness = currentBestValidationFitness;
+            }
+            else if (currentBestValidationFitness > validationMaxFitness) {
                 validationMaxFitness = currentBestValidationFitness;
                 validationBestPopulationPerson = population.getBestPerson();
             }

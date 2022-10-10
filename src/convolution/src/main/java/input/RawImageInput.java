@@ -19,17 +19,17 @@ public class RawImageInput implements ConvolutionInput {
         for (int height = 0; height < imageHeight; height++) {
             for (int width = 0; width < imageWidth; width++) {
                 int rgb = image.getRGB(width, height);
-
-                Color.RGBtoHSB(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF, hsb);
-
-
-                rawData[0][height][width] = hsb[0];
-                rawData[1][height][width] = hsb[1];
-                rawData[2][height][width] = hsb[2];
 //
-//                rawData[0][height][width] = rgb >> 16 & 0xFF;
-//                rawData[1][height][width] = rgb >> 8 & 0xFF;
-//                rawData[2][height][width] = rgb & 0xFF;
+//                Color.RGBtoHSB(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF, hsb);
+//
+//
+//                rawData[0][height][width] = hsb[0];
+//                rawData[1][height][width] = hsb[1];
+//                rawData[2][height][width] = hsb[2];
+//
+                rawData[0][height][width] = rgb >> 16 & 0xFF;
+                rawData[1][height][width] = rgb >> 8 & 0xFF;
+                rawData[2][height][width] = rgb & 0xFF;
             }
         }
 
