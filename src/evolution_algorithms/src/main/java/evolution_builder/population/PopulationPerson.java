@@ -23,7 +23,6 @@ public class PopulationPerson<T> implements Person<T> {
         return p;
     }
 
-    private final boolean ALLOW_NEGATIVE_FITNESS;
     private T geneCode;
     private double fitness;
     private int percentOfFitness;
@@ -40,8 +39,6 @@ public class PopulationPerson<T> implements Person<T> {
         );
 
         this.geneCode = geneCode;
-
-        ALLOW_NEGATIVE_FITNESS = false;
     }
 
     /**
@@ -68,8 +65,6 @@ public class PopulationPerson<T> implements Person<T> {
         );
 
         this.geneCode = geneCode;
-
-        ALLOW_NEGATIVE_FITNESS = allowNegativeFitness;
     }
 
     /**
@@ -119,14 +114,7 @@ public class PopulationPerson<T> implements Person<T> {
     }
 
     final void setFitness(double fitness) {
-        if (ALLOW_NEGATIVE_FITNESS) {
-            this.fitness = fitness;
-        }
-        else {
-            this.fitness = fitness > 0
-                ? fitness
-                : 0;
-        }
+        this.fitness = fitness;
     }
 
     @Override
