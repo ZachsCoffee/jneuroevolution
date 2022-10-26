@@ -17,8 +17,14 @@ public class ConvolutionGenes implements Genes<Double, TrainableLayer> {
     }
 
     @Override
-    public void mutationValue(PopulationPerson<TrainableLayer> populationPerson, int position, double mutationValue) {
-        populationPerson.getGeneCode().setWeightAt(position, mutationValue);
+    public void mutationValue(
+        PopulationPerson<TrainableLayer> populationPerson,
+        int index,
+        double mutationValue,
+        double maxMutationValue,
+        boolean withNegative
+    ) {
+        populationPerson.getGeneCode().setWeightAt(index, mutationValue);
     }
 
     @Override

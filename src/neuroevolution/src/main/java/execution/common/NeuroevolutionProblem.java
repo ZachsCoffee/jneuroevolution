@@ -15,21 +15,21 @@ import networks.interfaces.Network;
  *
  * @author Zachs
  */
-public interface NeuroevolutionProblem<P> {
+public interface NeuroevolutionProblem<P extends Network> {
     
     /**
      * Builds a network, this method must return a fixed size network every time.
      * @param maxStartValue The max start value for neurons weights
      * @return A fixed size network
      */
-    Network buildNetwork(int maxStartValue);
+    P buildNetwork(int maxStartValue);
     
     /**
      * Build a network, this method must return a random size network every time
      * @param maxStartValue The max start value for neurons weights
      * @return A random size network
      */
-    Network buildRandomNetwork(int maxStartValue);
+    P buildRandomNetwork(int maxStartValue);
     
     /**
      * Evaluates the network for the specific dataset
@@ -37,7 +37,7 @@ public interface NeuroevolutionProblem<P> {
      * @param rawDataset The dataset for evaluation
      * @return The score of network for the specific dataset
      */
-    double evaluateNetwork(Network network, RawDataset rawDataset);
+    double evaluateNetwork(P network, RawDataset rawDataset);
     
     Problem<P, RawDataset> getProblem();
 }

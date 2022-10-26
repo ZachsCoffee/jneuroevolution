@@ -56,15 +56,10 @@ public class NetworkLayer implements Imitable<NetworkLayer> {
         neurons[position] = neuron;
     }
 
-    protected void buildNeurons(double[] weights, int startPoint) {
+    protected void buildNeurons(double[] weights, boolean[] weightStatuses, int startPoint) {
         int endPoint = startPoint + totalWeightsCount;
         for (int i = 0; i < neurons.length; i++) {
-            if (function == null) {
-                neurons[i] = new Neuron(weights, startPoint, endPoint, maxStartValue);
-            }
-            else {
-                neurons[i] = new Neuron(weights, startPoint, endPoint, maxStartValue, function);
-            }
+            neurons[i] = new Neuron(weights, weightStatuses, startPoint, endPoint, maxStartValue, function);
 
             startPoint += totalWeightsCount;
             endPoint += totalWeightsCount;

@@ -6,9 +6,9 @@ import execution.EvaluationTarget;
 import execution.ExecutionResponse;
 import execution.ProblemExecutor;
 import execution.common.DataBinder;
-import networks.interfaces.Network;
+import networks.interfaces.PartialNetwork;
 
-public class AustralianProblemExecutor extends ProblemExecutor<Network, RawDataset, AustralianCreditProblem> {
+public class AustralianProblemExecutor extends ProblemExecutor<PartialNetwork, RawDataset, AustralianCreditProblem> {
 
     public static void main(String[] args) {
         Gui.create(AustralianProblemExecutor.class);
@@ -31,7 +31,7 @@ public class AustralianProblemExecutor extends ProblemExecutor<Network, RawDatas
     }
 
     @Override
-    protected EvaluationResult evaluation(Network person, RawDataset dataset) {
+    protected EvaluationResult evaluation(PartialNetwork person, RawDataset dataset) {
         double[][] predictions = new double[dataset.SIZE][2];
 
         int fitness = 0;

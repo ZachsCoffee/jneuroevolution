@@ -10,71 +10,74 @@ import evolution_builder.population.PopulationPerson;
 import evolution_builder.population.Population;
 
 /**
- *
  * @author main
  */
 public class Mutation {
-    public static void mutation(Population population, int chance, double maxValue, boolean negative, Genes genes){
-        int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0)) ;
-        PopulationPerson tempPopulationPerson;
-        
-        if (chance < 2){
+
+    public static <P, T> void mutation(
+        Population<P> population,
+        int chance,
+        double maxValue,
+        boolean negative,
+        Genes<T, P> genes
+    ) {
+        int populationSize = population.getSize(), genesCount = genes.genesCount(population.getPersonAt(0));
+        PopulationPerson<P> tempPopulationPerson;
+
+        if (chance < 2) {
             throw new IllegalArgumentException("Argument, at pos 2: must be greater than one.");
         }
-        
-        if (negative){
-           for (int i=0; i<populationSize; i++){
-                for (int j=0; j<genesCount; j++){
-                    if ((int)(Math.random()*chance) == 0){
-                        tempPopulationPerson = population.getPersonAt(i);
 
-                        genes.mutationValue(tempPopulationPerson, j, Math.random()*(maxValue*2)-maxValue);
-                    }
-                }
-            } 
-        }
-        else{
-            for (int i=0; i<populationSize; i++){
-                for (int j=0; j<genesCount; j++){
-                    if ((int)(Math.random()*chance) == 0){
-                        tempPopulationPerson = population.getPersonAt(i);
+        for (int i = 0; i < populationSize; i++) {
+            for (int j = 0; j < genesCount; j++) {
+                if ((int) (Math.random() * chance) == 0) {
+                    tempPopulationPerson = population.getPersonAt(i);
 
-                        genes.mutationValue(tempPopulationPerson, j, Math.random()*maxValue);
-                    }
+                    genes.mutationValue(
+                        tempPopulationPerson,
+                        j,
+                        generateRandomValue(maxValue, negative),
+                        maxValue,
+                        negative
+                    );
                 }
             }
         }
     }
-    
-    public static void variableLength(Population population, int chance, double maxValue, boolean negative, Genes genes){
+
+    private static double generateRandomValue(double maxValue, boolean negative) {
+        return negative
+            ? Math.random() * (maxValue * 2) - maxValue
+            : Math.random() * maxValue;
+    }
+
+    public static <P, T> void variableLength(
+        Population<P> population,
+        int chance,
+        double maxValue,
+        boolean negative,
+        Genes<T, P> genes
+    ) {
         int populationSize = population.getSize(), genesCount;
-        PopulationPerson tempPopulationPerson;
-        
-        if (chance < 2){
+        PopulationPerson<P> tempPopulationPerson;
+
+        if (chance < 2) {
             throw new IllegalArgumentException("Argument, chance: must be greater than one.");
         }
-        
-        if (negative){
-           for (int i=0; i<populationSize; i++){
-                genesCount = genes.genesCount(population.getPersonAt(i));
-                for (int j=0; j<genesCount; j++){
-                    if ((int)(Math.random()*chance) == 0){
-                        tempPopulationPerson = population.getPersonAt(i);
 
-                        genes.mutationValue(tempPopulationPerson, j, Math.random()*(maxValue*2)-maxValue);
-                    }
-                }
-            } 
-        }
-        else{
-            for (int i=0; i<populationSize; i++){
-                genesCount = genes.genesCount(population.getPersonAt(i));
-                for (int j=0; j<genesCount; j++){
-                    if ((int)(Math.random()*chance) == 0){
-                        tempPopulationPerson = population.getPersonAt(i);
+        for (int i = 0; i < populationSize; i++) {
+            genesCount = genes.genesCount(population.getPersonAt(i));
+            for (int j = 0; j < genesCount; j++) {
+                if ((int) (Math.random() * chance) == 0) {
+                    tempPopulationPerson = population.getPersonAt(i);
 
-                        genes.mutationValue(tempPopulationPerson, j, Math.random()*maxValue);
-                    }
+                    genes.mutationValue(
+                        tempPopulationPerson,
+                        j,
+                        generateRandomValue(maxValue, negative),
+                        maxValue,
+                        negative
+                    );
                 }
             }
         }

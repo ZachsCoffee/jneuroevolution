@@ -132,7 +132,13 @@ public class RecombinationTest {
         }
 
         @Override
-        public void mutationValue(PopulationPerson<int[]> populationPerson, int position, double mutationValue) {
+        public void mutationValue(
+            PopulationPerson<int[]> populationPerson,
+            int index,
+            double mutationValue,
+            double maxMutationValue,
+            boolean withNegative
+        ) {
 
         }
 

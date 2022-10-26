@@ -14,21 +14,27 @@ import execution.Problem;
 import files.csv.CSVFileReader;
 import functions.ActivationFunction;
 import maths.MinMax;
-import networks.interfaces.Network;
+import networks.interfaces.PartialNetwork;
 import networks.multilayer_perceptron.builders.NeuralNetworkBuilder;
 import neuroevolution.NeuroevolutionGenes;
+import neuroevolution.NeuroevolutionGenesOptions;
 import neuroevolution.NeuroevolutionNetworkPersonManager;
 
-public class AustralianCreditProblem extends AbstractNeuroevolutionProblem<Network, RawDataset> {
+public class AustralianCreditProblem extends AbstractNeuroevolutionProblem<PartialNetwork, RawDataset> {
 
     public static final int EPOCHS = 500;
 
-    private final NeuroevolutionNetworkPersonManager<Network> personManager = new NeuroevolutionNetworkPersonManager<>(
+    private final NeuroevolutionNetworkPersonManager<PartialNetwork> personManager = new NeuroevolutionNetworkPersonManager<>(
         this);
-    private final NeuroevolutionGenes<Network> genes = new NeuroevolutionGenes<>();
+    private final NeuroevolutionGenes<PartialNetwork> genes = new NeuroevolutionGenes<>(
+        NeuroevolutionGenesOptions.Builder.getInstance()
+            .setDeactivateWeightMutationChange(.2)
+            .setWeightStatusMutationChance(.2)
+            .build()
+    );
 
     public AustralianCreditProblem() {
-        setDynamicMutation(new MinMax(150, 500), EPOCHS);
+        setDynamicMutation(new MinMax(500, 1000), EPOCHS);
 
         double[][] data = CSVFileReader.readNumbersFile(
             "/home/zachs/Develop/Java/artificialintelligence/datasets/australian_credit/output/australian_credit_norm.csv",
@@ -48,32 +54,32 @@ public class AustralianCreditProblem extends AbstractNeuroevolutionProblem<Netwo
     }
 
     @Override
-    public NeuroevolutionPersonManager<Network> getPersonManager() {
+    public NeuroevolutionPersonManager<PartialNetwork> getPersonManager() {
         return personManager;
     }
 
     @Override
-    public void computePercentOfFitness(Population<Network> population) {
+    public void computePercentOfFitness(Population<PartialNetwork> population) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Population<Network> recombinationOperator(Population<Network> population, int epoch) {
+    public Population<PartialNetwork> recombinationOperator(Population<PartialNetwork> population, int epoch) {
         return Recombination.random(population, 3, genes);
     }
 
     @Override
-    public Population<Network> selectionMethod(Population<Network> population) {
+    public Population<PartialNetwork> selectionMethod(Population<PartialNetwork> population) {
         return Selection.tournament(population, 5, false);
     }
 
     @Override
-    public void mutationMethod(Population<Network> population, int epoch, int maxEpoch) {
-        Mutation.mutation(population, getMutationChange(epoch), 2, true, genes);
+    public void mutationMethod(Population<PartialNetwork> population, int epoch, int maxEpoch) {
+        Mutation.mutation(population, getMutationChange(epoch), 2, false, genes);
     }
 
     @Override
-    public Network buildNetwork(int maxStartValue) {
+    public PartialNetwork buildNetwork(int maxStartValue) {
         return NeuralNetworkBuilder.initialize(14)
             .addLayer(20, ActivationFunction.SIGMOID.getFunction())
             .addLayer(10, ActivationFunction.SIGMOID.getFunction())
@@ -83,12 +89,12 @@ public class AustralianCreditProblem extends AbstractNeuroevolutionProblem<Netwo
     }
 
     @Override
-    public Network buildRandomNetwork(int maxStartValue) {
+    public PartialNetwork buildRandomNetwork(int maxStartValue) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public double evaluateNetwork(Network network, RawDataset rawDataset) {
+    public double evaluateNetwork(PartialNetwork network, RawDataset rawDataset) {
         int fitness = 0;
 
         for (int i = 0; i < rawDataset.SIZE; i++) {
@@ -103,7 +109,7 @@ public class AustralianCreditProblem extends AbstractNeuroevolutionProblem<Netwo
     }
 
     @Override
-    public Problem<Network, RawDataset> getProblem() {
+    public Problem<PartialNetwork, RawDataset> getProblem() {
         return this;
     }
 }

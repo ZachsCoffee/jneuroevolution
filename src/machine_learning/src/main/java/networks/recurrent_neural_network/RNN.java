@@ -86,16 +86,16 @@ public class RNN implements TimeNetwork{
     }
     
     @Override
-    public double getWeightAt(int position) {
-        return allArrays[position / numberOfFeatures][position % numberOfFeatures];
+    public double getWeightAt(int index) {
+        return allArrays[index / numberOfFeatures][index % numberOfFeatures];
     }
     @Override
     public int getTotalWeights() {
         return weightsCount;
     }
     @Override
-    public void setWeightAt(int position, double weight) {
-        allArrays[position / numberOfFeatures][position % numberOfFeatures] = weight;
+    public void setWeightAt(int index, double weight) {
+        allArrays[index / numberOfFeatures][index % numberOfFeatures] = weight;
     }
     
     @Override

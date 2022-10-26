@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * @author Zachs
  */
-public class NeuroevolutionNetworkPersonManager<P> implements NeuroevolutionPersonManager<Network> {
+public class NeuroevolutionNetworkPersonManager<P extends Network> implements NeuroevolutionPersonManager<P> {
 
     private final NeuroevolutionProblem<P> neuroevolutionProblem;
 
@@ -34,21 +34,21 @@ public class NeuroevolutionNetworkPersonManager<P> implements NeuroevolutionPers
     }
 
     @Override
-    public PopulationPerson<Network> newPerson() {
-        return new PopulationPerson<>(
+    public PopulationPerson<P> newPerson() {
+        return new PopulationPerson<P>(
             neuroevolutionProblem.buildNetwork(NeuroevolutionGenes.maxStartValue)
         );
     }
 
     @Override
-    public PopulationPerson<Network> newRandomPerson() {
+    public PopulationPerson<P> newRandomPerson() {
         return new PopulationPerson<>(
             neuroevolutionProblem.buildRandomNetwork(NeuroevolutionGenes.maxStartValue)
         );
     }
 
     @Override
-    public PopulationPerson<Network> newSameLengthAs(PopulationPerson<Network> populationPerson) {
+    public PopulationPerson<P> newSameLengthAs(PopulationPerson<P> populationPerson) {
         NeuralNetwork givenNetwork = (NeuralNetwork) populationPerson.getGeneCode();
 
         NetworkLayer[] networkLayers = new NetworkLayer[givenNetwork.getLayerCount()];
@@ -92,22 +92,23 @@ public class NeuroevolutionNetworkPersonManager<P> implements NeuroevolutionPers
         }
 
         if (givenNetwork instanceof BackpropagationMLP) {
-            return new PopulationPerson<>(
-                new BackpropagationMLP(
+            PopulationPerson<P> populationPerson1 = new PopulationPerson<>(
+                (P)new BackpropagationMLP(
                     networkLayers,
                     ((BackpropagationMLP) givenNetwork).LEARN_RATE,
                     neuroevolutionProblem.getProblem().getTrainingDataset().getFeatures(),
                     neuroevolutionProblem.getProblem().getTrainingDataset().getTargets()
                 )
             );
+            return populationPerson1;
         }
         else {
-            return new PopulationPerson<>(new NeuralNetwork(networkLayers, 2));
+            return new PopulationPerson<>((P)new NeuralNetwork(networkLayers, 2));
         }
     }
 
     @Override
-    public double computeFitness(PopulationPerson<Network> populationPerson, DatasetType datasetType) {
+    public double computeFitness(PopulationPerson<P> populationPerson, DatasetType datasetType) {
         return computeFitness(populationPerson, getDataset(datasetType));
     }
 
@@ -124,21 +125,19 @@ public class NeuroevolutionNetworkPersonManager<P> implements NeuroevolutionPers
         }
     }
 
-    private double computeFitness(PopulationPerson<Network> populationPerson, RawDataset rawDataset) {
+    private double computeFitness(PopulationPerson<P> populationPerson, RawDataset rawDataset) {
         double fitness;
 
         if (populationPerson.getGeneCode() instanceof TimeNetwork) {
             TimeNetwork timeNetwork = (TimeNetwork) populationPerson.getGeneCode();
             timeNetwork.startCompute();
 
-            fitness = neuroevolutionProblem.evaluateNetwork(timeNetwork, rawDataset);
+            fitness = neuroevolutionProblem.evaluateNetwork((P) timeNetwork, rawDataset);
 
             timeNetwork.endCompute();
         }
         else {
-            Network network = populationPerson.getGeneCode();
-
-            fitness = neuroevolutionProblem.evaluateNetwork(network, rawDataset);
+            fitness = neuroevolutionProblem.evaluateNetwork(populationPerson.getGeneCode(), rawDataset);
         }
 
         return fitness;

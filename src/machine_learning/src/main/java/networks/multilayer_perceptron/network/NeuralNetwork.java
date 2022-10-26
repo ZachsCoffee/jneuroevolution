@@ -5,7 +5,6 @@
  */
 package networks.multilayer_perceptron.network;
 
-import core.layer.ConvolutionSchemaPrinter;
 import core.layer.MatrixReader;
 import core.layer.MatrixSchema;
 import core.layer.TrainableLayer;
@@ -15,13 +14,14 @@ import maths.matrix.Matrix2D;
 import networks.interfaces.Network;
 import maths.MinMax;
 import core.schema.SchemaRow;
+import networks.interfaces.PartialNetwork;
 
 import java.util.Arrays;
 
 /**
  * @author main
  */
-public class NeuralNetwork implements Network, TrainableLayer {
+public class NeuralNetwork implements PartialNetwork {
 
     public static Network buildRandomSizeNetwork(
         int inputFeatures,
@@ -78,11 +78,24 @@ public class NeuralNetwork implements Network, TrainableLayer {
         return returnedNetwork;
     }
 
+    private static boolean[] createArrayWithTrueValues(int length) {
+        boolean[] array = new boolean[length];
+
+        Arrays.fill(array, true);
+
+        return array;
+    }
+
     public final int MAX_START_VALUE;
     protected final NetworkLayer[] layers;
     protected final double[] weights;
+    protected final boolean[] weightStatuses;
 
     public NeuralNetwork(double[] weights, NetworkLayer[] layers) {
+        this(weights, createArrayWithTrueValues(weights.length), layers);
+    }
+
+    public NeuralNetwork(double[] weights, boolean[] weightStatuses, NetworkLayer[] layers) {
         this(layers);
 
         if (weights.length != this.weights.length) throw new IllegalArgumentException(
@@ -90,6 +103,7 @@ public class NeuralNetwork implements Network, TrainableLayer {
         );
 
         System.arraycopy(weights, 0, this.weights, 0, this.weights.length);
+        System.arraycopy(weightStatuses, 0, this.weightStatuses, 0, this.weightStatuses.length);
     }
 
     public NeuralNetwork(NetworkLayer[] layers) {
@@ -113,6 +127,7 @@ public class NeuralNetwork implements Network, TrainableLayer {
         }
 
         weights = new double[sumOfWeights];
+        weightStatuses = createArrayWithTrueValues(sumOfWeights);
 
         MAX_START_VALUE = maxStartValue;
 
@@ -123,7 +138,7 @@ public class NeuralNetwork implements Network, TrainableLayer {
         int startPoint = 0;
         for (int i = 0; i < layers.length; i++) {
             layers[i].maxStartValue = MAX_START_VALUE;
-            layers[i].buildNeurons(weights, startPoint);
+            layers[i].buildNeurons(weights, weightStatuses, startPoint);
             startPoint += layers[i].getNeuronsCount() * layers[i].totalWeightsCount;
         }
     }
@@ -143,13 +158,13 @@ public class NeuralNetwork implements Network, TrainableLayer {
     }
 
     @Override
-    public double getWeightAt(int position) {
-        return weights[position];
+    public double getWeightAt(int index) {
+        return weights[index];
     }
 
     @Override
-    public void setWeightAt(int position, double value) {
-        weights[position] = value;
+    public void setWeightAt(int index, double value) {
+        weights[index] = value;
     }
 
     public NetworkLayer getLayerAt(int position) {
@@ -235,6 +250,21 @@ public class NeuralNetwork implements Network, TrainableLayer {
         }
 
         return output + "\n";
+    }
+
+    @Override
+    public void setWeightStatus(int index, boolean status) {
+        weightStatuses[index] = status;
+    }
+
+    @Override
+    public boolean getWeightStatus(int index) {
+        return weightStatuses[index];
+    }
+
+    @Override
+    public void reverseWeightStatus(int index) {
+        weightStatuses[index] = !weightStatuses[index];
     }
 
     protected double[] computeLayer(int layerIndex, double[] features) {

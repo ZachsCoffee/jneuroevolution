@@ -5,17 +5,26 @@
  */
 package neuroevolution;
 
-import core.layer.TrainableLayer;
 import evolution_builder.population.Genes;
-import networks.interfaces.Network;
 import evolution_builder.population.PopulationPerson;
+import networks.interfaces.PartialNetwork;
 
 /**
- *
  * @author Zachs
  */
-public class NeuroevolutionGenes<L extends TrainableLayer> implements Genes<Double, L> {
+public class NeuroevolutionGenes<L extends PartialNetwork> implements Genes<Double, L> {
+
     static int maxStartValue = 1;
+
+    private final NeuroevolutionGenesOptions neuroevolutionGenesOptions;
+
+    public NeuroevolutionGenes() {
+        this(NeuroevolutionGenesOptions.Builder.getInstance().build());
+    }
+
+    public NeuroevolutionGenes(NeuroevolutionGenesOptions neuroevolutionGenesOptions) {
+        this.neuroevolutionGenesOptions = neuroevolutionGenesOptions;
+    }
 
     @Override
     public Double getGenAt(PopulationPerson<L> populationPerson, int position) {
@@ -28,13 +37,34 @@ public class NeuroevolutionGenes<L extends TrainableLayer> implements Genes<Doub
     }
 
     @Override
-    public void mutationValue(PopulationPerson<L> populationPerson, int position, double mutationValue) {
+    public void mutationValue(
+        PopulationPerson<L> populationPerson,
+        int index,
+        double mutationValue,
+        double maxMutationValue,
+        boolean withNegative
+    ) {
         L network = populationPerson.getGeneCode();
-        double weight = network.getWeightAt(position);
-        if (weight + mutationValue > maxStartValue){
-            maxStartValue = (int)(weight + mutationValue);
+
+        if (neuroevolutionGenesOptions.hasDeactivationChange()) {
+            if (mutationValue <= maxMutationValue * neuroevolutionGenesOptions.getWeightStatusMutationChance()) {
+                network.reverseWeightStatus(index);
+            }
+            else {
+                mutateWeight(network, index, mutationValue);
+            }
         }
-        network.setWeightAt(position, weight + mutationValue);
+        else {
+            mutateWeight(network, index, mutationValue);
+        }
+    }
+
+    private void mutateWeight(L network, int index, double mutationValue) {
+        double weight = network.getWeightAt(index);
+        if (weight + mutationValue > maxStartValue) {
+            maxStartValue = (int) (weight + mutationValue);
+        }
+        network.setWeightAt(index, weight + mutationValue);
     }
 
     @Override

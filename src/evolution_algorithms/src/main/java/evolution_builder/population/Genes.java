@@ -14,7 +14,7 @@ public interface Genes<T, P> {
 
     void setGenAt(PopulationPerson<P> populationPerson, T gene, int position);
 
-    void mutationValue(PopulationPerson<P> populationPerson, int position, double mutationValue);
+    void mutationValue(PopulationPerson<P> populationPerson, int index, double mutationValue, double maxMutationValue, boolean withNegative);
 
     int genesCount(PopulationPerson<P> populationPerson);
 }

@@ -14,8 +14,8 @@ import core.layer.TrainableLayer;
 public interface Network extends TrainableLayer {
     double[] compute(double[] features);
     
-    double getWeightAt(int position);
-    void setWeightAt(int position, double weight);
+    double getWeightAt(int index);
+    void setWeightAt(int index, double weight);
     
     int getTotalWeights();
 }

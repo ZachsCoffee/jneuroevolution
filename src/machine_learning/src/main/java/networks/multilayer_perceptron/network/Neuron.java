@@ -14,14 +14,15 @@ public class Neuron {
     public static final int EXTRA_WEIGHTS = 2;
     protected final int START_POINT, END_POINT, ADD_BIAS_POS, MUL_BIAS_POS;
     protected final Function function;
-    protected double[] allWeights;
+    protected final double[] allWeights;
+    protected final boolean[] weightStatuses;
     private double neuronSum;
 
-    Neuron(double[] allWeights, int startPoint, int endPoint, int maxStartValue) {
-        this(allWeights, startPoint, endPoint, maxStartValue, null);
+    Neuron(double[] allWeights, boolean[] weightStatuses, int startPoint, int endPoint, int maxStartValue) {
+        this(allWeights, weightStatuses, startPoint, endPoint, maxStartValue, null);
     }
 
-    Neuron(double[] allWeights, int startPoint, int endPoint, int maxStartValue, Function function) {
+    Neuron(double[] allWeights, boolean[] weightStatuses, int startPoint, int endPoint, int maxStartValue, Function function) {
         if (allWeights == null) {
             throw new IllegalArgumentException(
                     "Arguments, at pos 1: not null."
@@ -31,6 +32,7 @@ public class Neuron {
         END_POINT = endPoint;
         START_POINT = startPoint;
         this.allWeights = allWeights;
+        this.weightStatuses = weightStatuses;
 
         ADD_BIAS_POS = endPoint - 1;
         MUL_BIAS_POS = endPoint - 2;
@@ -98,39 +100,20 @@ public class Neuron {
         }
 
         double sum = 0;
-        if (function == null) {
-            for (int i = START_POINT; i < END_POINT - EXTRA_WEIGHTS; i++) {
+
+        for (int i = START_POINT; i < END_POINT - EXTRA_WEIGHTS; i++) {
+            if (weightStatuses[i]) {
                 sum += allWeights[i] * features[i - START_POINT];
             }
+        }
 
-            sum = sum + allWeights[ADD_BIAS_POS];
-//            sum = (sum + allWeights[ADD_BIAS_POS]) * allWeights[MUL_BIAS_POS];
+        neuronSum = sum + allWeights[ADD_BIAS_POS];
 
-//          origin  sum = sum * allWeights[MUL_BIAS_POS] + allWeights[ADD_BIAS_POS];
-
-//            sum += allWeights[ADD_BIAS_POS];
-//            sum *= allWeights[MUL_BIAS_POS];
-
-            neuronSum = sum;
-
-            return sum;
+        if (function == null) {
+            return neuronSum;
         }
         else {
-            for (int i = START_POINT; i < END_POINT - EXTRA_WEIGHTS; i++) {
-                sum += allWeights[i] * features[i - START_POINT];
-            }
-
-            sum = sum + allWeights[ADD_BIAS_POS];
-
-//            sum = (sum + allWeights[ADD_BIAS_POS]) * allWeights[MUL_BIAS_POS];
-//          origin  sum = sum * allWeights[MUL_BIAS_POS] + allWeights[ADD_BIAS_POS];
-
-//            sum += allWeights[ADD_BIAS_POS];
-//            sum *= allWeights[MUL_BIAS_POS];
-
-            neuronSum = sum;
-
-            return function.compute(sum);
+            return function.compute(neuronSum);
         }
     }
 }
