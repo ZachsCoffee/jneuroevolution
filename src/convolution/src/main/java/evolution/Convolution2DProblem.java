@@ -2,9 +2,9 @@ package evolution;
 
 import core.layer.TrainableLayer;
 import dataset.MatrixReaderDataset;
-import execution.common.CommonProblem;
+import execution.common.SupervisedProblem;
 
-public interface Convolution2DProblem extends CommonProblem<TrainableLayer, MatrixReaderDataset> {
+public interface Convolution2DProblem extends SupervisedProblem<TrainableLayer, MatrixReaderDataset> {
 
     TrainableLayer buildConvolution();
 

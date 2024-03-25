@@ -4,9 +4,7 @@ import data_manipulation.DatasetTarget;
 import data_manipulation.DatasetType;
 import evolution_builder.components.EvolutionPhases;
 
-public interface CommonProblem<P, D extends DatasetTarget> extends EvolutionPhases<P> {
-
-    NeuroevolutionPersonManager<P> getPersonManager();
+public interface SupervisedProblem<P, D extends DatasetTarget> extends EvolutionPhases<P>, GenericProblem<P> {
 
     D getTrainingDataset();
 

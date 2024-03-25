@@ -8,7 +8,6 @@ import evolution_builder.components.Mutation;
 import evolution_builder.components.Recombination;
 import evolution_builder.components.Selection;
 import evolution_builder.population.Population;
-import execution.AbstractNeuroevolutionProblem;
 import execution.common.NeuroevolutionPersonManager;
 import execution.Problem;
 import files.csv.CSVFileReader;
@@ -19,7 +18,7 @@ import networks.multilayer_perceptron.builders.NeuralNetworkBuilder;
 import neuroevolution.NeuroevolutionGenes;
 import neuroevolution.NeuroevolutionNetworkPersonManager;
 
-public class AustralianCreditProblem extends AbstractNeuroevolutionProblem<Network, RawDataset> {
+public class AustralianCreditProblem extends Problem<Network, RawDataset> implements execution.common.NeuroevolutionProblem<Network> {
 
     public static final int EPOCHS = 500;
 

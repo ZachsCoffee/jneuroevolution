@@ -7,14 +7,14 @@ package execution;
 
 import data_manipulation.DatasetTarget;
 import data_manipulation.DatasetType;
-import execution.common.CommonProblem;
+import execution.common.SupervisedProblem;
 import maths.LinearValues;
 import maths.MinMax;
 
 /**
  * @author Zachs
  */
-public abstract class Problem<P, D extends DatasetTarget> implements CommonProblem<P, D> {
+public abstract class Problem<P, D extends DatasetTarget> implements SupervisedProblem<P, D> {
 
     protected D
         trainingDataset,

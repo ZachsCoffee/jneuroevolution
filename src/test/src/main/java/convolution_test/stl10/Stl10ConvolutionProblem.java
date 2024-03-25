@@ -3,6 +3,7 @@ package convolution_test.stl10;
 import common.TrainableConvolutionSystemBuilder;
 import core.layer.MatrixReader;
 import core.layer.TrainableLayer;
+import data_manipulation.RawDataset;
 import dataset.MatrixReaderDataset;
 import evolution.AbstractConvolution2DProblem;
 import evolution.ConvolutionGenes;
@@ -18,6 +19,7 @@ import input.RawImageInput;
 import layers.pool.PoolFunction;
 import maths.MinMax;
 import multithreaded.RecursiveEvaluation;
+import networks.interfaces.Network;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -186,6 +188,21 @@ public class Stl10ConvolutionProblem extends AbstractConvolution2DProblem {
             trainImages.toArray(new MatrixReader[0][]),
             trainTargets.toArray(new double[0][])
         );
+    }
+
+    @Override
+    public Network buildNetwork(int maxStartValue) {
+        return null;
+    }
+
+    @Override
+    public Network buildRandomNetwork(int maxStartValue) {
+        return null;
+    }
+
+    @Override
+    public double evaluateNetwork(Network network, RawDataset rawDataset) {
+        return 0;
     }
 
     @Override
