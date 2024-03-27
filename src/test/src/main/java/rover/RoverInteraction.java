@@ -26,7 +26,15 @@ public class RoverInteraction extends AbstractRoverInteraction {
 
     @Override
     public void died() {
+//        System.out.println("@@@DIED@@@");
         diedAction.run();
+    }
+
+    @Override
+    public void rockCollected(Position currentPosition) {
+        super.rockCollected(currentPosition);
+        points += 100;
+        System.out.println("Rock collected!");
     }
 
     @Override
@@ -39,6 +47,8 @@ public class RoverInteraction extends AbstractRoverInteraction {
         super.biochemicalReactionObserved(position);
 
         points += BIOCHEMICAL_REACTIONS_POINTS;
+
+        System.out.println("Biochemical observed!");
     }
 
     public int getPoints() {
@@ -59,7 +69,37 @@ public class RoverInteraction extends AbstractRoverInteraction {
             );
         }
 
+        if (nextRoverAction == RoverAction.MOVE) {
+            points++;
+        }
+
+//        System.out.print("\b\b\b\b\b\b\b\b\b\b\b\b\b\b "+nextRoverAction + " " + rover.getEnergyLevel());
+
         return nextRoverAction;
+    }
+
+    @Override
+    public void failedToCollectRock() {
+//        System.out.println("@@Rock Not Collected!");
+
+//        points -= 50;
+    }
+
+    @Override
+    public void failedToObserveBiochemical() {
+//        System.out.println("@@Biochemical Not Observed!");
+
+//        points -= 50;
+    }
+
+    @Override
+    public void failedToRecharge() {
+//        points -= 50;
+    }
+
+    @Override
+    public void failedToUnload() {
+//        points -= 50;
     }
 
     private double[] normalizeRover(Rover rover) {
@@ -72,27 +112,25 @@ public class RoverInteraction extends AbstractRoverInteraction {
             for (int j = 0; j < vision[i].length; j++) {
                 for (BlockType blockType : BlockType.values()) {
                     var blockTypes = vision[i][j];
-                    if (blockTypes == null) {
-                        continue;
+                    if (blockTypes != null) {
+                        input[inputIndex] = blockTypes.contains(blockType)
+                                ? 1
+                                : 0;
                     }
-                    input[inputIndex] = blockTypes.contains(blockType)
-                        ? 1
-                        : 0;
                     inputIndex++;
                 }
             }
         }
 
-        input[inputIndex++] = rover.getPosition().x;
-        input[inputIndex++] = rover.getPosition().y;
-        input[inputIndex++] = rover.getStorageLevel();
-        input[inputIndex++] = rover.getEnergyLevel();
+        input[inputIndex++] = normalize(rover.getPosition().x, 0, world.getMap().x());
+        input[inputIndex++] = normalize(rover.getPosition().y, 0, world.getMap().y());
+        input[inputIndex++] = normalize(rover.getStorageLevel(), 0, Rover.STORAGE_CAPACITY);
+        input[inputIndex++] = normalize(rover.getEnergyLevel(), 0, Rover.BATTERY_CAPACITY);
 
-        input[inputIndex++] = rover.getEnergyLevel();
         Position basePosition = world.getBase().getPosition();
 
-        input[inputIndex++] = basePosition.x;
-        input[inputIndex++] = basePosition.y;
+        input[inputIndex++] = normalize(basePosition.x, 0, world.getMap().x());
+        input[inputIndex++] = normalize(basePosition.y, 0, world.getMap().y());
 
         return input;
     }
@@ -107,6 +145,12 @@ public class RoverInteraction extends AbstractRoverInteraction {
         int position = softmax(from, to, results);
 
         return Direction.values()[position - from];
+    }
+
+    private double normalize(double value, double min, double max) {
+        var range = max - min;
+
+        return (value - min) / range;
     }
 
     private int softmax(int from, int to, double[] results) {

@@ -11,11 +11,12 @@ import maths.Function;
  * @author main
  */
 public class Neuron {
-    public static final int EXTRA_WEIGHTS = 2;
-    protected final int START_POINT, END_POINT, ADD_BIAS_POS, MUL_BIAS_POS;
+    public static final int EXTRA_WEIGHTS = 3;
+    protected final int START_POINT, END_POINT, ADD_BIAS_POS, MUL_BIAS_POS, RECURRENT_POS;
     protected final Function function;
     protected double[] allWeights;
     private double neuronSum;
+    private double oldOutput = 0;
 
     Neuron(double[] allWeights, int startPoint, int endPoint, int maxStartValue) {
         this(allWeights, startPoint, endPoint, maxStartValue, null);
@@ -34,6 +35,7 @@ public class Neuron {
 
         ADD_BIAS_POS = endPoint - 1;
         MUL_BIAS_POS = endPoint - 2;
+        RECURRENT_POS = endPoint - 3;
 
         for (int i = startPoint; i < endPoint; i++) {
             allWeights[i] = Math.random() * (maxStartValue * 2) - maxStartValue;
@@ -103,7 +105,7 @@ public class Neuron {
                 sum += allWeights[i] * features[i - START_POINT];
             }
 
-            sum = sum + allWeights[ADD_BIAS_POS];
+            sum += allWeights[ADD_BIAS_POS] + oldOutput * allWeights[RECURRENT_POS];
 //            sum = (sum + allWeights[ADD_BIAS_POS]) * allWeights[MUL_BIAS_POS];
 
 //          origin  sum = sum * allWeights[MUL_BIAS_POS] + allWeights[ADD_BIAS_POS];
@@ -111,7 +113,7 @@ public class Neuron {
 //            sum += allWeights[ADD_BIAS_POS];
 //            sum *= allWeights[MUL_BIAS_POS];
 
-            neuronSum = sum;
+            oldOutput = neuronSum = sum;
 
             return sum;
         }
@@ -120,7 +122,8 @@ public class Neuron {
                 sum += allWeights[i] * features[i - START_POINT];
             }
 
-            sum = sum + allWeights[ADD_BIAS_POS];
+            sum += allWeights[ADD_BIAS_POS] + oldOutput * allWeights[RECURRENT_POS];
+
 
 //            sum = (sum + allWeights[ADD_BIAS_POS]) * allWeights[MUL_BIAS_POS];
 //          origin  sum = sum * allWeights[MUL_BIAS_POS] + allWeights[ADD_BIAS_POS];
@@ -130,7 +133,9 @@ public class Neuron {
 
             neuronSum = sum;
 
-            return function.compute(sum);
+            oldOutput = function.compute(sum);
+
+            return oldOutput;
         }
     }
 }

@@ -20,7 +20,7 @@ import com.landscraper.rover.common.BlockType;
 public class RoverProblem implements GenericProblem<Network> {
     public static final int
             POSSIBLE_BLOCK_TYPES = BlockType.values().length,
-            VISION_RANGE = 11,
+            VISION_RANGE = 11 * 11,
             ROVER_POSITION = 2,
             STORAGE_LEVEL = 1,
             ENERGY_LEVEL = 1,
@@ -48,10 +48,10 @@ public class RoverProblem implements GenericProblem<Network> {
 
     private Network buildNetwork() {
         return NeuralNetworkBuilder.initialize(INPUT_LENGTH)
-                .addLayer(200, ActivationFunction.SIGMOID.getFunction())
-                .addLayer(100, ActivationFunction.SIGMOID.getFunction())
-                .addLayer(50, ActivationFunction.SIGMOID.getFunction())
-                .addLayer(ROVER_ACTIONS_COUNT + DIRECTIONS, ActivationFunction.RELU.getFunction())
+//                .addLayer(100, ActivationFunction.SIGMOID.getFunction())
+//                .addLayer(100, ActivationFunction.SIGMOID.getFunction())
+//                .addLayer(50, ActivationFunction.SIGMOID.getFunction())
+                .addLayer(ROVER_ACTIONS_COUNT + DIRECTIONS, ActivationFunction.SIGMOID.getFunction())
                 .build();
 
     }
@@ -84,12 +84,12 @@ public class RoverProblem implements GenericProblem<Network> {
 
     @Override
     public Population<Network> selectionMethod(Population<Network> population) {
-        return Selection.tournament(population, 5, false);
+        return Selection.tournament(population, 2, false);
     }
 
     @Override
     public void mutationMethod(Population<Network> population, int epoch, int maxEpoch) {
-        Mutation.mutation(population, 1000, 2, true, genes);
+        Mutation.mutation(population, 100, 2, true, genes);
     }
 
     @Override

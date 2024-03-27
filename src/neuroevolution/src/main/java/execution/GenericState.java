@@ -39,6 +39,7 @@ public class GenericState<P> implements EvolutionStage<P> {
         if (progressListener != null) {
             progressListener.epochUpdate(epoch);
         }
+        System.out.println("End of Epoch: " + epoch);
     }
 
     @Override

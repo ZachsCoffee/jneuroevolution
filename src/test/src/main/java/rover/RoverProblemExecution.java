@@ -8,8 +8,9 @@ public class RoverProblemExecution extends GenericProblemExecutor<Network, Rover
     public RoverProblemExecution(RoverProblem problem) {
         super(problem);
 
-        threads = 1;
-        epochs = 10;
+        threads = 4;
+        epochs = 100;
+        populationSize = 5;
     }
 
     @Override
